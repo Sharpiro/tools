@@ -1,6 +1,7 @@
 #load "./load/objects.csx"
 #load "./load/sheet.csx"
 #load "./load/io.csx"
+#load "../../shared/Blake2Scripted.csx"
 
 using System.Security.Cryptography;
 
@@ -39,6 +40,7 @@ static string hex(byte[] buffer) => string.Join(string.Empty, buffer.Select(b =>
 static byte[] sha128(byte[] buffer) => SHA1.Create().ComputeHash(buffer);
 static byte[] sha256(byte[] buffer) => SHA256.Create().ComputeHash(buffer);
 static byte[] sha(byte[] buffer) => sha256(buffer);
+static byte[] blake2(byte[] buffer) => Blake2Scripted.Create().ComputeHash(buffer);
 // static byte[] ripemd(byte[] buffer) => RIPEMD160.Create().ComputeHash(buffer);
 // static byte[] hash160(byte[] buffer) => ripemd(sha256(buffer));
 static byte[] hmac256(byte[] key, byte[] message) => new HMACSHA256(key).ComputeHash(message);

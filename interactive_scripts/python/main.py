@@ -1,13 +1,14 @@
 import hashlib
 import inspect
 import binascii
+import numpy
 
 irreduciblePolynomial = 0x11b
 
 
 def binary(number, maxPadding=8):
-    binary = bin(number)[2:]
-    return ("0"*maxPadding)[len(binary):] + binary
+    binaryData = bin(number)[2:]
+    return ("0"*maxPadding)[len(binaryData):] + binaryData
 
 
 def gfMul(a, b):
@@ -29,9 +30,9 @@ def sha(data):
 def buffer(data="", encoding="hex"):
     if encoding == "hex":
         return bytearray.fromhex(data)
-    if (encoding == "utf8"):
+    if encoding == "utf8":
         return bytearray(data, encoding)
-    if (encoding == "base64"):
+    if encoding == "base64":
         return bytearray(binascii.a2b_base64(data))
     return bytearray()
 
@@ -61,5 +62,16 @@ def fast(start, end):
     return (end - start) % 24
 
 
-def list(func):
-    return inspect.getargspec(func)
+def listFunc2(func):
+    return inspect.getfullargspec(func)
+
+
+def listFunc3(func):
+    return inspect.signature(func)
+
+
+def mortgage(ratePercent, mortgagePeriodYears, presentValue):
+    rate = ratePercent / 100 / 12
+    numberOfPeriods = mortgagePeriodYears * 12
+    monthlyPayment = numpy.pmt(rate, numberOfPeriods, presentValue)
+    return monthlyPayment, monthlyPayment * numberOfPeriods, 13

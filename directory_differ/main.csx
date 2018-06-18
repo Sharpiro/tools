@@ -1,6 +1,5 @@
 #! "netcoreapp2.0"
-#r "ref/Blake2Sharp.dll"
-#load "Blake2Scripted.csx"
+#load "../shared/Blake2Scripted.csx"
 
 using System.Security.Cryptography;
 using Blake2Sharp;
