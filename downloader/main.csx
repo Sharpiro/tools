@@ -6,21 +6,25 @@ using System.Net.Http;
 
 var byteObfuscator = new ByteSwapper();
 var parsedArguments = ParseArgs();
-var requstInfo = GetRequestInfo(parsedArguments.urlArgument, parsedArguments.options);
-WriteLine($"environmentProxyUrl: '{requstInfo.EnvironmentProxy}'");
-WriteLine($"Proxy: '{requstInfo.Proxy}'");
-WriteLine($"RequestUrl: '{requstInfo.RequestUrl}'");
-WriteLine($"encodedRequestUrl: '{requstInfo.EncodedRequestUrl}'");
-WriteLine($"generatedRequestUrl: '{requstInfo.GeneratedRequestUrl}'");
+var requestInfo = GetRequestInfo(parsedArguments.urlArgument, parsedArguments.options);
+if (requestInfo.IsDebug)
+{
+    WriteLine($"environmentProxyUrl: '{requestInfo.EnvironmentProxy}'");
+    WriteLine($"Proxy: '{requestInfo.Proxy}'");
+    WriteLine($"RequestUrl: '{requestInfo.RequestUrl}'");
+    WriteLine($"encodedRequestUrl: '{requestInfo.EncodedRequestUrl}'");
+    WriteLine($"generatedRequestUrl: '{requestInfo.GeneratedRequestUrl}'\r\n\r\n");
+}
 
-var httpClientHandler = new HttpClientHandler { Proxy = new WebProxy(requstInfo.EnvironmentProxy) };
-var httpClient = requstInfo.EnvironmentProxy == null ? new HttpClient() : new HttpClient(httpClientHandler, disposeHandler: true);
-var res = await httpClient.GetAsync(requstInfo.GeneratedRequestUrl);
+var httpClientHandler = new HttpClientHandler { Proxy = new WebProxy(requestInfo.EnvironmentProxy) };
+var httpClient = requestInfo.EnvironmentProxy == null ? new HttpClient() : new HttpClient(httpClientHandler, disposeHandler: true);
+var res = await httpClient.GetAsync(requestInfo.GeneratedRequestUrl);
+res.EnsureSuccessStatusCode();
 var bytes = (await res.Content.ReadAsByteArrayAsync()).Select(byteObfuscator.Obfuscate).ToArray();
 
-if (requstInfo.FileName != null)
+if (requestInfo.FileName != null)
 {
-    File.WriteAllBytes(requstInfo.FileName, bytes);
+    File.WriteAllBytes(requestInfo.FileName, bytes);
     return;
 }
 
@@ -50,12 +54,15 @@ RequestInfo GetRequestInfo(string urlArgument, Dictionary<string, string> option
 
     options.TryGetValue("-f", out string fileName);
     options.TryGetValue("-p", out string proxy);
+    options.TryGetValue("-d", out string isDebugString);
+    bool.TryParse(isDebugString, out bool isDebug);
 
     var requestInfo = new RequestInfo(byteObfuscator)
     {
         RequestUrl = urlArgument,
         FileName = fileName,
         Proxy = proxy ?? defaultProxy,
+        IsDebug = isDebug
     };
     return requestInfo;
 }
