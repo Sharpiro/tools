@@ -1,11 +1,15 @@
+#r "nuget: Newtonsoft.Json, 11.0.2"
+
 #load "./load/objects.csx"
 #load "./load/sheet.csx"
 #load "./load/io.csx"
 #load "../../shared/Blake2Scripted.csx"
 
 using System.Security.Cryptography;
+using Newtonsoft.Json;
 
-static byte[] buffer(int size) => new byte[size];
+static public byte[] readBuffer => json<byte[]>(ReadLine());
+static byte[] buffer(int size) => size >= 0 ? new byte[size] : readBuffer;
 static byte[] buffer(string data = "", string encoding = "hex")
 {
     if (string.IsNullOrEmpty(data)) return new byte[0];
@@ -36,6 +40,9 @@ static byte[] random(int size = 32)
     return buffer;
 }
 
+static object json(string jsonText) => JsonConvert.DeserializeObject(jsonText);
+static T json<T>(string jsonText) => JsonConvert.DeserializeObject<T>(jsonText);
+static string json<T>(T json) => JsonConvert.SerializeObject(json);
 static string hex(byte[] buffer) => string.Join(string.Empty, buffer.Select(b => b.ToString("x2")));
 static byte[] sha128(byte[] buffer) => SHA1.Create().ComputeHash(buffer);
 static byte[] sha256(byte[] buffer) => SHA256.Create().ComputeHash(buffer);

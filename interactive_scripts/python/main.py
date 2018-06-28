@@ -16,6 +16,22 @@ def binary(number, maxPadding=8, endianness="be"):
     return separatedBinary
 
 
+def binList(byteIterable, maxPadding=8):
+    bits = list()
+    for byte in byteIterable:
+        binaryData = bin(byte)[2:]
+        paddedBinary = ("0"*maxPadding)[len(binaryData):] + binaryData
+        bits.append(paddedBinary)
+    print("-".join(bits))
+
+
+def fromBinList(binaryString, split=8):
+    bitGroups = list((binaryString[i:i+split] for i in range(0, len(binaryString), split)))
+    numberGroups = (str(int(x, 2)) for x in bitGroups)
+    print("-".join(bitGroups))
+    print("-".join(numberGroups))
+
+
 def gfMul(a, b):
     z = 0
     while a > 0:
