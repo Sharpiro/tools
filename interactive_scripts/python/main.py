@@ -6,9 +6,14 @@ import numpy
 irreduciblePolynomial = 0x11b
 
 
-def binary(number, maxPadding=8):
+def binary(number, maxPadding=8, endianness="be"):
     binaryData = bin(number)[2:]
-    return ("0"*maxPadding)[len(binaryData):] + binaryData
+    paddedBinary = ("0"*maxPadding)[len(binaryData):] + binaryData
+    byteGroups = (paddedBinary[i:i+8] for i in range(0, len(paddedBinary), 8))
+    if endianness == "le":
+        byteGroups = reversed(list(byteGroups))
+    separatedBinary = "-".join(byteGroups)
+    return separatedBinary
 
 
 def gfMul(a, b):
