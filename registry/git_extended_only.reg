@@ -1,0 +1,6 @@
+Windows Registry Editor Version 5.00
+; force git context menu actions to be shift-right-click only
+[HKEY_LOCAL_MACHINE\Software\Classes\Directory\Background\shell\git_gui]
+"Extended"=""
+[HKEY_LOCAL_MACHINE\Software\Classes\Directory\Background\shell\git_shell]
+"Extended"=""
