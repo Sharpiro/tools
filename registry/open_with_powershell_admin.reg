@@ -1,26 +1,25 @@
 Windows Registry Editor Version 5.00
-; Open files
+
+; file
 [HKEY_CURRENT_USER\Software\Classes\*\shell\pshelladmin]
-@="Open with admin powershell"
-"Icon"="C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe,0"
+@="Open with powershell admin"
+"Icon"="powershell.exe"
 "Extended"=""
 [HKEY_CURRENT_USER\Software\Classes\*\shell\pshelladmin\command]
-@="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -Command \"start powershell -verb runas -argumentList \\\"-noexit cd '%V'\\\"\""
+@="powershell -Command \"start powershell -verb runas -argumentList \\\"-noexit cd '`\\\"$((Get-Item -Path `\\\".`\\`\\\").FullName)'\\\"\""
 
-; This will make it appear when you right click ON a folder
-; The "Icon" line can be removed if you don't want the icon to appear
+; folder
 [HKEY_CURRENT_USER\Software\Classes\Directory\shell\pshelladmin]
-@="Open with admin powershell"
-"Icon"="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\",0"
+@="Open with powershell admin"
+"Icon"="powershell.exe"
 "Extended"=""
 [HKEY_CURRENT_USER\Software\Classes\Directory\shell\pshelladmin\command]
-@="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -Command \"start powershell -verb runas -argumentList \\\"-noexit cd '`%L`\\\"'\\\"\""
+@="powershell -Command \"start powershell -verb runas -argumentList \\\"-noexit cd '`%L`\\\"'\\\"\""
 
-; This will make it appear when you right click INSIDE a folder
-; The "Icon" line can be removed if you don't want the icon to appear
+; background folder
 [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\pshelladmin]
-@="Open with admin powershell"
-"Icon"="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\",0"
+@="Open with powershell admin"
+"Icon"="powershell.exe"
 "Extended"=""
 [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\pshelladmin\command]
-@="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -Command \"start powershell -verb runas -argumentList \\\"-noexit cd '%V'\\\"\""
+@="powershell -Command \"start powershell -verb runas -argumentList \\\"-noexit cd '%V'\\\"\""

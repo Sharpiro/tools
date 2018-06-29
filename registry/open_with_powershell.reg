@@ -1,21 +1,20 @@
 Windows Registry Editor Version 5.00
-; Open files
+
+; file
 [HKEY_CURRENT_USER\Software\Classes\*\shell\pshell]
 @="Open with powershell"
 "Icon"="C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe,0"
 [HKEY_CURRENT_USER\Software\Classes\*\shell\pshell\command]
 @="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\""
 
-; This will make it appear when you right click ON a folder
-; The "Icon" line can be removed if you don't want the icon to appear
+; folder
 [HKEY_CURRENT_USER\Software\Classes\Directory\shell\pshell]
 @="Open with powershell"
 "Icon"="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\",0"
 [HKEY_CURRENT_USER\Software\Classes\Directory\shell\pshell\command]
-@="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -NoExit -Command Set-Location -LiteralPath '%L'"
+@="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -noexit cd '%L'"
 
-; This will make it appear when you right click INSIDE a folder
-; The "Icon" line can be removed if you don't want the icon to appear
+; background folder
 [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\pshell]
 @="Open with powershell"
 "Icon"="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\",0"

@@ -1,23 +1,23 @@
 Windows Registry Editor Version 5.00
-; Open files
+
+
+; file
 [HKEY_CURRENT_USER\Software\Classes\*\shell\cprompt]
 @="Open with cmd"
-"Icon"="C:\\windows\\System32\\cmd.exe,0"
+"Icon"="cmd.exe"
 [HKEY_CURRENT_USER\Software\Classes\*\shell\cprompt\command]
-@="\"C:\\windows\\System32\\cmd.exe\""
+@="cmd"
 
-; This will make it appear when you right click ON a folder
-; The "Icon" line can be removed if you don't want the icon to appear
+; folder
 [HKEY_CURRENT_USER\Software\Classes\Directory\shell\cprompt]
 @="Open with cmd"
-"Icon"="\"C:\\windows\\System32\\cmd.exe\",0"
+"Icon"="cmd.exe"
 [HKEY_CURRENT_USER\Software\Classes\Directory\shell\cprompt\command]
-@="\"C:\\windows\\System32\\cmd.exe\" /s /k pushd \"%V\""
+@="cmd /s /k pushd \"%V\""
 
-; This will make it appear when you right click INSIDE a folder
-; The "Icon" line can be removed if you don't want the icon to appear
+; background folder
 [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\cprompt]
 @="Open with cmd"
-"Icon"="\"C:\\windows\\System32\\cmd.exe\",0"
+"Icon"="cmd.exe"
 [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\cprompt\command]
-@="\"C:\\windows\\System32\\cmd.exe\""
+@="cmd"
