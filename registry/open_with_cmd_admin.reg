@@ -6,7 +6,9 @@ Windows Registry Editor Version 5.00
 "Icon"="cmd.exe"
 "Extended"=""
 [HKEY_CURRENT_USER\Software\Classes\*\shell\cpromptadmin\command]
-@="powershell -Command \"start powershell -verb runas -argumentList \\\"-noexit cmd /K cd '`\\\"$((Get-Item -Path `\\\".`\\`\\\").FullName)'\\\"\""
+; @="powershell -Command \"start powershell -verb runas -argumentList \\\"-noexit cmd /K cd '`\\\"$((Get-Item -Path `\\\".`\\`\\\").FullName)'\\\"\""
+@="powershell -Command \"start cmd -verb runas -argumentList \\\"/K echo '`\\\"$((Get-Item -Path `\\\".`\\`\\\").FullName)'\\\"\""
+; @="powershell -Command \"start cmd -verb runas -argumentList \\\"/K cd %cd%\\\"\""
 
 ; folder
 [HKEY_CURRENT_USER\Software\Classes\Directory\shell\cpromptadmin]
@@ -14,7 +16,7 @@ Windows Registry Editor Version 5.00
 "Icon"="cmd.exe"
 "Extended"=""
 [HKEY_CURRENT_USER\Software\Classes\Directory\shell\cpromptadmin\command]
-@="powershell -Command \"start powershell -verb runas -argumentList \\\"-noexit cmd /K cd '`%L`\\\"'\\\"\""
+@="powershell -Command \"start cmd -verb runas -argumentList \\\"/K cd `\\\"%L`\\\"\\\"\""
 
 ; background folder
 [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\cpromptadmin]
@@ -22,4 +24,4 @@ Windows Registry Editor Version 5.00
 "Icon"="cmd.exe"
 "Extended"=""
 [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\cpromptadmin\command]
-@="powershell -Command \"start powershell -verb runas -argumentList \\\"-noexit cmd /K cd '%V'\\\"\""
+@="powershell -Command \"start cmd -verb runas -argumentList \\\"/K cd `\\\"%V`\\\"\\\"\""
