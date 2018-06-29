@@ -5,7 +5,7 @@ Windows Registry Editor Version 5.00
 "Icon"="C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe,0"
 "Extended"=""
 [HKEY_CURRENT_USER\Software\Classes\*\shell\pshelladmin\command]
-@="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -Command \"start powershell -verb runas -argumentList \\\"-noexit cd '`\\\"$((Get-Item -Path `\\\".`\\`\\\").FullName)'\\\"\""
+@="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -Command \"start powershell -verb runas -argumentList \\\"-noexit cd '%V'\\\"\""
 
 ; This will make it appear when you right click ON a folder
 ; The "Icon" line can be removed if you don't want the icon to appear
@@ -23,4 +23,4 @@ Windows Registry Editor Version 5.00
 "Icon"="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\",0"
 "Extended"=""
 [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\pshelladmin\command]
-@="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -Command \"start powershell -verb runas -argumentList \\\"-noexit cd '`\\\"$((Get-Item -Path `\\\".`\\`\\\").FullName)'\\\"\""
+@="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -Command \"start powershell -verb runas -argumentList \\\"-noexit cd '%V'\\\"\""
