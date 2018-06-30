@@ -16,8 +16,10 @@ function GetMap() {
     //     }, err => console.error(err))
 
     const polygons = [
-        getPolygon(twentyMinFromSyca, 'rgba(0, 255, 0, 0.5)'),
-        getPolygon(twentyMinutesFromWork, 'rgba(0, 0, 255, 0.5)')
+        // getPolygon(twentyMinFromSyca, 'rgba(0, 255, 0, 0.5)'),
+        // getPolygon(twentyMinutesFromWork, 'rgba(0, 0, 255, 0.5)')
+        getPolygon(twentyMinFromSyca),
+        getPolygon(twentyMinutesFromWork)
     ]
 
     for (const polygon of polygons) {
