@@ -1,6 +1,5 @@
 Windows Registry Editor Version 5.00
 
-
 ; file
 [HKEY_CURRENT_USER\Software\Classes\*\shell\cprompt]
 @="Open with cmd"

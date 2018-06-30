@@ -3,20 +3,20 @@ Windows Registry Editor Version 5.00
 ; file
 [HKEY_CURRENT_USER\Software\Classes\*\shell\pshell]
 @="Open with powershell"
-"Icon"="C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe,0"
+"Icon"="powershell.exe"
 [HKEY_CURRENT_USER\Software\Classes\*\shell\pshell\command]
-@="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\""
+@="powershell"
 
 ; folder
 [HKEY_CURRENT_USER\Software\Classes\Directory\shell\pshell]
 @="Open with powershell"
-"Icon"="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\",0"
+"Icon"="powershell.exe"
 [HKEY_CURRENT_USER\Software\Classes\Directory\shell\pshell\command]
-@="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -noexit cd '%L'"
+@="powershell -noexit cd '%L'"
 
 ; background folder
 [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\pshell]
 @="Open with powershell"
-"Icon"="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\",0"
+"Icon"="powershell.exe"
 [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\pshell\command]
-@="\"C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\""
+@="powershell"

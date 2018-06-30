@@ -1,7 +1,0 @@
-start cmd -verb runas -argumentList
-start cmd -argumentList "/K echo `"c:\`""
-start cmd -argumentList "/K echo '`"$((Get-Item -Path `".`\`").FullName)'"
-
-start cmd -argumentList "/K echo `"$((Get-Item -Path `".`\`").FullName)`""
-start ConsoleApp1.exe -argumentList "/K echo `"$((Get-Item -Path `".`\`").FullName)`""
-start ConsoleApp1.exe -argumentList '"c:\my foolder"'

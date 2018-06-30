@@ -6,9 +6,7 @@ Windows Registry Editor Version 5.00
 "Icon"="cmd.exe"
 "Extended"=""
 [HKEY_CURRENT_USER\Software\Classes\*\shell\cpromptadmin\command]
-; @="powershell -Command \"start powershell -verb runas -argumentList \\\"-noexit cmd /K cd '`\\\"$((Get-Item -Path `\\\".`\\`\\\").FullName)'\\\"\""
-@="powershell -Command \"start cmd -verb runas -argumentList \\\"/K echo '`\\\"$((Get-Item -Path `\\\".`\\`\\\").FullName)'\\\"\""
-; @="powershell -Command \"start cmd -verb runas -argumentList \\\"/K cd %cd%\\\"\""
+@="powershell -Command \"start cmd -verb runas -argumentList \\\"/K cd `\\\"$((Get-Item -Path `\\\".\\\\`\\\").FullName)`\\\" \\\"\""
 
 ; folder
 [HKEY_CURRENT_USER\Software\Classes\Directory\shell\cpromptadmin]
