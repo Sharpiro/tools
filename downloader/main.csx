@@ -12,14 +12,19 @@ if (requestInfo.IsDebug)
     WriteLine($"environmentProxyUrl: '{requestInfo.EnvironmentProxy}'");
     WriteLine($"Proxy: '{requestInfo.Proxy}'");
     WriteLine($"RequestUrl: '{requestInfo.RequestUrl}'");
-    WriteLine($"encodedRequestUrl: '{requestInfo.EncodedRequestUrl}'");
+    WriteLine($"UrlBase64encodedRequestUrl: '{requestInfo.UrlBase64EncodedRequestUrl}'");
     WriteLine($"generatedRequestUrl: '{requestInfo.GeneratedRequestUrl}'\r\n\r\n");
 }
 
 var httpClientHandler = new HttpClientHandler { Proxy = new WebProxy(requestInfo.EnvironmentProxy) };
 var httpClient = requestInfo.EnvironmentProxy == null ? new HttpClient() : new HttpClient(httpClientHandler, disposeHandler: true);
 var res = await httpClient.GetAsync(requestInfo.GeneratedRequestUrl);
-res.EnsureSuccessStatusCode();
+if (res.StatusCode != HttpStatusCode.OK)
+{
+    var reason = await res.Content.ReadAsStringAsync();
+    throw new Exception($"Response was not successful.  Reason: '{reason}'");
+}
+
 var bytes = (await res.Content.ReadAsByteArrayAsync()).Select(byteObfuscator.Obfuscate).ToArray();
 
 if (requestInfo.FileName != null)

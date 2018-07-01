@@ -10,9 +10,9 @@
                 "exec",
                 "${env:userprofile}/.dotnet/tools/.store/dotnet-script/0.25.0/dotnet-script/0.25.0/tools/netcoreapp2.1/any/dotnet-script.dll",
                 "${file}",
-                "https://raw.githubusercontent.com/Sharpiro/dotnet-script/master/LICENSE",
-                "-f",
-                "test.txt"
+                "https://gist.githubusercontent.com/Sharpiro/2a9a8bbf7195a056965362abed93c80d/raw/db81f60da78f9a4e951be925ccbfb047d0e900e0/AsSpanExtension.cs",
+                // "-f",
+                // "test.txt"
             ],
             "cwd": "${workspaceRoot}",
             "stopAtEntry": true
