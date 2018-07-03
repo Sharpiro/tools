@@ -6,6 +6,10 @@ import numpy
 irreduciblePolynomial = 0x11b
 
 
+def sharesize(secretSizeBytes):
+    return secretSizeBytes*8+16+16+10
+
+
 def binary(number, maxPadding=8, endianness="be"):
     binaryData = bin(number)[2:]
     paddedBinary = ("0"*maxPadding)[len(binaryData):] + binaryData
@@ -26,7 +30,8 @@ def binList(byteIterable, maxPadding=8):
 
 
 def fromBinList(binaryString, split=8):
-    bitGroups = list((binaryString[i:i+split] for i in range(0, len(binaryString), split)))
+    bitGroups = list((binaryString[i:i+split]
+                      for i in range(0, len(binaryString), split)))
     numberGroups = (str(int(x, 2)) for x in bitGroups)
     print("-".join(bitGroups))
     print("-".join(numberGroups))
