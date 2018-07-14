@@ -7,6 +7,7 @@ class RequestInfo
     public string RequestUrl { get; set; }
     public string FileName { get; set; }
     public string Proxy { get; set; }
+    public string LocalProxy { get; set; }
     public string EnvironmentProxy => Environment.GetEnvironmentVariable("http_proxy");
     public string Base64EncodedRequestUrl => Convert.ToBase64String(Encoding.UTF8.GetBytes(RequestUrl).Select(_byteObfuscator.Obfuscate).ToArray());
     public string UrlBase64EncodedRequestUrl => Uri.EscapeDataString(Base64EncodedRequestUrl);
