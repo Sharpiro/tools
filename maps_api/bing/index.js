@@ -9,17 +9,17 @@ function GetMap() {
     // const workUrl = "https://dev.virtualearth.net/REST/v1/Routes/Isochrones?waypoint=35.3123464,-80.7747997&maxTime=20&timeUnit=Minutes&travelMode=driving&key=" + apiKey
 
 
-    // getRawCoords(35.2089113, -80.8624413)
+    // getRawCoords(35.2089113, -80.8624413, 30)
     //     .then(res => {
     //         const polygon = getPolygon(res, "orange")
     //         map.entities.push(polygon);
     //     }, err => console.error(err))
 
     const polygons = [
-        // getPolygon(twentyMinFromSyca, 'rgba(0, 255, 0, 0.5)'),
-        // getPolygon(twentyMinutesFromWork, 'rgba(0, 0, 255, 0.5)')
-        getPolygon(twentyMinFromSyca),
-        getPolygon(twentyMinutesFromWork)
+        getPolygon(twentyMinFromSyca, 'rgba(0, 255, 0, 0.5)'),
+        getPolygon(twentyMinutesFromWork, 'rgba(0, 0, 255, 0.5)')
+        // getPolygon(twentyMinFromSyca),
+        // getPolygon(twentyMinutesFromWork)
     ]
 
     for (const polygon of polygons) {
@@ -40,8 +40,8 @@ function getLocationData(rawCoords) {
     return rawCoords.map(c => new Microsoft.Maps.Location(c[0], c[1]))
 }
 
-function getRawCoords(latitde, longitude) {
-    const url = `https://dev.virtualearth.net/REST/v1/Routes/Isochrones?waypoint=${latitde},${longitude}&maxTime=20&timeUnit=Minutes&travelMode=driving&key=${apiKey}`
+function getRawCoords(latitde, longitude, driveTime) {
+    const url = `https://dev.virtualearth.net/REST/v1/Routes/Isochrones?waypoint=${latitde},${longitude}&maxTime=${driveTime}&timeUnit=Minutes&travelMode=driving&key=${apiKey}`
     return new Promise((resolve, rej) => {
         fetch(url).then(res => {
             res.json().then(json => {
