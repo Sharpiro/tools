@@ -16,7 +16,8 @@ if (requestInfo.IsDebug)
     WriteLine($"generatedRequestUrl: '{requestInfo.GeneratedRequestUrl}'\r\n\r\n");
 }
 
-var httpClientHandler = new HttpClientHandler { Proxy = new WebProxy(requestInfo.EnvironmentProxy) };
+var localProxy = requestInfo.LocalProxy ?? requestInfo.EnvironmentProxy;
+var httpClientHandler = new HttpClientHandler { Proxy = new WebProxy(localProxy) };
 var httpClient = requestInfo.EnvironmentProxy == null ? new HttpClient() : new HttpClient(httpClientHandler, disposeHandler: true);
 var res = await httpClient.GetAsync(requestInfo.GeneratedRequestUrl);
 if (res.StatusCode != HttpStatusCode.OK)
@@ -60,6 +61,7 @@ RequestInfo GetRequestInfo(string urlArgument, Dictionary<string, string> option
     options.TryGetValue("-f", out string fileName);
     options.TryGetValue("-p", out string proxy);
     options.TryGetValue("-d", out string isDebugString);
+    options.TryGetValue("-lp", out string localProxy);
     bool.TryParse(isDebugString, out bool isDebug);
 
     var requestInfo = new RequestInfo(byteObfuscator)
@@ -67,6 +69,7 @@ RequestInfo GetRequestInfo(string urlArgument, Dictionary<string, string> option
         RequestUrl = urlArgument,
         FileName = fileName,
         Proxy = proxy ?? defaultProxy,
+        LocalProxy = localProxy,
         IsDebug = isDebug
     };
     return requestInfo;
