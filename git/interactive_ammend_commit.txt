@@ -1,0 +1,8 @@
+git rebase -i aabbccff
+// select 'e' to edit every affected commit
+
+// ammend the author for each commit
+git commit --amend --author="sharpiro <dsharpbb09@gmail.com>"
+
+// continue through each selected commit
+git rebase --continue
