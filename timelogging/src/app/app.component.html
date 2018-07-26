@@ -1,0 +1,21 @@
+<form class="example-form">
+  <!-- <mat-form-field class="example-full-width">
+    <input name="task" matInput placeholder="Task" [(ngModel)]="task">
+  </mat-form-field> -->
+
+  <mat-form-field>
+    <mat-select name="taskx" placeholder="Task" [(ngModel)]="task">
+      <mat-option *ngFor="let taskx of tasks" [value]="taskx">
+        {{taskx}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="example-full-width">
+    <input name="timeFormatted" matInput placeholder="Time" [(ngModel)]="timeFormatted">
+  </mat-form-field>
+  <button mat-button type="button" (click)="submit()">Submit</button>
+  <button mat-button type="button" (click)="newTask()">New Task</button>
+  <button mat-button type="button" (click)="list()">List</button>
+  <button mat-button type="button" (click)="reset()">Reset</button>
+</form>
