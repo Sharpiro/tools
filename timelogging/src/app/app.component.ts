@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Buffer } from "buffer"
 
 @Component({
   selector: 'app-root',
@@ -14,6 +15,8 @@ export class AppComponent implements OnInit {
   tasks: string[]
 
   ngOnInit(): void {
+    var buffer = Buffer.from([1, 2, 3])
+    console.log(buffer);
     this.tasks = this.getLogFromLocalStorage().tasks
   }
 
