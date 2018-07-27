@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Buffer } from "buffer"
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-root',
@@ -10,32 +10,52 @@ export class AppComponent implements OnInit {
   key = "log"
 
   title = 'timelogging'
-  task: string
+  task = "none"
   timeFormatted: string
   tasks: string[]
 
+  constructor(public snackBar: MatSnackBar) { }
+
   ngOnInit(): void {
-    var buffer = Buffer.from([1, 2, 3])
-    console.log(buffer);
     this.tasks = this.getLogFromLocalStorage().tasks
   }
 
+  ngModelChange(event) {
+    if (event != "addNew") return
+    this.newTask();
+  }
+
   submit() {
-    if (!this.task || !this.timeFormatted) return
+    if (!this.task || this.task == "none" || !this.timeFormatted) {
+      this.snackBar.open("please fill out all fields", "OK", { duration: 5000 })
+      return
+    }
     let minutes = this.getMinutes(this.timeFormatted)
+    if (minutes < 0) {
+      this.snackBar.open("error converting time string to minutes", "OK", { duration: 5000 })
+      return
+    }
     console.log(this.task)
     console.log(this.timeFormatted)
     console.log(minutes)
     this.addOrUpdateLocalStorage({ task: this.task, time: minutes })
-    this.task = null
     this.timeFormatted = null
   }
+
+  debug() {
+    // const snackRef = this.snackBar.open("message", "action", { duration: 10000 })
+    this.snackBar.open("message", "OK", { duration: 5000 })
+    // snackRef.onAction().subscribe(v => {
+    //   console.log("action clicked")
+    // })
+  }
+
 
   newTask() {
     const task = prompt("add task")
     if (!task) return
     if (task === " ") {
-      throw new Error("invalid task name")
+      this.snackBar.open("invalid task name", "OK", { duration: 5000 })
     }
     const log = this.getLogFromLocalStorage()
     log.tasks.push(task)
@@ -68,9 +88,10 @@ export class AppComponent implements OnInit {
   }
 
   reset() {
+    if (!confirm("Are you sure you want to delete all task information?")) return
     localStorage.clear()
     this.tasks = []
-    this.task = null
+    this.task = "none"
     this.timeFormatted = null
   }
 
@@ -78,7 +99,7 @@ export class AppComponent implements OnInit {
     let split = timeFormatted.split(":")
     let temp = split.length >= 2 ? +split[0] * 60 + +split[1] : +split[0]
     if (isNaN(temp)) {
-      throw new Error("error converting time string to minutes")
+      return -1
     }
     return temp
   }

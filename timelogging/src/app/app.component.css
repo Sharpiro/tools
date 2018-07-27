@@ -1,0 +1,25 @@
+.container {
+    padding-top:15px;
+    display: flex;
+    justify-content: center;
+}
+
+.row{
+    flex-basis: 100%;
+}
+
+.form{
+    flex-basis:65%;
+}
+
+.input{
+    width:100%;
+}
+
+.button-padding{
+    padding-right: 10px;
+}
+
+.button-flex{
+    width: 20%;
+}
