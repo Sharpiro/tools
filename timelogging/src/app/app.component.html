@@ -1,21 +1,37 @@
-<form class="example-form">
-  <!-- <mat-form-field class="example-full-width">
-    <input name="task" matInput placeholder="Task" [(ngModel)]="task">
-  </mat-form-field> -->
+<div class="container">
+  <form class="form">
+    <div class="row">
+      <mat-form-field class="input">
+        <mat-select name="taskx" placeholder="Task" [(ngModel)]="task" (ngModelChange)="ngModelChange($event)">
+          <mat-option value="none">None</mat-option>
+          <mat-option *ngFor="let taskx of tasks" [value]="taskx">
+            {{taskx}}
+          </mat-option>
+          <mat-option value="addNew">Add New...</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
 
-  <mat-form-field>
-    <mat-select name="taskx" placeholder="Task" [(ngModel)]="task">
-      <mat-option *ngFor="let taskx of tasks" [value]="taskx">
-        {{taskx}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+    <div class="row">
+      <mat-form-field class="input">
+        <input name="timeFormatted" matInput placeholder="Time" [(ngModel)]="timeFormatted">
+      </mat-form-field>
+    </div>
 
-  <mat-form-field class="example-full-width">
-    <input name="timeFormatted" matInput placeholder="Time" [(ngModel)]="timeFormatted">
-  </mat-form-field>
-  <button mat-button type="button" (click)="submit()">Submit</button>
-  <button mat-button type="button" (click)="newTask()">New Task</button>
-  <button mat-button type="button" (click)="list()">List</button>
-  <button mat-button type="button" (click)="reset()">Reset</button>
-</form>
+    <div class="row">
+      <span class="button-padding">
+        <button class="button-flex" mat-raised-button type="button" (click)="submit()">Submit</button>
+      </span>
+      <span class="button-padding">
+        <button class="button-flex" mat-raised-button type="button" (click)="list()">List</button>
+      </span>
+      <span class="button-padding">
+        <button class="button-flex" mat-raised-button type="button" (click)="reset()">Reset</button>
+      </span>
+      <!-- <span class="button-padding">
+      <button mat-raised-button type="button" (click)="debug()">Debug</button>
+    </span> -->
+
+    </div>
+  </form>
+</div>

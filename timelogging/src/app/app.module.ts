@@ -5,6 +5,7 @@ import { AppComponent } from './app.component';
 import { MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatOptionModule, MatSelectModule } from '@angular/material';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '../../node_modules/@angular/forms';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { FormsModule } from '../../node_modules/@angular/forms';
     FormsModule,
     MatFormFieldModule,
     MatOptionModule,
-    MatSelectModule
+    MatSelectModule,
+    MatSnackBarModule
   ],
   providers: [],
   bootstrap: [AppComponent]
