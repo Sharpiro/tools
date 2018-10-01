@@ -1,12 +1,12 @@
 import { SourceCode } from "./sourceCode";
 import { Command, AddCommand, AddImmediateCommand } from "./addCommandSyntax";
 
-export class Compiler {
+export class RiscVCompiler {
     readonly sourceCode: SourceCode
 
     constructor(public readonly source: string) {
         source = source + "\0"
-        this.sourceCode = new SourceCode(source, 0)
+        this.sourceCode = new SourceCode(source)
     }
 
     compile(): Command[] {

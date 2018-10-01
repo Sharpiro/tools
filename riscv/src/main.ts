@@ -1,21 +1,25 @@
-import { Compiler } from "./compiler";
-import { Runner } from "./runner";
+import { CLangCompiler } from "./cLangCompiler";
 
-// expected: [0, 2, 3, 5, 0 ...]
-const source =
-    `addi x1, x0, 2
-addi x2, x0, 3
-add x3, x1, x2`
-const compiler = new Compiler(source)
-const commands = compiler.compile()
-const runner = new Runner(commands)
-runner.run()
+const cppSource = "int x = 2 + 3;"
+
+const cCompiler = new CLangCompiler(cppSource)
+cCompiler.compile()
+
+// // expected: [0, 2, 3, 5, 0 ...]
+// const source =
+//     `addi x1, x0, 2
+// addi x2, x0, 3
+// add x3, x1, x2`
+// const riscVCompiler = new RiscVCompiler(source)
+// const commands = riscVCompiler.compile()
+// const runner = new Runner(commands)
+// runner.run()
 
 
 
 // run(commands)
 // console.log(commands)
-console.log(runner.registers.registers.slice(0, 5))
+// console.log(runner.registers.registers.slice(0, 5))
 
 // function run(commands: CommandSyntax[]) {
 
