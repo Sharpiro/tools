@@ -30,6 +30,10 @@ static byte[] buffer(string data = "", string encoding = "hex")
     {
         return Encoding.UTF8.GetBytes(data);
     }
+    if (encoding == "base64")
+    {
+        return Convert.FromBase64String(data);
+    }
     throw new Exception("invalid encoding");
 }
 
@@ -57,3 +61,6 @@ static double fast(double start, double end) => (end - start).Mod(24);
 // extensions
 static double Mod(this double x, double m) => (x % m + m) % m;
 static string ToHex(this byte[] buffer) => hex(buffer);
+
+static byte[] swap(byte[] buffer) => buffer.Select(b => (byte)~b).ToArray();
+static void swap(string fileName) => File.WriteAllBytes($"{fileName}.swapped", swap(File.ReadAllBytes(fileName)));
