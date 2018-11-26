@@ -2,6 +2,7 @@ import hashlib
 import inspect
 import binascii
 import numpy
+import math
 
 irreduciblePolynomial = 0x11b
 
@@ -10,10 +11,15 @@ def sharesize(secretSizeBytes):
     return secretSizeBytes*8+16+16+10
 
 
-def binary(number, maxPadding=8, endianness="be"):
-    binaryData = bin(number)[2:]
-    paddedBinary = ("0"*maxPadding)[len(binaryData):] + binaryData
-    byteGroups = (paddedBinary[i:i+8] for i in range(0, len(paddedBinary), 8))
+def binary(number, maxPadding=8, endianness="be", separator=8):
+    if number > 0:
+        binaryString = bin(number)[2:]
+        paddedBinary = ("0"*maxPadding)[len(binaryString):] + binaryString
+    else:
+        mask = int("1"*maxPadding, 2)
+        binaryString = bin(number & mask)[2:]
+        paddedBinary = binaryString
+    byteGroups = (paddedBinary[i:i+separator] for i in range(0, len(paddedBinary), separator))
     if endianness == "le":
         byteGroups = reversed(list(byteGroups))
     separatedBinary = "-".join(byteGroups)
@@ -88,11 +94,7 @@ def fast(start, end):
     return (end - start) % 24
 
 
-def listFunc2(func):
-    return inspect.getfullargspec(func)
-
-
-def listFunc3(func):
+def sig(func):
     return inspect.signature(func)
 
 
