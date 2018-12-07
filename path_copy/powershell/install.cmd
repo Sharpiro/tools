@@ -16,3 +16,8 @@ REM REM background folder
 REM REG ADD HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\pathcopy /d "Copy Path" /f
 REM REG ADD HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\pathcopy /v Icon /d "%userprofile%\pathcopy\icon.ico" /f
 REM REG ADD HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\pathcopy\command /d "%userprofile%\pathcopy\PathCopy.exe \"%%V" /f
+
+REM REM drive
+REM REG ADD HKCU\Software\Classes\Drive\shell\pathcopy /d "Copy Path" /f
+REM REG ADD HKCU\Software\Classes\Drive\shell\pathcopy /v Icon /d "%userprofile%\pathcopy\copyicon.ico" /f
+REM REG ADD HKCU\Software\Classes\Drive\shell\pathcopy\command /d "%userprofile%\pathcopy\PathCopy.exe \"%%V" /f

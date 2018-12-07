@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Forms;
 using System.IO;
 using Microsoft.Win32;
 
@@ -17,7 +16,6 @@ namespace PathCopy
             return remotePath + extension;
         }
 
-        [STAThread]
         static void Main(string[] args)
         {
             try
@@ -25,11 +23,11 @@ namespace PathCopy
                 if (args.Length < 1 || args[0] == null || args[0].Length < 2) return;
 
                 var result = UNCPath(args[0]);
-                Clipboard.SetText(result);
+                Kolibri.Clippy.PushStringToClipboard(result);
             }
             catch (Exception ex)
             {
-                var path = $@"{Environment.GetEnvironmentVariable("userprofile")}\pathcopy\debug.log";
+                var path = $@"{Environment.GetEnvironmentVariable("userprofile")}\pathcopy\debug.log";  // todo: change to running dir
                 File.AppendAllText(path, $"{args[0]}\r\n{ex.ToString()}");
             }
         }
