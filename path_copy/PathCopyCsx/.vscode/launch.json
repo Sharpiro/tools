@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Script Debug",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "exec",
+                "C:/Users/u403598/.dotnet/tools/.store/dotnet-script/0.28.0/dotnet-script/0.28.0/tools/netcoreapp2.1/any/dotnet-script.dll",
+                "${file}",
+                "Y:\\ForAlly\\43274.VDS.CommunicationStaging.txt"
+            ],
+            "cwd": "${workspaceRoot}",
+            "stopAtEntry": true
+        }
+    ]
+}
