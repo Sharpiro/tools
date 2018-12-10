@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "PathCopy": {
-      "commandName": "Project",
-      "commandLineArgs": "y:\\Software\\rdcman.msi"
-    }
-  }
-}
