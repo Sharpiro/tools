@@ -1,13 +1,19 @@
 #r "nuget: Newtonsoft.Json, 11.0.2"
 
 #load "./load/objects.csx"
-#load "./load/sheet.csx"
+// #load "./load/sheet.csx"
 #load "./load/io.csx"
+#load "./load/FormatTextAsNumberConverter.csx"
 #load "../../shared/Blake2Scripted.csx"
 
+using System.Collections.Generic;
+using System.Globalization;
+using System.Reflection;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
+static void print(object obj) => WriteLine(obj);
 static public byte[] readBuffer => json<byte[]>(ReadLine());
 static byte[] buffer(int size) => size >= 0 ? new byte[size] : readBuffer;
 static byte[] buffer(string data = "", string encoding = "hex")
@@ -64,3 +70,76 @@ static string ToHex(this byte[] buffer) => hex(buffer);
 
 static byte[] swap(byte[] buffer) => buffer.Select(b => (byte)~b).ToArray();
 static void swap(string fileName) => File.WriteAllBytes($"{fileName}.swapped", swap(File.ReadAllBytes(fileName)));
+static IEnumerable<string[]> csv(string filePath) => ReadAllLinesSafe(filePath).Select(l => l.Split(','));
+
+static List<Dictionary<string, string>> csvToMaps(string filePath)
+{
+    var rawData = csv(filePath);
+    var headers = rawData.First();
+    var allMaps = new List<Dictionary<string, string>>();
+    foreach (var data in rawData.Skip(1))
+    {
+        var map = new Dictionary<string, string>();
+        for (var i = 0; i < headers.Length; i++)
+        {
+            map[headers[i]] = data[i];
+        }
+        allMaps.Add(map);
+    }
+    return allMaps;
+}
+
+static string csvToJson(string filePath)
+{
+    var csvMaps = csvToMaps(filePath);
+    var settings = new JsonSerializerSettings
+    {
+        Converters = { new FormatTextAsNumberConverter() },
+        Formatting = Formatting.Indented
+    };
+    var json = JsonConvert.SerializeObject(csvMaps, settings);
+    return json;
+}
+
+public string commands
+{
+    get
+    {
+        var startsWith = "Submission#0:";
+        var blacklist = new HashSet<string>{
+            // "ReadSafe",
+            // "ReadSafeTemp",
+            "ComputeStringHash",
+            "ToString",
+            "Equals",
+            "GetHashCode",
+            "GetType",
+            "Finalize",
+            "MemberwiseClone"
+        };
+        var blacklistParts = new[]{
+            "get_",
+            "set_",
+            "<",
+            ">",
+        };
+
+        var assembly = Assembly.GetExecutingAssembly();
+        var names = (from type in assembly.GetTypes()
+                     from method in type.GetMethods(
+                       BindingFlags.Public | BindingFlags.NonPublic |
+                       BindingFlags.Instance | BindingFlags.Static)
+                     select type.FullName + ":" + method.Name).Distinct().ToArray();
+        var filtered = names
+            .Where(n => n.StartsWith(startsWith))
+            .Select(n => n.Substring(startsWith.Length))
+            .Where(n => !blacklist.Contains(n))
+            .Where(n => !blacklistParts.Any(bp => n.Contains(bp))).ToArray()
+            .OrderBy(n => n);
+
+        var json = JsonConvert.SerializeObject(filtered);
+        return $"commands: [{string.Join(", ", filtered)}]";
+    }
+}
+
+WriteLine(commands);

@@ -8,25 +8,17 @@ static MemoryStream ReadSafe(string inputFile)
     }
 }
 
-static MemoryStream ReadSafeTemp(string inputFilePath)
+static List<string> ReadAllLinesSafe(string filePath)
 {
-    var tempDirectory = Path.GetTempPath();
-    var fileInfo = new FileInfo(inputFilePath);
-    var tempFilePath = $"{tempDirectory}{fileInfo.Name}";
-    fileInfo.CopyTo(tempFilePath, overwrite: true);
-
-    MemoryStream memoryStream;
-    try
+    using (var sourceStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
     {
-        using (var sourceStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        var streamReader = new StreamReader(sourceStream);
+        var lines = new List<string>();
+        string line;
+        while ((line = streamReader.ReadLine()) != null)
         {
-            memoryStream = new MemoryStream();
-            sourceStream.CopyTo(memoryStream);
+            lines.Add(line);
         }
+        return lines;
     }
-    finally
-    {
-        File.Delete(tempFilePath);
-    }
-    return memoryStream;
 }
