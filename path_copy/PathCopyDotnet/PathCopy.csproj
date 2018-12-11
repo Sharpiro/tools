@@ -3,18 +3,13 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net461</TargetFramework>
+    <Version>1.0.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="install.cmd">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="uninstall.cmd">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="copyicon.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>  
+    <None Include="install-template.cmd" Link="install.cmd" CopyToOutputDirectory="PreserveNewest"  />
+    <None Include="uninstall-template.cmd" Link="uninstall.cmd" CopyToOutputDirectory="PreserveNewest"  />
+    <None Include="copyicon.ico" Link="copyicon.ico" CopyToOutputDirectory="PreserveNewest"  />
   </ItemGroup>
 
 </Project>
