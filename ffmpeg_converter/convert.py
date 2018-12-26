@@ -1,24 +1,27 @@
 from glob import glob
-import os
 import sys
 from subprocess import call
 
-# print(sys.argv)
-workingDirectory = os.getcwd()
-files = glob(f"{workingDirectory}/*.aac")
-files = files + glob(f"{workingDirectory}/*.m4a")
-files = files + glob(f"{workingDirectory}/*.wmv")
-if not files:
-    sys.exit("no audio files to convert")
+print("enter input file pattern. E.g. *.mp3;*.avi")
+res = input()
 
-print(f"do you want to convert {len(files)} files in {workingDirectory}? (y/n)")
+# res = "*avi;*.wmv"
+fileTypes = res.split(";")
+files = []
+for x in fileTypes:
+    files = files + glob(x)
+
+print("enter output file extension. E.g. .mp3")
+outputFileExtension = input()
+
+print(
+    f"do you want to convert {len(files)} files? (y/n)")
+print(files)
 res = input()
 if res != "y":
     sys.exit("user exited")
 for inputFilePath in files:
-    fileName = os.path.basename(inputFilePath)
-    outputFilePath = f"{workingDirectory}/{fileName}"
-    command = f"ffmpeg -i \"{inputFilePath}\" -aq 0 -vn \"{outputFilePath}"[:-4] + ".mp3\""
-    print(f"converting '{fileName}''")
+    command = f"ffmpeg -i {inputFilePath} {inputFilePath[:-4] + outputFileExtension}"
+    print(f"converting '{inputFilePath}''")
     print(command)
     call(command)
