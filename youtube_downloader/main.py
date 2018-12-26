@@ -1,5 +1,5 @@
-import youtube_dl
 import sys
+import youtube_dl
 
 if len(sys.argv) < 3:
     sys.exit("must provide arg url")
@@ -8,7 +8,8 @@ command = sys.argv[1]
 url = sys.argv[2]
 
 # proxy = "http://localhost:8888"
-proxy = "http://localhost:5000"
+# proxy = "http://localhost:5000"
+proxy = ""
 
 
 def audio():
@@ -19,7 +20,7 @@ def audio():
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
         }],
-        'format': "140 "
+        'format': "251 "
     }
     youtube = youtube_dl.YoutubeDL(options)
     youtube.download([url])
