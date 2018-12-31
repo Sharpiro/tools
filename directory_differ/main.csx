@@ -8,7 +8,7 @@ using Blake2Sharp;
 // private HashAlgorithm _hasher = Blake2.Create();
 private HashAlgorithm _hasher = Blake2Scripted.Create();
 
-const string directory = @"C:\Users\sharpiro\Documents\OneDrive\Pictures";
+const string directory = @"C:\Users\sharpiro\Documents\OneDrive\Pictures\Camera_Roll";
 var allFilePaths = Directory.GetFiles(directory, "*", SearchOption.AllDirectories);
 var fileGroups = new Dictionary<string, List<string>>();
 
@@ -19,7 +19,7 @@ WriteLine($"comparing {allFilePaths.Length} files");
 foreach (var filePath in allFilePaths)
 {
     var buffer = File.ReadAllBytes(filePath);
-    var hashHex = GetHash(buffer);
+    var hashHex = string.Join(string.Empty, buffer.Select(i => i.ToString("x2")));
     var exists = fileGroups.TryGetValue(hashHex, out List<string> fileGroup);
     if (!exists)
     {
@@ -38,11 +38,9 @@ timer.Stop();
 WriteLine($"{dupes.Count} files duped");
 WriteLine($"{dupes.SelectMany(d => d.Files).Count()} total dupes");
 WriteLine($"{timer.Elapsed.TotalSeconds} seconds elapsed");
-WriteLine("done");
-
-string GetHash(byte[] buffer)
+WriteLine("Dupes:\r\n");
+foreach (var dupe in dupes)
 {
-    var hash = _hasher.ComputeHash(buffer);
-    var hashHex = string.Join(string.Empty, hash.Select(i => i.ToString("x2")));
-    return hashHex;
+    WriteLine(dupe.Files.First());
 }
+WriteLine("done");
