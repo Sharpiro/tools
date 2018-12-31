@@ -1,0 +1,11 @@
+PNG
+    get
+        exiftool -creationtime IMG_1617.PNG
+    set
+        exiftool -creationtime="2001:10:23 20:06:34.33-05:00" IMG_1617.PNG
+
+JPG
+    get
+        exiftool.exe -createdate IMG_1596.JPG
+    set
+        exiftool.exe -createdate="2001:10:23 20:06:34.33-05:00" IMG_1596.JPG
