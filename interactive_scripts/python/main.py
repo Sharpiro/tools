@@ -6,6 +6,24 @@ import math
 
 irreduciblePolynomial = 0x11b
 
+def rs1024_polymod(values):
+  GEN = [0xe0e040, 0x1c1c080, 0x3838100, 0x7070200, 0xe0e0009, 0x1c0c2412, 0x38086c24, 0x3090fc48, 0x21b1f890, 0x3f3f120]
+  chk = 1
+  for v in values:
+    b = (chk >> 20)
+    chk = (chk & 0xfffff) << 10 ^ v
+    for i in range(10):
+      chk ^= GEN[i] if ((b >> i) & 1) else 0
+  return chk
+
+def rs1024_verify_checksum(cs, data):
+  return rs1024_polymod([ord(x) for x in cs] + data) == 1
+
+def rs1024_create_checksum(cs, data):
+    values = [ord(x) for x in cs] + data
+    polymod = rs1024_polymod(values + [0,0,0]) ^ 1
+    return [(polymod >> 10 * (2 - i)) & 1023 for i in range(3)]
+
 
 def sharesize(secretSizeBytes):
     return secretSizeBytes*8+16+16+10
