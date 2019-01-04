@@ -1,43 +1,48 @@
-<div style="width:55%">
-    <canvas id="myChart"></canvas>
-</div>
+<link rel="stylesheet" href="styles.css" />
 
-<div>
-    <!-- <span>Years</span>
+<div class="container">
+    <div>
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <div>
+        <!-- <span>Years</span>
     <input type="text" /> -->
-    <input style="width:95%;" step="1" type="range" min="0" max="50" value="0" id="slider">
-</div>
-<div>
-    <p>Inflation: <span id="value"></span>%</p>
+        <input class="slider" step="1" type="range" min="0" max="50" value="0" id="slider">
+    </div>
+    <div>
+        <p>Inflation: <span id="value"></span>%</p>
 
-    <h3>Wealth Lost</h3>
-    <ul>
-        <li>
-            <p>5 years: <span id="fiveYears"></span></p>
+        <h3>Wealth Lost</h3>
+        <ul>
+            <li>
+                <p>5 years: <span id="fiveYears"></span></p>
 
-        </li>
-    </ul>
-    <ul>
-        <li>
-            <p>10 years: <span id="tenYears"></span></p>
-        </li>
-    </ul>
-    <ul>
-        <li>
-            <p>20 years: <span id="twentyYears"></span></p>
-        </li>
-    </ul>
-    <ul>
-        <li>
-            <p>40 years: <span id="fourtyYears"></span></p>
-        </li>
-    </ul>
-    <ul>
-        <li>
-            <p>60 years: <span id="sixtyYears"></span></p>
-        </li>
-    </ul>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <p>10 years: <span id="tenYears"></span></p>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <p>20 years: <span id="twentyYears"></span></p>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <p>40 years: <span id="fourtyYears"></span></p>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <p>60 years: <span id="sixtyYears"></span></p>
+            </li>
+        </ul>
+    </div>
 </div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js"></script>
 <script src="index.js"></script>
