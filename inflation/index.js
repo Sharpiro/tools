@@ -1,11 +1,11 @@
 const yearLabels = [...Array(61).keys()]
 let data = []
 const principal = 100000
-let inflationRate = 0
+let inflationRate = 3
 var canvas = document.getElementById("myChart")
 var context = canvas.getContext('2d');
 
-slider.value = 0
+slider.value = inflationRate
 value.innerHTML = slider.value;
 
 var myChart = new Chart(context, {
