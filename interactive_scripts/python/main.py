@@ -3,8 +3,12 @@ import inspect
 import binascii
 import numpy
 import math
+import secrets
 
 irreduciblePolynomial = 0x11b
+
+def random(length):
+    return list(secrets.token_bytes(length))
 
 def rs1024_polymod(values):
   GEN = [0xe0e040, 0x1c1c080, 0x3838100, 0x7070200, 0xe0e0009, 0x1c0c2412, 0x38086c24, 0x3090fc48, 0x21b1f890, 0x3f3f120]
