@@ -23,3 +23,23 @@
 ```bash
 pwd
 ```
+
+## Search Text
+
+```bash
+echo data this is ata my text data | grep ata
+```
+
+```bash
+grep ata test.txt
+```
+
+## Get Count of Search Text
+
+```bash
+echo data this is ata my text data | grep -o ata | wc -l
+```
+
+```bash
+grep -o ata test.txt| wc -l
+```
