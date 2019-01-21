@@ -43,3 +43,12 @@ echo data this is ata my text data | grep -o ata | wc -l
 ```bash
 grep -o ata test.txt| wc -l
 ```
+
+## Links
+
+### Symbolic Links
+
+```bash
+# ln -s source target
+sudo ln -s /usr/lib64/libssl.so.1.1.1 /usr/lib64/libssl.so.1.0.0
+```
