@@ -4,7 +4,10 @@
         {
             "label": "run",
             "type": "shell",
-            "command": "./pyx.ps1"
+            "command": "py",
+            "args": [
+                "test.py"
+            ]
         }
     ]
 }
