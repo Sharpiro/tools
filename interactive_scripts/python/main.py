@@ -1,7 +1,7 @@
 import hashlib
 import inspect
 import binascii
-import numpy
+# import numpy
 import math
 import secrets
 
@@ -26,10 +26,13 @@ def double_and_add(n, x):
     result = 0
     addend = x
 
+    print("result", "addend")
+    print(result, addend)
     for bit in bits(n):
         if bit == 1:
             result += addend
         addend <<= 1
+        print(result, addend)
 
     return result
 
@@ -146,8 +149,8 @@ def sig(func):
     return inspect.signature(func)
 
 
-def mortgage(ratePercent, mortgagePeriodYears, presentValue):
-    rate = ratePercent / 100 / 12
-    numberOfPeriods = mortgagePeriodYears * 12
-    monthlyPayment = numpy.pmt(rate, numberOfPeriods, presentValue)
-    return monthlyPayment, monthlyPayment * numberOfPeriods, 13
+# def mortgage(ratePercent, mortgagePeriodYears, presentValue):
+#     rate = ratePercent / 100 / 12
+#     numberOfPeriods = mortgagePeriodYears * 12
+#     monthlyPayment = numpy.pmt(rate, numberOfPeriods, presentValue)
+#     return monthlyPayment, monthlyPayment * numberOfPeriods, 13
