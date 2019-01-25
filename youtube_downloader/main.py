@@ -7,6 +7,10 @@ if len(sys.argv) < 3:
 command = sys.argv[1]
 url = sys.argv[2]
 
+if len(sys.argv) >= 4:
+    formatValue = sys.argv[3]
+# formatValue = 0
+
 # proxy = "http://localhost:8888"
 # proxy = "http://localhost:5000"
 proxy = ""
@@ -20,7 +24,17 @@ def audio():
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
         }],
-        'format': "251 "
+        'format': "251"
+    }
+    youtube = youtube_dl.YoutubeDL(options)
+    youtube.download([url])
+
+
+def download():
+    options = {
+        'proxy': proxy,
+        'nocheckcertificate': True,
+        'format': formatValue
     }
     youtube = youtube_dl.YoutubeDL(options)
     youtube.download([url])
@@ -52,5 +66,7 @@ elif command == "audio":
     audio()
 elif command == "video":
     video()
+elif command == "download":
+    download()
 else:
     print("invalid command")
