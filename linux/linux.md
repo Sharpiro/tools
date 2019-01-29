@@ -62,10 +62,17 @@ sudo woeusb \
 
 ## ffmpeg
 
+### clip
 ```bash
 # clip a 10 minute video starting at the 30 minute mark
 # timestamp format: HH:MM:SS.xxx
 ffmpeg -i "input.mp4" -ss 00:30:00.0 -t 00:10:00.0 "output.mp4"
+```
+### fade in/out
+
+```bash
+# clip w/ fade in/out
+ffmpeg -i input.mp4 -ss 00:00:00.0 -t 00:00:10.0 -y -vf fade=in:0:60,fade=out:240:30 -af afade=in:st=0:d=1,afade=out:st=5:d=5 slide_fade_in.mp4
 ```
 
 ## Luks
