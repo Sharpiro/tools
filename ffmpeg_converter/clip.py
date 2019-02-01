@@ -1,6 +1,7 @@
 from subprocess import call
 from pathlib import Path
 import json
+import sys
 
 
 def get_seconds(timestamp):
@@ -23,7 +24,16 @@ def validate_clips(clips):
         get_seconds(clip["stop"])
 
 
-file = Path("test-clips.json").read_text()
+print(sys.argv)
+if len(sys.argv) < 3:
+    sys.exit("error: not enoughg args, ex: clip input.mp4 clips.json")
+
+video_file_name = sys.argv[1]
+print(video_file_name)
+clips_file_name = sys.argv[2]
+print(clips_file_name)
+
+file = Path(clips_file_name).read_text()
 clips = json.loads(file)
 validate_clips(clips)
 for clip in clips:
@@ -34,13 +44,8 @@ for clip in clips:
     audio_fade_out_start_seconds = (duration_seconds - 3)
     fade_duration_frames = 3 * 30
     clipName = clip["name"]
-    print(clipName, duration_seconds)
-    command = f"ffmpeg -ss {start_seconds} -i original.mp4 -t {duration_seconds} -y -vf fade=in:0:{fade_duration_frames},fade=out:{video_fade_out_start_frames}:{fade_duration_frames} -af afade=in:st=0:d=3,afade=out:st={audio_fade_out_start_seconds}:d=3 {clipName}.mp4".split(" ") #54 seconds
+    print(clipName, ":", duration_seconds, "seconds")
+    command = f"ffmpeg -ss {start_seconds} -i {video_file_name} -t {duration_seconds} -y -vf fade=in:0:{fade_duration_frames},fade=out:{video_fade_out_start_frames}:{fade_duration_frames} -af afade=in:st=0:d=3,afade=out:st={audio_fade_out_start_seconds}:d=3 {clipName}.mp4".split(" ")
     print(command)
     print()
     call(command)
-
-
-# ffmpeg -i input.mp4 -ss 00:00:00.0 -t 00:00:10.0 -y -vf fade=in:0:60,fade=out:240:30 -af afade=in:st=0:d=1,afade=out:st=5:d=5 slide_fade_in.mp4
-# command = "ffmpeg -i original.mp4 -ss 00:00:00.0 -t 00:00:10.0 -y -vf fade=in:0:60,fade=out:240:30 -af afade=in:st=0:d=1,afade=out:st=5:d=5 output.mp4".split(" ")
-# command = "ffmpeg -i original.mp4 -ss 50 -t 10 -y -vf fade=in:0:60,fade=out:240:30 -af afade=in:st=0:d=1,afade=out:st=5:d=5 output.mp4".split(" ")
