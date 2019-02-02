@@ -4,34 +4,48 @@
 
 ### Current User
 
-#### Aliases
+#### Add Aliases (current user)
 
 ```bash
 vim ~/.bashrc
-```
 
-```bash
+# add alias
 alias py=python3
 ```
 
-### All Users
+#### Add to path (current user)
 
-#### Add to path for all users
-
-Open `/etc/environment` and add new directory to ```PATH```:
+Open `~/.profile` and add new directory to ```PATH```:
 
 ```bash
-PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/opt/node-v10.13.0-linux-x
-64/bin"
+export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-#### Allow new directory to be used by super users
+#### Add Script or Program
 
-Open `/etc/sudoers` and add new directory to ```secure_path```:
+Copy program to ```/usr/bin```
+
+### All Users
+
+#### Add Aliases (all users)
+
+Copy ```.sh``` script to ```/etc/profile.d```
+
+ex: ```test.sh```:
 
 ```bash
-secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/opt/node-v10.13.0-li
-nux-x64/bin"
+sudo vim /etc/profile.d/test.sh
+
+# add alias
+alias py=python3
+```
+
+#### Add to path (all users)
+
+Copy ```.sh``` script to ```/etc/profile.d```
+
+```bash
+export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
 ## Disk commands
@@ -62,18 +76,48 @@ sudo woeusb \
 
 ## ffmpeg
 
+### basic
+
+```bash
+ffmpeg -i input.mp4 output.avi
+```
+
+### itunes mp3
+
+```bash
+ffmpeg -i input.mp3 -aq 0 -vn output.mp3
+ffmpeg -i input.mp3 -b:a 128 -vn output.mp3 -b:a 128=audio bitrate
+```
+
+### plyback speed
+
+```bash
+ffmpeg -i videoplayback.m4a -af "atempo=1.5" -vn videoplayback-fast.mp3
+```
+
 ### clip
+
 ```bash
 # clip a 10 minute video starting at the 30 minute mark
 # timestamp format: HH:MM:SS.xxx
 ffmpeg -i "input.mp4" -ss 00:30:00.0 -t 00:10:00.0 "output.mp4"
 ```
+
 ### fade in/out
 
 ```bash
 # clip w/ fade in/out
 ffmpeg -i input.mp4 -ss 00:00:00.0 -t 00:00:10.0 -y -vf fade=in:0:60,fade=out:240:30 -af afade=in:st=0:d=1,afade=out:st=5:d=5 slide_fade_in.mp4
 ```
+
+### flags
+
+| flag          | usage             | description
+| ------------- |------------------ |-------------
+| -aq           | -aq               | audio quality(lower better, fixes common iTunes length bug)
+| -vn           | -vn               | disable video(fixes 'invalid pixel' bug even on some audio files in rare cases)
+| -s            | -s 640x480        | resolution
+| -af           | -af "atempo=1.5"  | audio format for changing playback speed
 
 ## Luks
 
@@ -128,6 +172,23 @@ chmod 700 /path/to/onion_service
 ./tor -f /path/to/torrc
 ```
 
+### Links / Shortcuts
+
+#### Symbolic Links
+
+```bash
+# ln -s source target
+sudo ln -s /usr/lib64/libssl.so.1.1.1 /usr/lib64/libssl.so.1.0.0
+```
+
+### Ignore case in terminal
+
+Add the following to ```~/.inputrc``` for current user or ```/etc/inputrc``` for all users:
+
+```bash
+set completion-ignore-case On
+```
+
 ## Misc
 
 ### iPhone detection fix
@@ -137,6 +198,15 @@ chmod 700 /path/to/onion_service
 ```
 
 * <https://ubuntuforums.org/showthread.php?t=2376741>
+
+#### Allow new directory to be used by super users
+
+Open `/etc/sudoers` and add new directory to ```secure_path```:
+
+```bash
+secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/opt/node-v10.13.0-li
+nux-x64/bin"
+```
 
 ### Print Current Directory
 
@@ -164,19 +234,16 @@ echo data this is ata my text data | grep -o ata | wc -l
 grep -o ata test.txt| wc -l
 ```
 
-### Links
-
-#### Symbolic Links
+### Customize Bookmarks
 
 ```bash
-# ln -s source target
-sudo ln -s /usr/lib64/libssl.so.1.1.1 /usr/lib64/libssl.so.1.0.0
+# default bookmarks
+vim ~/.config/user-dirs.dirs
 ```
-
-### Ignore case in terminal
-
-Add the following to ```~/.inputrc``` for current user or ```/etc/inputrc``` for all users:
 
 ```bash
-set completion-ignore-case On
+# custom bookmarks
+vim ~/.config/gtk-3.0/bookmarks
 ```
+
+> Don't know how to remove "Starred" yet...
