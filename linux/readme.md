@@ -149,6 +149,15 @@ export LD_LIBRARY_PATH
 ./tor
 ```
 
+### Building Tor
+
+```sh
+# add debug flag
+export CFLAG='-ggdb'
+sh autogen.sh && ./configure && make
+/src/app/tor
+```
+
 ### Get Onion Service Running
 
 * run Tor browser once to populate default settings
