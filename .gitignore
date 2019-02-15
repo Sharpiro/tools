@@ -6,3 +6,5 @@ settings.json
 node_modules
 dist
 __pycache__
+.nyc_output
+coverage
