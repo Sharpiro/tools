@@ -48,6 +48,34 @@ Copy ```.sh``` script to ```/etc/profile.d```
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
+## Keyboard Mapping
+
+```sh
+# create new symbols file
+sudo vim /usr/share/X11/xkb/symbols/custom
+
+# OR update default symbols file
+sudo vim /usr/share/X11/xkb/symbols/us
+```
+
+```sh
+# paste in the following
+xkb_symbols "custom" {
+
+ name[Group1] = "Custom";
+ include "us(basic)"
+
+        key <RALT> {        [     Home,     Home            ]       };
+        key <RCTL> {        [     End,      End             ]       };
+};
+
+```
+
+```sh
+# load new symbol configuration
+setxkbmap custom
+```
+
 ## Disk commands
 
 ### List information
