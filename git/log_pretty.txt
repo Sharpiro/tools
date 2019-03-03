@@ -1,1 +1,0 @@
-git log --pretty=format:"%h - %ae, %ce : %s" -1
