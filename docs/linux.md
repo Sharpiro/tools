@@ -226,6 +226,13 @@ Add the following to ```~/.inputrc``` for current user or ```/etc/inputrc``` for
 set completion-ignore-case On
 ```
 
+### Git credetial libsecret
+
+```sh
+git config --global credential.helper /usr/libexec/git-core/git-credential-libsecret
+```
+
+
 ## Misc
 
 ### iPhone detection fix
