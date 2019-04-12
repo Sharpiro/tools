@@ -1,76 +1,50 @@
-#load "RequestInfo.csx"
-#load "Obfuscation.csx"
+#load "args.csx"
 
 using System.Net;
 using System.Net.Http;
 
-var byteObfuscator = new ByteSwapper();
-var parsedArguments = ParseArgs();
-var requestInfo = GetRequestInfo(parsedArguments.urlArgument, parsedArguments.options);
-if (requestInfo.IsDebug)
+async Task Main()
 {
-    WriteLine($"environmentProxyUrl: '{requestInfo.EnvironmentProxy}'");
-    WriteLine($"Proxy: '{requestInfo.Proxy}'");
-    WriteLine($"RequestUrl: '{requestInfo.RequestUrl}'");
-    WriteLine($"UrlBase64encodedRequestUrl: '{requestInfo.UrlBase64EncodedRequestUrl}'");
-    WriteLine($"generatedRequestUrl: '{requestInfo.GeneratedRequestUrl}'\r\n\r\n");
-}
+    Func<byte, byte> Obfuscate = (byte b) => (byte)~b;
+    var (requestUrl, parsedOptions) = ParseArgs();
+    var requestOptions = GetRequestOptions(requestUrl, parsedOptions);
+    var obfuscatedRequestUrl = Encoding.UTF8.GetBytes(requestUrl).Select(Obfuscate).ToArray();
+    var postData = Convert.ToBase64String(obfuscatedRequestUrl);
 
-var localProxy = requestInfo.LocalProxy ?? requestInfo.EnvironmentProxy;
-var httpClientHandler = new HttpClientHandler { Proxy = new WebProxy(localProxy) };
-var httpClient = requestInfo.EnvironmentProxy == null ? new HttpClient() : new HttpClient(httpClientHandler, disposeHandler: true);
-var res = await httpClient.GetAsync(requestInfo.GeneratedRequestUrl);
-if (res.StatusCode != HttpStatusCode.OK)
-{
-    var reason = await res.Content.ReadAsStringAsync();
-    throw new Exception($"Response was not successful.  Reason: '{reason}'");
-}
+    WriteLine($"LocalProxy: '{requestOptions.LocalProxy}'");
+    WriteLine($"RemoteProxy: '{requestOptions.RemoteProxy}'");
+    WriteLine($"RequestUrl: '{requestUrl}'");
+    WriteLine($"Post Data: '{postData}'");
+    WriteLine("\n------------------------------------------------------------------------------\n");
 
-var bytes = (await res.Content.ReadAsByteArrayAsync()).Select(byteObfuscator.Obfuscate).ToArray();
+    var httpClient = requestOptions.LocalProxy == null ?
+        new HttpClient() :
+        new HttpClient(new HttpClientHandler { Proxy = new WebProxy(requestOptions.LocalProxy) });
 
-if (requestInfo.FileName != null)
-{
-    File.WriteAllBytes(requestInfo.FileName, bytes);
-    return;
-}
-
-WriteLine(Encoding.UTF8.GetString(bytes));
-
-(string urlArgument, Dictionary<string, string> options) ParseArgs()
-{
-    var tempArgs = Args;
-    if (tempArgs.Count < 1) throw new Exception("Must provide url for request");
-
-    var map = new Dictionary<string, string>();
-    if (tempArgs.Count > 1)
+    var response = await httpClient.PostAsync(requestOptions.RemoteProxy, new StringContent(postData));
+    if (response.StatusCode != HttpStatusCode.OK)
     {
-        for (var i = 1; i < tempArgs.Count; i += 2)
-        {
-            if (i + 1 >= tempArgs.Count) throw new Exception($"Invalid data @ '{tempArgs[i]}'");
-            map.Add(tempArgs[i], tempArgs[i + 1]);
-        }
+        var reason = await response.Content.ReadAsStringAsync();
+        throw new Exception($"Response was not successful.  Reason: '{reason}'");
     }
 
-    return (Args[0], map);
-}
 
-RequestInfo GetRequestInfo(string urlArgument, Dictionary<string, string> options)
-{
-    const string defaultProxy = "https://sharpirotestfunctions.azurewebsites.net/api/HttpTriggerCSharp1?code=O756E2BV0acD9mDbtQ9J3jbZ4rysCcvn9nxhKwcvPmrTD1sXpj4MVw==";
+    var contentBuffer = await response.Content.ReadAsByteArrayAsync();
+    var unObfuscatedContent = contentBuffer.Select(Obfuscate).ToArray();
 
-    options.TryGetValue("-f", out string fileName);
-    options.TryGetValue("-p", out string proxy);
-    options.TryGetValue("-d", out string isDebugString);
-    options.TryGetValue("-lp", out string localProxy);
-    bool.TryParse(isDebugString, out bool isDebug);
-
-    var requestInfo = new RequestInfo(byteObfuscator)
+    if (requestOptions.FileName != null)
     {
-        RequestUrl = urlArgument,
-        FileName = fileName,
-        Proxy = proxy ?? defaultProxy,
-        LocalProxy = localProxy,
-        IsDebug = isDebug
-    };
-    return requestInfo;
+        File.WriteAllBytes(requestOptions.FileName, unObfuscatedContent);
+        return;
+    }
+
+    if (unObfuscatedContent.Length < 100_000)
+    {
+        WriteLine(Encoding.UTF8.GetString(unObfuscatedContent));
+        return;
+    }
+
+    WriteLine("Data too long to show in console...");
 }
+
+await Main();
