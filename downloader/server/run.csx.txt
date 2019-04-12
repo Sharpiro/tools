@@ -1,0 +1,35 @@
+#r "Newtonsoft.Json"
+
+using System.Net;
+using System.Text;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
+
+public static async Task<HttpResponseMessage> Run(HttpRequest req, ILogger log)
+{
+    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+    log.LogInformation($"raw request: {requestBody}");
+
+    var swappedBuffer = Convert.FromBase64String(requestBody);
+    var unswappedDataBuffer = Swap(swappedBuffer);
+    var dataUrl = Encoding.UTF8.GetString(unswappedDataBuffer);
+
+    log.LogInformation($"data url: {dataUrl}");
+    
+    var client = new HttpClient { Timeout = TimeSpan.FromHours(1) };
+    var response = await client.GetAsync(dataUrl);
+    var contentBuffer = await response.Content.ReadAsByteArrayAsync();
+
+    log.LogInformation($"content downloaded successfully... sending");
+
+    var swappedContentBuffer = Swap(contentBuffer);
+    var message = new HttpResponseMessage
+    {
+        Content = new ByteArrayContent(swappedContentBuffer)
+    };
+
+    return message;
+}
+
+static byte[] Swap(byte[] buffer) => buffer.Select(b => (byte)~b).ToArray();
