@@ -1,6 +1,6 @@
 (string urlArgument, Dictionary<string, string> options) ParseArgs()
 {
-    var args = Args; // for debug
+    var args = Args; // debug workaround
     if (args.Count < 1) throw new Exception("Must provide url for request");
 
     var map = new Dictionary<string, string>();
