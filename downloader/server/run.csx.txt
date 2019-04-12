@@ -8,10 +8,30 @@ using Newtonsoft.Json;
 
 public static async Task<HttpResponseMessage> Run(HttpRequest req, ILogger log)
 {
+    const string secret = "38762a56abf4da28884d818c8cff4b9b3878f7377b2474e4aad0b800b944f13b";
+    const int codeLifetimeSeconds = 5;
+
     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
     log.LogInformation($"raw request: {requestBody}");
 
-    var swappedBuffer = Convert.FromBase64String(requestBody);
+    dynamic requestObject = JsonConvert.DeserializeObject(requestBody);
+    var actualCodeCurrent = GetOneTimeCode(secret, DateTime.UtcNow, codeLifetimeSeconds);
+    if (actualCodeCurrent == requestObject.Code.Value)
+    {
+        log.LogInformation("current code matched");
+        goto process;
+    }
+    var actualCodeOld = GetOneTimeCode(secret, DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(codeLifetimeSeconds)), codeLifetimeSeconds);
+    if (actualCodeOld == requestObject.Code.Value)
+    {
+        log.LogInformation("old code matched");
+        goto process;
+    }
+    return new HttpResponseMessage(HttpStatusCode.BadRequest){Content = new StringContent("error: code did not match!")};
+
+process:
+
+    var swappedBuffer = Convert.FromBase64String(requestObject.Data.Value);
     var unswappedDataBuffer = Swap(swappedBuffer);
     var dataUrl = Encoding.UTF8.GetString(unswappedDataBuffer);
 
@@ -33,3 +53,17 @@ public static async Task<HttpResponseMessage> Run(HttpRequest req, ILogger log)
 }
 
 static byte[] Swap(byte[] buffer) => buffer.Select(b => (byte)~b).ToArray();
+
+public static string GetOneTimeCode(string secret, DateTime date, int codeLifetimeSeconds)
+{
+    using (var alg = System.Security.Cryptography.HashAlgorithm.Create("sha256"))
+    {
+        var roundedSeconds = codeLifetimeSeconds * (date.Second / codeLifetimeSeconds);
+        var roundedTime = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, roundedSeconds);
+        var ticksBuffer = BitConverter.GetBytes(roundedTime.Ticks);
+        var buffer = Encoding.UTF8.GetBytes(secret).Concat(ticksBuffer).ToArray();
+        var hash = alg.ComputeHash(alg.ComputeHash(buffer));
+        var base64Hash = Convert.ToBase64String(hash);
+        return base64Hash;
+    }
+}
