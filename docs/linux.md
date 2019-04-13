@@ -50,6 +50,22 @@ export PATH="$HOME/.cargo/bin:$PATH"
 
 ## Keyboard Mapping
 
+### Terminal
+
+```sh
+# special characters section
+ stty --help | less
+
+# change "interrupt" to ctrl-k
+stty intr \^k
+
+# change "delete-line" to escape
+# https://askubuntu.com/a/760450/837828
+bind '"\e": unix-line-discard'
+```
+
+### Global
+
 ```sh
 # create new symbols file
 sudo vim /usr/share/X11/xkb/symbols/custom
@@ -231,7 +247,6 @@ set completion-ignore-case On
 ```sh
 git config --global credential.helper /usr/libexec/git-core/git-credential-libsecret
 ```
-
 
 ## Misc
 
