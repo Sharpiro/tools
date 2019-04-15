@@ -1,6 +1,5 @@
 bin
 obj
-settings.json
 .vs
 .ropeproject
 node_modules
