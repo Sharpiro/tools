@@ -6,6 +6,19 @@ import secrets
 
 irreduciblePolynomial = 0x11b
 
+def add_bin(x, y):
+    carry = 0
+    z = 0
+    for i in range(9):
+        two_power = 1 << i
+        x_i = (x & two_power) >> i
+        y_i = (y & two_power) >> i
+        sum_i_carry = x_i ^ y_i ^ carry
+        if (sum_i_carry == 1):
+            z = z ^ two_power
+        carry = (x_i & y_i) | (x_i & carry) | (y_i & carry)
+    return z
+
 def bits(n):
     """
     Generates the binary digits of n, starting
@@ -61,16 +74,26 @@ def sharesize(secretSizeBytes):
     return secretSizeBytes*8+16+16+10
 
 
-# bug: =  binary(58 & 1, 8)
-def binary(number, maxPadding=8, endianness="be", separator=8):
-    if number > 0:
+def binary(number, endianness="be", sep=8, size=0):
+    """
+        Converts a number to a string of bits.
+    """
+    sep = sep if sep != 0 else 9000
+    if number >= 0:
+        min_bits = 0 if number == 0 else math.floor(math.log2(number)) + 1
+        min_bits_rounded =  8 if min_bits % 8 == 0 else min_bits + 8 - (min_bits % 8)
+        temp_padding = size if size > 0 else min_bits_rounded
         binaryString = bin(number)[2:]
-        paddedBinary = ("0"*maxPadding)[len(binaryString):] + binaryString
+        paddedBinary = ("0"*temp_padding)[len(binaryString):] + binaryString
     else:
-        mask = int("1"*maxPadding, 2)
+        min_bits = math.floor(math.log2((-number)* 2 - 1)) + 1
+        min_bits_rounded =  min_bits if min_bits % 8 == 0 else min_bits + 8 - (min_bits % 8)
+        temp_padding = min_bits if size <= min_bits else size
+
+        mask = int("1"*temp_padding, 2)
         binaryString = bin(number & mask)[2:]
         paddedBinary = binaryString
-    byteGroups = (paddedBinary[i:i+separator] for i in range(0, len(paddedBinary), separator))
+    byteGroups = (paddedBinary[i:i+sep] for i in range(0, len(paddedBinary), sep))
     if endianness == "le":
         byteGroups = reversed(list(byteGroups))
     separatedBinary = "-".join(byteGroups)
@@ -78,6 +101,9 @@ def binary(number, maxPadding=8, endianness="be", separator=8):
 
 
 def binList(byteIterable, maxPadding=8):
+    """
+        Converts a byte array to a string of bits
+    """
     bits = list()
     for byte in byteIterable:
         binaryData = bin(byte)[2:]
@@ -87,6 +113,9 @@ def binList(byteIterable, maxPadding=8):
 
 
 def fromBinList(binaryString, split=8):
+    """
+        Converts a string of bits into an array of numbers
+    """
     bitGroups = list((binaryString[i:i+split]
                       for i in range(0, len(binaryString), split)))
     numberGroups = (str(int(x, 2)) for x in bitGroups)
