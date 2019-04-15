@@ -1,7 +1,6 @@
 import hashlib
 import inspect
 import binascii
-# import numpy
 import math
 import secrets
 
@@ -62,6 +61,7 @@ def sharesize(secretSizeBytes):
     return secretSizeBytes*8+16+16+10
 
 
+# bug: =  binary(58 & 1, 8)
 def binary(number, maxPadding=8, endianness="be", separator=8):
     if number > 0:
         binaryString = bin(number)[2:]
@@ -147,10 +147,3 @@ def fast(start, end):
 
 def sig(func):
     return inspect.signature(func)
-
-
-# def mortgage(ratePercent, mortgagePeriodYears, presentValue):
-#     rate = ratePercent / 100 / 12
-#     numberOfPeriods = mortgagePeriodYears * 12
-#     monthlyPayment = numpy.pmt(rate, numberOfPeriods, presentValue)
-#     return monthlyPayment, monthlyPayment * numberOfPeriods, 13
