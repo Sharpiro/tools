@@ -19,17 +19,6 @@ def add_bin(x, y):
         carry = (x_i & y_i) | (x_i & carry) | (y_i & carry)
     return z
 
-def bits(n):
-    """
-    Generates the binary digits of n, starting
-    from the least significant bit.
-
-    bits(151) -> 1, 1, 1, 0, 1, 0, 0, 1 // 8 bits
-    """
-    while n:
-        yield n & 1
-        n >>= 1
-
 def double_and_add(n, x):
     """
     Returns the result of n * x, computed using
@@ -81,23 +70,54 @@ def binary(number, endianness="be", sep=8, size=0):
     sep = sep if sep != 0 else 9000
     if number >= 0:
         min_bits = 0 if number == 0 else math.floor(math.log2(number)) + 1
-        min_bits_rounded =  8 if min_bits % 8 == 0 else min_bits + 8 - (min_bits % 8)
-        temp_padding = size if size > 0 else min_bits_rounded
+        min_bits_rounded =  8 if min_bits % 8 == 0 else (min_bits + 8) - (min_bits % 8)
+
+        determined_size = size if size > min_bits else min_bits_rounded
+        rounded_size = determined_size if determined_size % 8 == 0 else (determined_size + 8) - (determined_size % 8)
+
         binaryString = bin(number)[2:]
-        paddedBinary = ("0"*temp_padding)[len(binaryString):] + binaryString
+        paddedBinary = ("0"*rounded_size)[len(binaryString):] + binaryString
     else:
         min_bits = math.floor(math.log2((-number)* 2 - 1)) + 1
         min_bits_rounded =  min_bits if min_bits % 8 == 0 else min_bits + 8 - (min_bits % 8)
-        temp_padding = min_bits if size <= min_bits else size
 
-        mask = int("1"*temp_padding, 2)
+        determined_size = size if size > min_bits else min_bits_rounded
+        rounded_size = determined_size if determined_size % 8 == 0 else (determined_size + 8) - (determined_size % 8)
+
+        mask = int("1"*rounded_size, 2)
         binaryString = bin(number & mask)[2:]
         paddedBinary = binaryString
-    byteGroups = (paddedBinary[i:i+sep] for i in range(0, len(paddedBinary), sep))
-    if endianness == "le":
-        byteGroups = reversed(list(byteGroups))
-    separatedBinary = "-".join(byteGroups)
-    return separatedBinary
+
+    determined_size = size if size > 0 else min_bits_rounded
+    determined_size = determined_size if determined_size >= min_bits else min_bits
+    byteGroups = list((paddedBinary[i:i+8] for i in range(0, len(paddedBinary), 8)))
+    sig_bits = determined_size if len(byteGroups) <= 1 else determined_size % ((len(byteGroups) - 1)  * 8)
+    byteGroups[0]= byteGroups[0][-sig_bits:]
+    byteGroups = byteGroups if endianness == "be" else reversed(byteGroups)
+
+    trimmed_binary = "".join(byteGroups)
+    sep_binary = ""
+    for i, v in enumerate(trimmed_binary[::-1]) if endianness == "be" else enumerate(trimmed_binary):
+        if i != 0 and i % sep == 0:
+            sep_binary += "-"
+        sep_binary += v
+
+    final = sep_binary[::-1] if endianness == "be" else sep_binary
+    return final
+
+def bits(n):
+    """
+    Returns an array of the binary digits of n, starting
+    from the least significant bit.
+
+    bits(151) -> 1, 1, 1, 0, 1, 0, 0, 1 // 8 bits
+    """
+    def temp(n):
+        while n:
+            yield n & 1
+            n >>= 1
+
+    return list(temp(n))
 
 
 def binList(byteIterable, maxPadding=8):
