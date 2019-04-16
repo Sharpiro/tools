@@ -1,5 +1,5 @@
 import math
-from main import binary
+from main import binary, bits
 # x = -255
 # # x = 152405818018898732
 # # bits = 64
@@ -32,8 +32,8 @@ from main import binary
 # print(res)
 # print(len(res))
 
-n = 16
-padding = 10 - (n*8) % 10
+# n = 16
+# padding = 10 - (n*8) % 10
 
 # # (size, value)
 # id = (15, binary(99, size=15, sep=0))
@@ -77,9 +77,14 @@ padding = 10 - (n*8) % 10
 
 # print(iteration_exponent)
 # 55210138423
-x =binary(-258, "be", size=31, sep=0)
+x = binary(55, "be")
 print(x)
-print(len(x))
+# print(len(x))
+
+# number = -129
+# print(math.floor(math.log2((-number)* 2 - 1)) + 1)
+# print(math.floor(math.log2((-number << 1) - 1)) + 1)
+
 
 # data = [1,2,3,4,5,6,7,8,9,10]
 # print(data[-5:])

@@ -67,29 +67,27 @@ def binary(number, endianness="be", sep=8, size=0):
     """
         Converts a number to a string of bits.
     """
-    sep = sep if sep != 0 else 9000
-    if number >= 0:
-        min_bits = 0 if number == 0 else math.floor(math.log2(number)) + 1
+
+    def get_bit_sizes(temp):
+        min_bits = 0 if temp == 0 else math.floor(math.log2(temp)) + 1
         min_bits_rounded =  8 if min_bits % 8 == 0 else (min_bits + 8) - (min_bits % 8)
-
-        determined_size = size if size > min_bits else min_bits_rounded
-        rounded_size = determined_size if determined_size % 8 == 0 else (determined_size + 8) - (determined_size % 8)
-
+        temp_size = size if size > min_bits else min_bits_rounded
+        rounded_size = temp_size if temp_size % 8 == 0 else (temp_size + 8) - (temp_size % 8)
+        determined_size = size if size > 0 else min_bits_rounded
+        determined_size = determined_size if determined_size >= min_bits else min_bits
+        return (rounded_size, determined_size)
+    
+    sep = sep if sep != 0 else 9001
+    if number >= 0:
+        rounded_size, determined_size = get_bit_sizes(number)
         binaryString = bin(number)[2:]
         paddedBinary = ("0"*rounded_size)[len(binaryString):] + binaryString
     else:
-        min_bits = math.floor(math.log2((-number)* 2 - 1)) + 1
-        min_bits_rounded =  min_bits if min_bits % 8 == 0 else min_bits + 8 - (min_bits % 8)
-
-        determined_size = size if size > min_bits else min_bits_rounded
-        rounded_size = determined_size if determined_size % 8 == 0 else (determined_size + 8) - (determined_size % 8)
-
-        mask = int("1"*rounded_size, 2)
+        rounded_size, determined_size = get_bit_sizes((-number << 1) - 1)
+        mask = 2**rounded_size - 1
         binaryString = bin(number & mask)[2:]
         paddedBinary = binaryString
 
-    determined_size = size if size > 0 else min_bits_rounded
-    determined_size = determined_size if determined_size >= min_bits else min_bits
     byteGroups = list((paddedBinary[i:i+8] for i in range(0, len(paddedBinary), 8)))
     sig_bits = determined_size if len(byteGroups) <= 1 else determined_size % ((len(byteGroups) - 1)  * 8)
     byteGroups[0]= byteGroups[0][-sig_bits:]
@@ -112,13 +110,13 @@ def bits(n):
 
     bits(151) -> 1, 1, 1, 0, 1, 0, 0, 1 // 8 bits
     """
-    def temp(n):
-        while n:
+
+    def get(n):
+        while n < -1 or n > 0:
             yield n & 1
             n >>= 1
 
-    return list(temp(n))
-
+    return list(get(n))
 
 def binList(byteIterable, maxPadding=8):
     """
