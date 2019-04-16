@@ -8,10 +8,20 @@ class BinaryTests(unittest.TestCase):
         expected="00000000"
         actual = binary(0, "be")
         self.assertEqual(expected, actual)
+
+    def test_one(self):
+        expected="00000001"
+        actual = binary(1, "be")
+        self.assertEqual(expected, actual)
     
     def test_negative_one(self):
         expected="11111111"
         actual = binary(-1, "be")
+        self.assertEqual(expected, actual)
+
+    def test_negative_two(self):
+        expected="11111110"
+        actual = binary(-2, "be")
         self.assertEqual(expected, actual)
 
     def test_small(self):
