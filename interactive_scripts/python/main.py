@@ -68,40 +68,38 @@ def binary(number, endianness="be", sep=8, size=0):
         Converts a number to a string of bits.
     """
 
-    def get_bit_sizes(temp):
-        min_bits = 0 if temp == 0 else math.floor(math.log2(temp)) + 1
-        min_bits_rounded =  8 if min_bits % 8 == 0 else (min_bits + 8) - (min_bits % 8)
-        temp_size = size if size > min_bits else min_bits_rounded
-        rounded_size = temp_size if temp_size % 8 == 0 else (temp_size + 8) - (temp_size % 8)
-        determined_size = size if size > 0 else min_bits_rounded
-        determined_size = determined_size if determined_size >= min_bits else min_bits
-        return (rounded_size, determined_size)
+    def get_max_bits(number):
+        min_bits = 0 if number == 0 else math.floor(math.log2(number)) + 1
+        min_bits_ceil =  8 if min_bits % 8 == 0 else (min_bits + 8) - (min_bits % 8)
+        max_bits = min_bits_ceil if size == 0 else size
+        max_bits = max_bits if max_bits >= min_bits else min_bits
+        max_bits_ceil = max_bits if max_bits % 8 == 0 else (max_bits + 8) - (max_bits % 8)
+        return (max_bits, max_bits_ceil)
     
-    sep = sep if sep != 0 else 9001
+    # create padded binary in big endian
     if number >= 0:
-        rounded_size, determined_size = get_bit_sizes(number)
+        max_bits, max_bits_ceil = get_max_bits(number)
         binaryString = bin(number)[2:]
-        paddedBinary = ("0"*rounded_size)[len(binaryString):] + binaryString
+        paddedBinary = ("0"*max_bits_ceil)[len(binaryString):] + binaryString
     else:
-        rounded_size, determined_size = get_bit_sizes((-number << 1) - 1)
-        mask = 2**rounded_size - 1
-        binaryString = bin(number & mask)[2:]
-        paddedBinary = binaryString
+        max_bits, max_bits_ceil = get_max_bits((-number << 1) - 1)
+        mask = 2**max_bits_ceil - 1
+        paddedBinary = bin(number & mask)[2:]
+    if endianness == "be" and max_bits_ceil == max_bits and sep <= 0: return paddedBinary
 
+    # trim bits and arrange endianness
     byteGroups = list((paddedBinary[i:i+8] for i in range(0, len(paddedBinary), 8)))
-    sig_bits = determined_size if len(byteGroups) <= 1 else determined_size % ((len(byteGroups) - 1)  * 8)
-    byteGroups[0]= byteGroups[0][-sig_bits:]
-    byteGroups = byteGroups if endianness == "be" else reversed(byteGroups)
-
+    sig_bits = max_bits if len(byteGroups) <= 1 else max_bits % ((len(byteGroups) - 1)  * 8)
+    byteGroups[0] = byteGroups[0][-sig_bits:]
+    byteGroups = byteGroups if endianness == "be" else byteGroups[::-1]
     trimmed_binary = "".join(byteGroups)
-    sep_binary = ""
-    for i, v in enumerate(trimmed_binary[::-1]) if endianness == "be" else enumerate(trimmed_binary):
-        if i != 0 and i % sep == 0:
-            sep_binary += "-"
-        sep_binary += v
+    if sep <= 0: return trimmed_binary
 
-    final = sep_binary[::-1] if endianness == "be" else sep_binary
-    return final
+    # create binary string with separator
+    iterator = enumerate(trimmed_binary[::-1]) if endianness == "be" else enumerate(trimmed_binary)
+    separated_binary = "".join(f"-{v}" if i != 0 and i % sep == 0 else v for i, v in iterator)
+    separated_binary = separated_binary[::-1] if endianness == "be" else separated_binary
+    return separated_binary
 
 def bits(n):
     """
