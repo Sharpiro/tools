@@ -34,6 +34,16 @@ class BinaryTests(unittest.TestCase):
         actual = binary(-55, "be")
         self.assertEqual(expected, actual)
 
+    def test_zero_sep(self):
+        expected="100000010"
+        actual = binary(258, "be", size=1, sep=0)
+        self.assertEqual(expected, actual)
+
+    def test_one_sep(self):
+        expected="0-0-0-0-0-0-0-1-0-0-0-0-0-0-1-0"
+        actual = binary(258, "be", sep=1)
+        self.assertEqual(expected, actual)
+
     # regular number
 
     def test_be(self):
