@@ -59,11 +59,33 @@ def rs1024_create_checksum(cs, data):
     return [(polymod >> 10 * (2 - i)) & 1023 for i in range(3)]
 
 
-def sharesize(secretSizeBytes):
-    return secretSizeBytes*8+16+16+10
+def be(big_endian_string):
+    """
+        Converts a string of big endian bits to a number
+    """
+    return int(big_endian_string.replace("-", ""), 2)
+    
 
 
-def binary(number, endianness="be", sep=8, size=0):
+def le(little_endian_string):
+    """
+        Converts a string of little endian bits to a number
+    """
+    bit_list = little_endian_string.split("-")
+    if len(bit_list) > 1:
+        bit_list = bit_list[::-1]
+        bits = "".join(bit_list)
+        number = int(bits, 2)
+        return number
+    
+    bit_list = list(little_endian_string[i-8:i] for i in range(8, len(little_endian_string) + 1, 8))
+    bit_list = bit_list[::-1]
+    bits = "".join(bit_list)
+    number = int(bits, 2)
+    return number
+
+
+def binary(number, endianness="be", sep=8, size=0, fmt="b"):
     """
         Converts a number to a string of bits.
     """
@@ -99,7 +121,11 @@ def binary(number, endianness="be", sep=8, size=0):
     iterator = enumerate(trimmed_binary[::-1]) if endianness == "be" else enumerate(trimmed_binary)
     separated_binary = "".join(f"-{v}" if i != 0 and i % sep == 0 else v for i, v in iterator)
     separated_binary = separated_binary[::-1] if endianness == "be" else separated_binary
-    return separated_binary
+    if fmt == "b": return separated_binary
+    
+    # display separated groups in a different format
+    temp = (str(int(n, 2)) for n in separated_binary.split("-"))
+    return "-".join(temp)
 
 def bits(n):
     """
