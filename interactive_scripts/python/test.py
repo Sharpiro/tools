@@ -1,5 +1,5 @@
 import math
-from main import binary, bits
+from main import binary, bits, le
 # x = -255
 # # x = 152405818018898732
 # # bits = 64
@@ -77,9 +77,10 @@ from main import binary, bits
 
 # print(iteration_exponent)
 # 55210138423
-x = binary(55, "be")
+# print(le("0000001000000001"))
+x = binary(51228, "le", sep=10, fmt="d")
 print(x)
-# print(len(x))
+print(len(x))
 
 # number = -129
 # print(math.floor(math.log2((-number)* 2 - 1)) + 1)
