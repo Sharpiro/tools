@@ -124,8 +124,12 @@ def binary(number, endianness="be", sep=8, size=0, fmt="b"):
     if fmt == "b": return separated_binary
     
     # display separated groups in a different format
-    temp = (str(int(n, 2)) for n in separated_binary.split("-"))
-    return "-".join(temp)
+    formatted_groups = list((int(n, 2) for n in separated_binary.split("-")))
+    if fmt == "d": return formatted_groups
+    hex_length = (math.ceil((max_bits_ceil // 4) / len(formatted_groups)))
+    hex_length_rounded = hex_length + (hex_length % 2)
+    formatted_groups = list((f"0x%0{hex_length_rounded}x" % n for n in formatted_groups))
+    return formatted_groups
 
 def bits(n):
     """

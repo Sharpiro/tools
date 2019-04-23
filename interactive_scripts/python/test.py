@@ -78,9 +78,10 @@ from main import binary, bits, le
 # print(iteration_exponent)
 # 55210138423
 # print(le("0000001000000001"))
-x = binary(51228, "le", sep=10, fmt="d")
+x = binary(725425835, "be", sep=10, fmt="h", size=1)
 print(x)
 print(len(x))
+# print(x[::-1])
 
 # number = -129
 # print(math.floor(math.log2((-number)* 2 - 1)) + 1)
