@@ -13,6 +13,15 @@ async Task Main()
 
     var code = GetOneTimeCode(secret, DateTime.UtcNow, codeLifetimeSeconds);
     Func<byte, byte> Obfuscate = (byte b) => (byte)~b;
+    if (Args.Count < 1)
+    {
+        WriteLine("proxy <url>");
+        WriteLine("-r : remote proxy");
+        WriteLine("-p : local proxy");
+        WriteLine("-o : output to file with optional file name");
+        return;
+    }
+
     var (requestUrl, parsedOptions) = ParseArgs();
     var requestOptions = GetRequestOptions(requestUrl, parsedOptions);
     var obfuscatedRequestUrl = Encoding.UTF8.GetBytes(requestUrl).Select(Obfuscate).ToArray();

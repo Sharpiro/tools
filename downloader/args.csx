@@ -3,6 +3,11 @@
     var args = Args; // debug workaround
     if (args.Count < 1) throw new Exception("Must provide url for request");
 
+    
+    if (!System.Text.RegularExpressions.Regex.Match(args[0], "https?://.*[.].*").Success){
+        throw new Exception($"Invalid url '{args[0]}', ensure protocol is provided (http/https)");
+    }
+
     var map = new Dictionary<string, string>();
     if (args.Count > 1)
     {
