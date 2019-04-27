@@ -1,12 +1,29 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
     <!-- when using the mode "code", it's important to specify charset utf-8 -->
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 
 </head>
+
 <body>
-    <div id="leftEditor" style="width: 400px; height: 400px;"></div>
-    <div id="rightEditor" style="width: 400px; height: 400px;"></div>
+    <div class="flex-container">
+        <div id="leftEditor" class="editor"></div>
+        <div class="button-column">
+            <div>
+                <button id="rightButton">
+                    <div class="button-image-right"></div>
+                </button>
+            </div>
+            <div>
+                <button id="leftButton">
+                    <div class="button-image-left"></div>
+                </button>
+            </div>
+        </div>
+        <div id="rightEditor" class="editor"></div>
+    </div>
 </body>
+
 </html>

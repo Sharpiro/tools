@@ -1,1 +1,35 @@
 @import '~jsoneditor/dist/jsoneditor.min.css';
+
+.flex-container {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+  
+.flex-container > .editor {
+    height: 96vh;
+    flex-basis: 50%;
+    padding : 0px 10px 0px 10px
+}
+
+.flex-container > .button-column {
+    height: 96vh;
+    flex-basis: 1%;
+}
+
+button{
+    display: block;
+    margin: 25px auto 25px auto;
+}
+
+.button-image-right{
+    background: url(~jsoneditor/dist/img/jsoneditor-icons.svg) 0 -48px;
+    width: 24px;
+    height: 24px;
+}
+
+.button-image-left{
+    background: url(~jsoneditor/dist/img/jsoneditor-icons.svg) -24px -48px;
+    width: 24px;
+    height: 24px;
+}
