@@ -59,9 +59,23 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # change "interrupt" to ctrl-k
 stty intr \^k
 
-# change "delete-line" to escape
-# https://askubuntu.com/a/760450/837828
-bind '"\e": unix-line-discard'
+# clear line with escape
+bind '"\e":"\C-k \C-u"'
+
+# clear screen with ctrl-r
+bind '"\C-r":"\C-k \C-uclear\n"'
+
+# alt-shift-w to execute command w/o disturbing current line
+bind -x '"\eW":"who"'
+```
+
+#### Persistent Terminal Bindings
+
+add to `~/.inputrc`
+
+```sh
+"\C-r":"\C-k \C-uclear\n"
+"\e":"\C-k \C-u"
 ```
 
 ### Global
