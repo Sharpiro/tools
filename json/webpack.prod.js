@@ -9,7 +9,6 @@ module.exports = merge(common, {
         new HtmlWebpackPlugin({
             title: 'Output Management',
             template: 'src/index.html',
-            favicon: "src/favicon.ico",
             inlineSource: '.(js|css|svg)$'
         }),
         new HtmlWebpackInlineSourcePlugin()
