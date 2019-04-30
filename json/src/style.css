@@ -22,14 +22,19 @@ button{
     margin: 25px auto 25px auto;
 }
 
-.button-image-right{
-    background: var(--main-svg) 0 -48px;
+.button-image{
     width: 24px;
     height: 24px;
 }
 
-.button-image-left{
+.image-right{
+    background: var(--main-svg) 0 -48px;
+}
+
+.image-left{
     background: var(--main-svg) -24px -48px;
-    width: 24px;
-    height: 24px;
+}
+
+.image-help{
+    background: var(--main-svg) -168px -48px;
 }
