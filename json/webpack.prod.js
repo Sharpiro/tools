@@ -9,7 +9,11 @@ module.exports = merge(common, {
         new HtmlWebpackPlugin({
             title: 'Output Management',
             template: 'src/index.html',
-            inlineSource: '.(js|css|svg)$'
+            inlineSource: '.(js|css|svg)$',
+            minify: {
+                collapseWhitespace: true,
+                removeComments: true
+            }
         }),
         new HtmlWebpackInlineSourcePlugin()
     ],
