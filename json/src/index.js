@@ -1,5 +1,6 @@
 import * as JSONEditor from "jsoneditor"
 import './style.css'
+import "./modal/modal-component"
 
 const localStorageKey = "jsonData"
 
@@ -26,6 +27,27 @@ function updateLeftEditor() {
     leftEditor.set(rightJson)
 }
 
+function showHelpModal() {
+    const dataModal = document.createElement("data-modal")
+    dataModal.closed.on(null, () => {
+        console.log("it was closed callback..")
+        document.body.removeChild(dataModal)
+    })
+    document.body.appendChild(dataModal)
+    dataModal.open()
+}
+
+
+const INITIAL_JSON = {
+    "Array": [1, 2, 3],
+    "Boolean": true,
+    "Null": null,
+    "Number": 123,
+    "Object": { "a": "b", "c": "d" },
+    "String": "Hello World",
+    "Color": "#aabbcc"
+}
+
 function GetInitialJson() {
     try {
         const jsonString = localStorage.getItem(localStorageKey)
@@ -39,32 +61,32 @@ function GetInitialJson() {
         console.log(err)
     }
 
-    return {
-        "Array": [1, 2, 3],
-        "Boolean": true,
-        "Null": null,
-        "Number": 123,
-        "Object": { "a": "b", "c": "d" },
-        "String": "Hello World",
-        "Color": "#aabbcc"
-    }
+    return INITIAL_JSON
 }
 
 document.onkeydown = event => {
-    if (!event.ctrlKey || event.key != "s") return
-
+    console.log(event)
+    if (!event.ctrlKey) return
     event.preventDefault()
-    for (const element of event.path) {
-        if (element.id == "rightEditor") {
-            updateLeftEditor()
-            return
-        }
-        if (element.id == "leftEditor") {
-            updateRightEditor()
-            return
+
+    if (event.shiftKey && event.code === "KeyR") {
+        leftEditor.set(INITIAL_JSON)
+        rightEditor.set(INITIAL_JSON)
+    }
+    else if (event.key === "s") {
+        for (const element of event.path) {
+            if (element.id == "rightEditor") {
+                updateLeftEditor()
+                return
+            }
+            if (element.id == "leftEditor") {
+                updateRightEditor()
+                return
+            }
         }
     }
 }
 
 rightButton.onclick = () => updateRightEditor()
 leftButton.onclick = () => updateLeftEditor()
+helpButton.onclick = () => showHelpModal()
