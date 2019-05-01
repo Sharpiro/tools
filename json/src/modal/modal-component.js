@@ -1,5 +1,7 @@
-import templateText from './modal-component.html';
 import { EventEmitter } from 'events';
+import { getTemplateContent, getStyleNode } from "../element-functions"
+import templateText from './modal-component.html';
+import componentCssData from './modal-component.css';
 
 customElements.define('data-modal', class extends HTMLElement {
     get closed() {
@@ -10,8 +12,9 @@ customElements.define('data-modal', class extends HTMLElement {
         super();
         this._closed = new EventEmitter()
 
-        const templateContent = this.getTemplateContent(templateText)
+        const templateContent = getTemplateContent(templateText)
         const shadowRoot = this.attachShadow({ mode: 'open' });
+        shadowRoot.appendChild(getStyleNode(componentCssData[0][1]))
         shadowRoot.appendChild(templateContent);
         this.dataModalContainer = shadowRoot.getElementById('data-modal-container')
 
@@ -22,16 +25,9 @@ customElements.define('data-modal', class extends HTMLElement {
         this.dataModalContainer.style.display = "block";
     }
 
-
     close() {
         this.closed.emit(null)
         this.dataModalContainer.style.display = "none";
-    }
-
-    getTemplateContent(htmlText) {
-        var template = document.createElement('template');
-        template.innerHTML = htmlText;
-        return template.content.cloneNode(true);
     }
 
     registerEvents(shadowRoot) {
