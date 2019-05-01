@@ -36,14 +36,15 @@ module.exports = merge(common, {
                 test: /\.css$/,
                 use: [
                     {
-                        loader: MiniCssExtractPlugin.loader,
-                        options: {
-                            // you can specify a publicPath here
-                            // by default it uses publicPath in webpackOptions.output
-                            publicPath: '../',
-                            hmr: process.env.NODE_ENV === 'development',
-                        },
+                        loader: MiniCssExtractPlugin.loader // instead of "style-loader"
                     },
+                    'css-loader' // order matters
+                ],
+                exclude: /component\.css$/
+            },
+            {
+                test: /component\.css$/, // css templates
+                use: [
                     'css-loader'
                 ]
             },
@@ -56,7 +57,7 @@ module.exports = merge(common, {
             {
                 test: /\.html$/,
                 exclude: /node_modules/,
-                use: {loader: 'html-loader'}
+                use: { loader: 'html-loader' }
             }
         ]
     }
