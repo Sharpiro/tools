@@ -1,7 +1,8 @@
 import * as JSONEditor from "jsoneditor"
 import './style.css'
-import "./modal/modal-component"
+import { ModalService } from "./modal/modal-service"
 
+const modalService = new ModalService()
 const localStorageKey = "jsonData"
 
 const initialJson = GetInitialJson()
@@ -27,27 +28,6 @@ function updateLeftEditor() {
     leftEditor.set(rightJson)
 }
 
-function showHelpModal() {
-    const dataModal = document.createElement("data-modal")
-    dataModal.closed.on(null, () => {
-        console.log("it was closed callback..")
-        document.body.removeChild(dataModal)
-    })
-    document.body.appendChild(dataModal)
-    dataModal.open()
-}
-
-
-const INITIAL_JSON = {
-    "Array": [1, 2, 3],
-    "Boolean": true,
-    "Null": null,
-    "Number": 123,
-    "Object": { "a": "b", "c": "d" },
-    "String": "Hello World",
-    "Color": "#aabbcc"
-}
-
 function GetInitialJson() {
     try {
         const jsonString = localStorage.getItem(localStorageKey)
@@ -65,7 +45,6 @@ function GetInitialJson() {
 }
 
 document.onkeydown = event => {
-    console.log(event)
     if (!event.ctrlKey) return
     event.preventDefault()
 
@@ -89,4 +68,14 @@ document.onkeydown = event => {
 
 rightButton.onclick = () => updateRightEditor()
 leftButton.onclick = () => updateLeftEditor()
-helpButton.onclick = () => showHelpModal()
+helpButton.onclick = () => modalService.open()
+
+const INITIAL_JSON = {
+    "Array": [1, 2, 3],
+    "Boolean": true,
+    "Null": null,
+    "Number": 123,
+    "Object": { "a": "b", "c": "d" },
+    "String": "Hello World",
+    "Color": "#aabbcc"
+}

@@ -1,48 +1,46 @@
 import templateText from './modal-component.html';
 import { EventEmitter } from 'events';
 
-let shadowRoot
-let templateElement
 customElements.define('data-modal', class extends HTMLElement {
+    get closed() {
+        return this._closed
+    }
 
     constructor() {
         super();
-        this.closed = new EventEmitter()
+        this._closed = new EventEmitter()
 
-        templateElement = this.parseHTML(templateText)
-        shadowRoot = this.attachShadow({ mode: 'open' });
-        shadowRoot.appendChild(templateElement.content.cloneNode(true));
-        this.modal = shadowRoot.getElementById('myModal')
+        const templateContent = this.getTemplateContent(templateText)
+        const shadowRoot = this.attachShadow({ mode: 'open' });
+        shadowRoot.appendChild(templateContent);
+        this.dataModalContainer = shadowRoot.getElementById('data-modal-container')
 
-        window.onclick = event => {
-            if (event.path[0].className === "modal") {
-                this.modal.style.display = "none";
-            }
-        }
-
-        var span = shadowRoot.querySelectorAll(".close")[0];
-        span.onclick = () => {
-            this.modal.style.display = "none";
-            this.visible = false
-            this.closed.emit(null)
-        }
+        this.registerEvents(shadowRoot)
     }
 
     open() {
-        this.modal.style.display = "block";
-        console.log("opening modal...")
+        this.dataModalContainer.style.display = "block";
     }
 
 
     close() {
-        console.log("closing modal...")
         this.closed.emit(null)
-        this.modal.style.display = "none";
+        this.dataModalContainer.style.display = "none";
     }
 
-    parseHTML(htmlText) {
-        var t = document.createElement('template');
-        t.innerHTML = htmlText;
-        return t;
+    getTemplateContent(htmlText) {
+        var template = document.createElement('template');
+        template.innerHTML = htmlText;
+        return template.content.cloneNode(true);
+    }
+
+    registerEvents(shadowRoot) {
+        window.onmousedown = event => {
+            if (event.path[0].id === "data-modal-container") {
+                this.close()
+            }
+        }
+
+        shadowRoot.getElementById("close-button").onclick = () => this.close()
     }
 });

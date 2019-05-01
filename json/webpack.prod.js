@@ -31,6 +31,11 @@ module.exports = merge(common, {
                 use: [
                     'file-loader'
                 ]
+            },
+            {
+                test: /\.html$/,
+                exclude: /node_modules/,
+                use: { loader: 'html-loader' }
             }
         ]
     }
