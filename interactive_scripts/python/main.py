@@ -3,8 +3,13 @@ import inspect
 import binascii
 import math
 import secrets
+import base64
+from pathlib import Path
+import os
 
 irreduciblePolynomial = 0x11b
+
+pwd = (lambda  : os.getcwd())()
 
 def add_bin(x, y):
     carry = 0
