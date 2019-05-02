@@ -14,8 +14,7 @@ module.exports = merge(common, {
         }),
         new HtmlWebpackPlugin({
             title: 'Output Management',
-            template: 'src/index.html',
-            favicon: "src/favicon.ico"
+            template: 'src/index.html'
         })
     ],
     devServer: {
