@@ -2,6 +2,16 @@ import * as JSONEditor from "jsoneditor"
 import './style.css'
 import { ModalService } from "./modal/modal-service"
 
+const INITIAL_JSON = {
+    "Array": [1, 2, 3],
+    "Boolean": true,
+    "Null": null,
+    "Number": 123,
+    "Object": { "a": "b", "c": "d" },
+    "String": "Hello World",
+    "Color": "#aabbcc"
+}
+
 const modalService = new ModalService()
 const localStorageKey = "jsonData"
 
@@ -70,13 +80,3 @@ document.body.onload = () => document.body.style.display = "block"
 rightButton.onclick = () => updateRightEditor()
 leftButton.onclick = () => updateLeftEditor()
 helpButton.onclick = () => modalService.open()
-
-const INITIAL_JSON = {
-    "Array": [1, 2, 3],
-    "Boolean": true,
-    "Null": null,
-    "Number": 123,
-    "Object": { "a": "b", "c": "d" },
-    "String": "Hello World",
-    "Color": "#aabbcc"
-}
