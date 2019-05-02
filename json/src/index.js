@@ -66,6 +66,7 @@ document.onkeydown = event => {
     }
 }
 
+document.body.onload = () => document.body.style.display = "block"
 rightButton.onclick = () => updateRightEditor()
 leftButton.onclick = () => updateLeftEditor()
 helpButton.onclick = () => modalService.open()

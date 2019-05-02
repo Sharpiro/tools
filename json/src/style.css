@@ -8,13 +8,13 @@
   
 .flex-container > .editor {
     height: 96vh;
-    flex-basis: 50%;
+    flex-basis: 47%;
     padding : 0px 10px 0px 10px
 }
 
 .flex-container > .button-column {
     height: 96vh;
-    flex-basis: 1%;
+    flex-basis: 3.5%;
 }
 
 button{
@@ -37,4 +37,14 @@ button{
 
 .image-help{
     background: var(--main-svg) -168px -48px;
+}
+
+.animate {
+    animation-name: animate;
+    animation-duration: 1s
+}
+  
+@keyframes animate { 
+    from { opacity: 0 } 
+    to { opacity: 1 }
 }
