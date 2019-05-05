@@ -56,14 +56,15 @@ function GetInitialJson() {
 
 document.onkeydown = event => {
     if (!event.ctrlKey) return
-    event.preventDefault()
 
     if (event.shiftKey && event.code === "KeyR") {
+        event.preventDefault()
         leftEditor.set(INITIAL_JSON)
         rightEditor.set(INITIAL_JSON)
     }
     else if (event.key === "s") {
-        for (const element of event.path) {
+        event.preventDefault()
+        for (const element of event.composedPath()) {
             if (element.id == "rightEditor") {
                 updateLeftEditor()
                 return

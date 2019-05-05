@@ -32,7 +32,7 @@ customElements.define('data-modal', class extends HTMLElement {
 
     registerEvents(shadowRoot) {
         window.onmousedown = event => {
-            if (event.path[0].id === "data-modal-container") {
+            if (event.composedPath()[0].id === "data-modal-container") {
                 this.close()
             }
         }
