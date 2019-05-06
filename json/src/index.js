@@ -94,4 +94,7 @@ document.onkeydown = event => {
 document.body.onload = () => document.body.style.display = "block"
 rightButton.onclick = () => updateRightEditor()
 leftButton.onclick = () => updateLeftEditor()
-helpButton.onclick = () => dataModalService.open()
+helpButton.onclick = () => {
+    eventInProgress = true
+    dataModalService.open().then(() => eventInProgress = false)
+}
