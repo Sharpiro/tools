@@ -1,6 +1,6 @@
-import "./modal-component"
+import "./data-modal-component"
 
-export class ModalService {
+export class DataModalService {
     open() {
         const dataModal = document.createElement("data-modal")
         dataModal.closed.on(null, () => {

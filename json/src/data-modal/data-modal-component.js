@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import { getTemplateContent, getStyleNode } from "../element-functions"
-import templateText from './modal-component.html';
-import componentCssData from './modal-component.css';
+import templateText from './data-modal-component.html';
+import componentCssData from './data-modal-component.css';
 
 customElements.define('data-modal', class extends HTMLElement {
     get closed() {
@@ -18,7 +18,7 @@ customElements.define('data-modal', class extends HTMLElement {
         shadowRoot.appendChild(templateContent);
         this.dataModalContainer = shadowRoot.getElementById('data-modal-container')
 
-        this.registerEvents(shadowRoot)
+        this.registerEvents()
     }
 
     open() {
@@ -30,13 +30,18 @@ customElements.define('data-modal', class extends HTMLElement {
         this.dataModalContainer.style.display = "none";
     }
 
-    registerEvents(shadowRoot) {
+    registerEvents() {
         window.onmousedown = event => {
             if (event.composedPath()[0].id === "data-modal-container") {
                 this.close()
             }
         }
+        window.onkeydown = event => {
+            if (event.key === "Escape") {
+                this.close()
+            }
+        }
 
-        shadowRoot.getElementById("close-button").onclick = () => this.close()
+        this.shadowRoot.getElementById("close-button").onclick = () => this.close()
     }
 });

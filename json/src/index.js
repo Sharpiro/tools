@@ -1,6 +1,7 @@
 import * as JSONEditor from "jsoneditor"
 import './style.css'
-import { ModalService } from "./modal/modal-service"
+import { DataModalService } from "./data-modal/data-modal-service"
+import { ConfirmModalService } from "./confirm-modal/confirm-modal-service"
 
 const INITIAL_JSON = {
     "Array": [1, 2, 3],
@@ -12,7 +13,8 @@ const INITIAL_JSON = {
     "Color": "#aabbcc"
 }
 
-const modalService = new ModalService()
+const dataModalService = new DataModalService()
+const confirmModalService = new ConfirmModalService()
 const localStorageKey = "jsonData"
 
 const initialJson = GetInitialJson()
@@ -54,13 +56,25 @@ function GetInitialJson() {
     return INITIAL_JSON
 }
 
+let eventInProgress = false
 document.onkeydown = event => {
+    if (eventInProgress) {
+        event.preventDefault()
+        return
+    }
     if (!event.ctrlKey) return
 
     if (event.shiftKey && event.code === "KeyR") {
+        eventInProgress = true
         event.preventDefault()
-        leftEditor.set(INITIAL_JSON)
-        rightEditor.set(INITIAL_JSON)
+
+        confirmModalService.confirm().then(isConfirmed => {
+            eventInProgress = false
+            if (!isConfirmed) return
+            leftEditor.set(INITIAL_JSON)
+            rightEditor.set(INITIAL_JSON)
+            localStorage.setItem(localStorageKey, JSON.stringify(INITIAL_JSON))
+        })
     }
     else if (event.key === "s") {
         event.preventDefault()
@@ -80,4 +94,4 @@ document.onkeydown = event => {
 document.body.onload = () => document.body.style.display = "block"
 rightButton.onclick = () => updateRightEditor()
 leftButton.onclick = () => updateLeftEditor()
-helpButton.onclick = () => modalService.open()
+helpButton.onclick = () => dataModalService.open()
