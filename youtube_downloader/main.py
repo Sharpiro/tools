@@ -1,15 +1,24 @@
 import sys
 import youtube_dl
 
+help_string = """
+syntax: <command> <url>
+ex: list https://www.youtube.com/watch?v=C0DPdy98e4c
+
+commands:
+list <url>
+audio <url>
+download <url> <formatValue>
+"""
+
 if len(sys.argv) < 3:
-    sys.exit("must provide arg url")
+    sys.exit(help_string)
 
 command = sys.argv[1]
 url = sys.argv[2]
 
 if len(sys.argv) >= 4:
     formatValue = sys.argv[3]
-# formatValue = 0
 
 # proxy = "http://localhost:8888"
 # proxy = "http://localhost:5000"
@@ -40,15 +49,6 @@ def download():
     youtube.download([url])
 
 
-def video():
-    options = {
-        'proxy': proxy,
-        'nocheckcertificate': True,
-    }
-    youtube = youtube_dl.YoutubeDL(options)
-    youtube.download([url])
-
-
 def list():
     print("listing...")
     options = {
@@ -64,8 +64,6 @@ if command == "list":
     list()
 elif command == "audio":
     audio()
-elif command == "video":
-    video()
 elif command == "download":
     download()
 else:
