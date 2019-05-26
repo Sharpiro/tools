@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+<channel>
+<title>Dave's Podcast Test</title>
+<link></link>
+<language>en-us</language> 
+<itunes:subtitle>Subtitle of podcast</itunes:subtitle>
+<itunes:author>Author Name</itunes:author>
+<itunes:summary>Description of podcast.</itunes:summary>
+<description>Description of podcast.</description>
+<itunes:owner>
+    <itunes:name>Owner Name</itunes:name>
+    <itunes:email>me@example.com</itunes:email>
+</itunes:owner>
+<itunes:explicit>no</itunes:explicit>
+<itunes:image href="http://www.example.com/podcast-icon.jpg" />
+<itunes:category text="Education"></itunes:category>
+<item>
+    <title>Religion w/ E. Michael Jones</title>
+    <itunes:summary>Religion w/ E. Michael Jones</itunes:summary>
+    <description>Religion w/ E. Michael Jones</description>
+    <link>http://ec2-54-144-36-107.compute-1.amazonaws.com</link>
+    <enclosure url="http://ec2-54-144-36-107.compute-1.amazonaws.com/content/religion_e_michael_jones.mp3" type="audio/mpeg" length="1024"></enclosure>
+    <pubDate>Sat, 25 May 2019 16:01:07 +0000</pubDate>
+    <itunes:author>Me</itunes:author>
+    <itunes:duration>00:32:16</itunes:duration>
+    <itunes:explicit>no</itunes:explicit>
+    <guid isPermaLink="false">123</guid>
+</item>
+<item>
+    <title>Dancing In the Moonlight</title>
+    <itunes:summary>Dancing In the Moonlight</itunes:summary>
+    <description>Dancing In the Moonlight</description>
+    <link>http://10.0.0.13</link>
+    <enclosure url="http://ec2-54-144-36-107.compute-1.amazonaws.com/content/moonlight.mp3" type="audio/mpeg" length="1024"></enclosure>
+    <pubDate>Fri, 24 May 2019 16:01:07 +0000</pubDate>
+    <itunes:author>Me</itunes:author>
+    <itunes:duration>00:32:15</itunes:duration>
+    <itunes:explicit>no</itunes:explicit>
+    <guid isPermaLink="false">456</guid>
+</item>
+</channel>
+</rss>
