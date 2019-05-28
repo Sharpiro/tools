@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # install apps
-sudo apt-get update
-sudo apt-get --assume-yes install tor nginx
+sudo apt update
+sudo apt install -y tor nginx
 
 # configure tor
 torrc=`cat <<EOF
