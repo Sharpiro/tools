@@ -29,6 +29,27 @@
 * find corresponding private key from fraudulent public key
   * hard problem because of PKI assumptions
 
+#### How Tor removes DNS and CA
+
+* What if a router or DNS are compromised and return a response from a malicious service?
+  * normie-web
+    * requirements
+      * DNS
+      * CA
+      * certificate
+      * signature
+    * fraudulent service will be unable to create signature using TLS certificate signed by CA
+    * DNS is required to map a name address to an IP address
+    * CA is required to map a name or IP address to a public key
+  * tor
+    * requirements
+      * certificate
+      * signature
+    * client hashes cert public key to verify it matches onion address
+    * server proves ownership of private key via signature
+    * DNS is unnecessary because name address = public key, thus no name mapping service required
+    * CA is unnecessary because name address = public key, thus no public key mapping service required
+
 ### Hidden Service (HS) Directories (HSDIR) Version 3
 
 This process explains how one can access a HS from directory information without any directory knowing the onion address.  Because the HSDIRS don't know the onion addresses, the hosting of HS descriptors does not expose the hidden services themselves, essentially forming a type of zero-knowledge.
@@ -96,13 +117,14 @@ export LD_LIBRARY_PATH
 ```
 
 ## Building Tor
-
+<!-- cspell:disable -->
 ```sh
 # add debug flag
 export CFLAG='-ggdb'
 sh autogen.sh && ./configure && make
 /src/app/tor
 ```
+<!-- cspell:enable-->
 
 ## Get Onion Service Running
 
