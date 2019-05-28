@@ -12,13 +12,13 @@ git diff ef5d00179b812df10a3f2e7b7ca5ac8a6e26f732 -- test_client/config
 git rev-list --count master
 ```
 
-## interactive ammend commit
+## interactive amend commit
 
 ```sh
 git rebase -i aabbccff
 # select 'e' to edit every affected commit
 
-# ammend the author for each commit
+# amend the author for each commit
 git commit --amend --author="sharpiro <dsharpbb09@gmail.com>"
 
 # continue through each selected commit

@@ -3,14 +3,25 @@
         "HSDIR",
         "HSDIRS",
         "MITM",
+        "VPCs",
         "chmod",
+        "cloudwatch",
         "fdisk",
         "lsblk",
         "normie",
+        "postgre",
+        "redshift",
         "setxkbmap",
         "stty",
         "subcredential",
+        "subnet",
+        "subnets",
         "torrc",
         "woeusb"
-    ]
+    ],
+    "markdownlint.config": {
+        "MD024": {
+            "siblings_only": true
+        }
+    }
 }
