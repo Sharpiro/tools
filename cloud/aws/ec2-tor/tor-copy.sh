@@ -1,4 +1,4 @@
-server=ubuntu@ec2-54-144-36-107.compute-1.amazonaws.com
+server=ubuntu@ec2-54-208-117-96.compute-1.amazonaws.com
 archive_name=archive.tar
 
 if [ ! -d secrets ]; then
@@ -21,11 +21,7 @@ sudo rm /var/lib/tor/website/$archive_name
 &&
 sudo chown -R debian-tor:debian-tor /var/lib/tor/website
 &&
-sudo chmod -R 600 /var/lib/tor/website/hostname
-&&
-sudo chmod -R 600 /var/lib/tor/website/hs_ed25519_public_key
-&&
-sudo chmod -R 600 /var/lib/tor/website/hs_ed25519_secret_key
+sudo chmod -R 700 /var/lib/tor/website/hostname
 &&
 sudo systemctl start tor
 EOF
