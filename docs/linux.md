@@ -185,6 +185,15 @@ ffmpeg -i input.mp4 -ss 00:00:00.0 -t 00:00:10.0 -y -vf fade=in:0:60,fade=out:24
 sudo cryptsetup luksDump --dump-master-key /dev/nvme0n1p2
 ```
 
+## SSH
+
+### SFTP via Nautilus
+
+```sh
+ssh-add /home/user/path-to-your-key/key_name
+sftp://funky@ip.to.your.server:7000
+```
+
 ## 7 Zip
 
 * Installation
