@@ -1,5 +1,72 @@
 # Linux
 
+## General
+
+* Everything is a file
+
+## Root Directories
+
+* bin (binaries)
+  * os binaries and programs like `cat` and `ls`
+* boot
+  * os boot loader
+* cdrom
+  * legacy mount point for cd-rom
+* dev (devices)
+  * hardware devices
+    * discs
+    * webcams
+    * keyboards
+    * etc
+  * first hard drive partition
+    * /dev/sda1
+* etc (etcetera)
+  * system-wide configurations
+* home
+  * personal docs
+  * can be installed on different drives which allows for easier re-install
+* libs (libraries)
+  * where libraries of functions are stored for use by binaries
+  * lib
+  * lib32
+  * lib64
+* media
+  * where os managed mounted devices
+  * leave this to the OS to manage
+* mnt (mount)
+  * where you should mount things manually
+* opt (optional)
+  * where manually installed software from vendors resides
+  * where you can install software you've created yourself
+* proc (processes)
+  * information about processes
+  * cpu info
+    * cat /proc/cpuinfo
+* root
+  * root user's home folder
+  * does not reside in `home` directory like other users
+* run
+  * tempfs file system
+    * all in ram
+    * gone on reboot
+* sbin
+  * binaries for root user
+* snap (snap packages)
+  * self-contained applications
+* srv (services)
+  * files served to http/ftp
+* sys (system)
+  * way to interact with kernel
+  * also not physically written to disc like `run`
+* tmp (temporary)
+  * files are temporarily stored during application session
+* usr (user)
+  * non-essential software
+  * most software installed from source ends up in local folders
+* var (variable)
+  * files and directories expected to grow in size
+  * logs
+
 ## Environment Variables And Aliases
 
 ### Current User
