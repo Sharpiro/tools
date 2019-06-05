@@ -1,0 +1,10 @@
+[Unit]
+Description=Onion Harvester
+
+[Service]
+ExecStart=/home/pi/test_service/run.sh
+#ExecStart=/usr/bin/python3 -m http.server
+
+[Install]
+WantedBy=multi-user.target
+#WantedBy=default.target
