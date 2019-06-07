@@ -136,3 +136,16 @@
 ## Resource Groups
 
 * group resources by application or other criteria
+
+## Key Management Service
+
+* Hardware Security Module (HSM)
+  * dedicated hardware for storing keys
+  * keys never leave the HSM unencrypted, or possibly ever
+* Customer Master Keys (CMKs)
+  * master key stored in a HSM
+* Data Keys
+  * keys that are typically generated on a per-encryption basis
+  * the encrypted data key is typically stored alongside the encrypted data
+* Envelope Encryption
+  * Envelope encryption is the practice of encrypting plaintext data with a data key, and then encrypting the data key with a master key.
