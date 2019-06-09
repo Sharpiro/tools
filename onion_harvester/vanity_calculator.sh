@@ -7,7 +7,7 @@ if [ -s $characters ]; then
 fi
 
 if [ -s $items_per_second ]; then
-    echo must provide items per second
+    echo must provide onions per second
     exit 1
 fi
 
@@ -21,8 +21,8 @@ let total_days=total_hours/24
 let total_years=total_days/365
 
 echo $characters characters
-printf "%'d total items\n" $max_items
-printf "%'d items / second\n" $items_per_second
+printf "%'d total onions\n" $max_items
+printf "%'d onions / second\n" $items_per_second
 
 if [ $total_years -gt 0 ]; then
     echo $total_years total years
