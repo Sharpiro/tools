@@ -294,6 +294,15 @@ set completion-ignore-case On
 git config --global credential.helper /usr/libexec/git-core/git-credential-libsecret
 ```
 
+## OpenSSL
+
+* gen private key only
+  * openssl genpkey -algorithm RSA -out key.pem
+* gen private/public key .pem files
+  * openssl req -x509 -newkey rsa:4096 -keyout test-private-key.pem -out test-public-key.pem -nodes -subj '/CN=localhost'
+* gen pkcs12 .pfx file
+  * openssl pkcs12 -export -out test-pkcs12.pfx -inkey test-private-key.pem -in test-public-key.pem -passout pass:
+
 ## Misc
 
 ### iPhone detection fix
