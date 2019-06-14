@@ -1,53 +1,20 @@
-// let items = ["https://abc123123.abc123123.com:8084/api/abc123123/abc123123/abc123123/abc123123/abc123123/abc123123/abc123123", "About", "Contact"]
-// let items = ["A", "About", "Contact"]
-// let dropdown
+const testEl = document.getElementById("testEl")
+const testEl2 = document.getElementById("testEl2")
+const testEl3 = document.getElementById("testEl3")
+testEl.items = [1, 2, 3]
+testEl.addEventListener("onenter", onEnter)
+testEl2.items = [4, 5, 6]
+testEl3.items = [7, 8, 9]
 
-// initialize()
+function addItem() {
+    if (!testEl.value) return false
 
-// function initialize() {
-//     dropdown = document.getElementById("myDropdown")
-//     updateDropdown()
-// }
+    testEl.items.unshift(testEl.value)
+    testEl.items = [...new Set(testEl.items)]
+    console.log(testEl.value)
+    return false
+}
 
-// function updateDropdown() {
-//     dropdown.innerHTML = ""
-//     for (var item of items) {
-//         var span = document.createElement("span")
-//         span.onclick = optionClicked
-//         span.innerText = item
-//         dropdown.appendChild(span)
-//     }
-// }
-
-// function openDropdown() {
-//     dropdown.classList.toggle("show");
-// }
-
-// function clearDropdown() {
-//     if (dropdown.classList.contains('show')) {
-//         dropdown.classList.remove('show');
-//     }
-// }
-
-// function optionClicked(event) {
-//     if (!event.srcElement.innerText) return
-//     testInput.value = event.srcElement.innerText
-// }
-
-// function onKeyInput() {
-//     clearDropdown()
-// }
-
-// function addItem() {
-//     if (!testInput.value) return
-
-//     items.unshift(testInput.value)
-//     items = [...new Set(items)]
-//     updateDropdown()
-// }
-
-// window.onclick = function (event) {
-//     if (!event.target.matches('#testInput')) {
-//         clearDropdown()
-//     }
-// }
+function onEnter(event) {
+    console.log("do something!")
+}
