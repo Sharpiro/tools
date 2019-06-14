@@ -1,21 +1,26 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
-    <test-element></test-element>
-    <!-- <div class="dropdown">
-        <input id="testInput" type="search">
-        <div id="myDropdown" class="dropdown-content"></div>
+    <div>
+        <form onsubmit="console.log('ab')">
+            <input-history style="width: 500px;" id="testEl"></input-history>
+            <div>
+                <button type="submit" onclick="return addItem()">Test</button>
+            </div>
+        </form>
     </div>
     <div>
-        <button onclick="addItem()">Add</button>
-    </div> -->
+        <input-history style="width: 500px;" id="testEl2"></input-history>
+    </div>
+    <div>
+        <input-history style="width: 500px;" id="testEl3"></input-history>
+    </div>
 
-    <!-- <script src="index.js"></script> -->
-    <script src="testElement.js"></script>
+    <script src="input-history-component.js"></script>
+    <script src="index.js"></script>
 </body>
 
 </html>
