@@ -7,6 +7,9 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Security.Cryptography;
+using System.Text;
+using System.Linq;
 
 namespace ConsoleApp1
 {
@@ -18,7 +21,6 @@ namespace ConsoleApp1
         private const string DeletionEvent = "__InstanceDeletionEvent";
 
         private static readonly object _object = new object();
-        private static readonly HashSet<string> _processes = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) { "ldaputil.exe", "wow.exe" };
         private static Dictionary<string, Rule> _rules;
         private static readonly StreamWriter _logger = new StreamWriter(LogFile);
         private static ManagementEventWatcher _creationWatcher;
@@ -27,15 +29,16 @@ namespace ConsoleApp1
         static void Main(string[] args)
         {
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnStopRequest);
+            _logger.AutoFlush = true;
 
             var tokenSource = new CancellationTokenSource();
             tokenSource.Token.Register(() => OnStopRequest());
 
-            Task.Run(() => { Log("Big brother is always watching...", showMessageBox: true); });
+            Log("Big brother is always watching...", showMessageBox: true);
 
             LoadRulesFile();
 
-            Task.Run(() => UpdateRulesFile());
+            Task.Run(UpdateRulesFile);
 
             //var creationQuery = new WqlEventQuery(CreationEvent, new TimeSpan(0, 0, 1), "TargetInstance isa \"Win32_Process\"");
             //var deletionQuery = new WqlEventQuery(DeletionEvent, new TimeSpan(0, 0, 1), "TargetInstance isa \"Win32_Process\"");
@@ -76,7 +79,7 @@ namespace ConsoleApp1
             var exists = _rules.TryGetValue(processName, out Rule rule);
             if (!exists) return;
 
-            Task.Run(() => Log(rule.StartMessage, showMessageBox: true));
+            Log(rule.StartMessage, showMessageBox: true);
         }
 
         private static void DeletionWatcher_EventArrived(object sender, EventArrivedEventArgs e)
@@ -86,7 +89,7 @@ namespace ConsoleApp1
             var exists = _rules.TryGetValue(processName, out Rule rule);
             if (!exists) return;
 
-            Task.Run(() => Log(rule.StopMessage, showMessageBox: true));
+            Log(rule.StopMessage, showMessageBox: true);
         }
 
         private static void OnStopRequest(object sender = null, EventArgs e = null)
@@ -126,15 +129,33 @@ namespace ConsoleApp1
                 var response = await httpClient.GetAsync(rulesUrl);
                 if (!response.IsSuccessStatusCode) return;
 
-                var json = await response.Content.ReadAsStringAsync();
+                var newJson = await response.Content.ReadAsStringAsync();
+                var oldJson = File.ReadAllText(RulesFile);
+                (var newHash, var oldHash) = GetHashes(newJson, oldJson);
+                if (newHash == oldHash)
+                {
+                    Log("Rules are up to date");
+                    return;
+                }
+
                 var testRules = new Dictionary<string, Rule>(StringComparer.InvariantCultureIgnoreCase);
-                JsonConvert.PopulateObject(json, testRules);
-                File.WriteAllText(RulesFile, json);
+                JsonConvert.PopulateObject(newJson, testRules);
+                File.WriteAllText(RulesFile, newJson);
                 Log("Successfully updated rules");
             }
             catch (Exception ex)
             {
                 Log(new Exception("An error occurred whil updating rules", ex));
+            }
+        }
+
+        private static (string NewHash, string OldHash) GetHashes(string newData, string oldData)
+        {
+            using (var sha256 = HashAlgorithm.Create(HashAlgorithmName.SHA256.Name))
+            {
+                var newHash = string.Join(string.Empty, sha256.ComputeHash(Encoding.UTF8.GetBytes(newData)).Select(b => b.ToString("x2")));
+                var oldHash = string.Join(string.Empty, sha256.ComputeHash(Encoding.UTF8.GetBytes(oldData)).Select(b => b.ToString("x2")));
+                return (newHash, oldHash);
             }
         }
 
@@ -173,7 +194,7 @@ namespace ConsoleApp1
             _logger.WriteLine(message);
             if (showMessageBox)
             {
-                MessageBox.Show(message);
+                Task.Run(() => MessageBox.Show(message));
             }
         }
 
