@@ -1,0 +1,17 @@
+{
+  "ldaputil.exe": {
+    "name": "ldaputil.exe",
+    "startMessage": "hello ldap util",
+    "stopMessage": "goodbye ldap util"
+  },
+  "wow.exe": {
+    "name": "wow.exe",
+    "startMessage": "Bring your friends to Azeroth, but don't forget to go outside Azeroth with them as well.",
+    "stopMessage": "Welcome back to the real world."
+  },
+  "winword.exe": {
+    "name": "winword.exe",
+    "startMessage": "May your thoughts flow clearly",
+    "stopMessage": "Did you really just write that?"
+  }
+}
