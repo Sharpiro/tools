@@ -15,45 +15,59 @@ namespace dotnet
 {
     class Program
     {
-        private const string RulesFile = "rules.json";
-        private const string LogFile = "debug.log";
         private const string CreationEvent = "__InstanceCreationEvent";
         private const string DeletionEvent = "__InstanceDeletionEvent";
 
+        private static readonly string AppDir = $"{Environment.GetEnvironmentVariable("appdata")}\\bigbro";
+        private static readonly string RulesFile = $"{AppDir}\\rules.json";
+        private static readonly string LogFile = $"{AppDir}\\debug.log";
         private static readonly object _object = new object();
         private static Dictionary<string, Rule> _rules;
-        private static readonly StreamWriter _logger = new StreamWriter(LogFile);
+        private static StreamWriter _logger;
         private static ManagementEventWatcher _creationWatcher;
         private static ManagementEventWatcher _deletionWatcher;
+        private static bool _initialized;
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnStopRequest);
+            Directory.CreateDirectory(AppDir);
+            _logger = new StreamWriter(LogFile, append: true);
             _logger.AutoFlush = true;
 
             var tokenSource = new CancellationTokenSource();
             tokenSource.Token.Register(() => OnStopRequest());
 
-            Log("Big brother is always watching...", showMessageBox: true);
+            var initialMessageTask = Task.Delay(TimeSpan.FromSeconds(15)).ContinueWith((_) => ShowNotification("Big brother is always watching..."));
 
-            LoadRulesFile();
+            try
+            {
+                LoadRulesFile();
+                Start();
+                _initialized = true;
+            }
+            catch(Exception ex)
+            {
+                Log(ex);
+            }
 
-            Task.Run(UpdateRulesFile);
+            try
+            {
+                await Task.Run(UpdateRulesFile);
+            }
+               catch(Exception ex)
+            {
+                Log(ex);
+            }
 
-            //var creationQuery = new WqlEventQuery(CreationEvent, new TimeSpan(0, 0, 1), "TargetInstance isa \"Win32_Process\"");
-            //var deletionQuery = new WqlEventQuery(DeletionEvent, new TimeSpan(0, 0, 1), "TargetInstance isa \"Win32_Process\"");
-
-            Start();
-            //var deletionTask = StartLoop(deletionQuery, "deleted", tokenSource.Token);
-
-            //while (true)
-            //{
-            //    await Task.Delay(-1);
-            //}
-
-            Console.ReadLine();
-            Log("Requesting close...");
-            tokenSource.Cancel();
+            await initialMessageTask;
+            if (!_initialized) return;
+            
+            await Task.Delay(-1);
+            // Console.ReadLine();
+            // Log("Requesting close...");
+            // tokenSource.Cancel();
+            // Task.Delay(TimeSpan.FromSeconds(2)).Wait();
         }
 
         private static void Start()
@@ -79,7 +93,7 @@ namespace dotnet
             var exists = _rules.TryGetValue(processName, out Rule rule);
             if (!exists) return;
 
-            Log(rule.StartMessage, showMessageBox: true);
+            ShowNotification(rule.StartMessage);
         }
 
         private static void DeletionWatcher_EventArrived(object sender, EventArrivedEventArgs e)
@@ -89,35 +103,30 @@ namespace dotnet
             var exists = _rules.TryGetValue(processName, out Rule rule);
             if (!exists) return;
 
-            Log(rule.StopMessage, showMessageBox: true);
+            ShowNotification(rule.StopMessage);
         }
 
         private static void OnStopRequest(object sender = null, EventArgs e = null)
         {
+            if (!_initialized) return;
+            
             _creationWatcher.Stop();
             _creationWatcher.Dispose();
             _deletionWatcher.Stop();
             _deletionWatcher.Dispose();
+            Log("Closing...");
         }
 
 
         private static void LoadRulesFile()
         {
-            try
-            {
-                if (!File.Exists(RulesFile)) throw new FileNotFoundException($"Rules not found @ {RulesFile}");
+            if (!File.Exists(RulesFile)) throw new FileNotFoundException($"Rules not found @ {RulesFile}");
 
-                var json = File.ReadAllText(RulesFile);
-                _rules = new Dictionary<string, Rule>(StringComparer.InvariantCultureIgnoreCase);
-                JsonConvert.PopulateObject(json, _rules);
+            var json = File.ReadAllText(RulesFile);
+            _rules = new Dictionary<string, Rule>(StringComparer.InvariantCultureIgnoreCase);
+            JsonConvert.PopulateObject(json, _rules);
 
-                Log("Successfully loaded rules file");
-            }
-            catch (Exception ex)
-            {
-                Log(ex);
-                throw;
-            }
+            Log("Successfully loaded rules file");
         }
 
         private static async Task UpdateRulesFile()
@@ -130,12 +139,15 @@ namespace dotnet
                 if (!response.IsSuccessStatusCode) return;
 
                 var newJson = await response.Content.ReadAsStringAsync();
-                var oldJson = File.ReadAllText(RulesFile);
-                (var newHash, var oldHash) = GetHashes(newJson, oldJson);
-                if (newHash == oldHash)
+                if (File.Exists(RulesFile))
                 {
-                    Log("Rules are up to date");
-                    return;
+                    var oldJson = File.ReadAllText(RulesFile);
+                    (var newHash, var oldHash) = GetHashes(newJson, oldJson);
+                    if (newHash == oldHash)
+                    {
+                        Log("Rules are up to date");
+                        return;
+                    }
                 }
 
                 var testRules = new Dictionary<string, Rule>(StringComparer.InvariantCultureIgnoreCase);
@@ -145,7 +157,7 @@ namespace dotnet
             }
             catch (Exception ex)
             {
-                Log(new Exception("An error occurred whil updating rules", ex));
+                Log(new Exception("An error occurred while updating rules", ex));
             }
         }
 
@@ -158,35 +170,6 @@ namespace dotnet
                 return (newHash, oldHash);
             }
         }
-
-        //private static async Task StartLoop(WqlEventQuery Query, string name, CancellationToken cancellationToken)
-        //{
-        //    await Task.Yield();
-        //    while (!cancellationToken.IsCancellationRequested)
-        //    {
-        //        try
-        //        {
-        //            using (var creationWatcher = new ManagementEventWatcher { Query = Query })
-        //            {
-        //                Log($"Starting {name}...");
-        //                while (true)
-        //                {
-        //                    dynamic @event = creationWatcher.WaitForNextEvent();
-        //                    var processName = @event["TargetInstance"]["Name"];
-        //                    if (!_processes.Contains(processName)) continue;
-
-        //                    Log($"Process {processName} has been {name}, path is: {@event["TargetInstance"]["ExecutablePath"]}");
-        //                    var message = name == "created" ? $"Hello, {processName}" : $"Goodbye, {processName}";
-        //                    _ = Task.Run(() => { Log(message, showMessageBox: true); });
-        //                }
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Log(ex);
-        //        }
-        //    }
-        //}
 
         private static void Log(string message, bool showMessageBox = false)
         {
@@ -201,7 +184,23 @@ namespace dotnet
         private static void Log(Exception ex)
         {
             Console.WriteLine(ex);
-            File.AppendAllText(LogFile, ex.ToString());
+            _logger.WriteLine(ex.ToString());
+        }
+
+        private static void ShowNotification(string message)
+        {
+            using (var notification = new NotifyIcon()
+            {
+                Visible = true,
+                Icon = System.Drawing.SystemIcons.Information,
+                BalloonTipTitle = "Big Bro",
+                BalloonTipText = message
+            })
+            {
+                notification.ShowBalloonTip(5000);
+                 Console.WriteLine("notify: " + message);
+                _logger.WriteLine("notify: " + message);
+            }
         }
 
         private class Rule
@@ -212,3 +211,20 @@ namespace dotnet
         }
     }
 }
+
+//static Form TopMostForm()
+//{
+//    var topmostForm = new Form
+//    {
+//        Size = new Size(1, 1),
+//        StartPosition = FormStartPosition.Manual
+//    };
+//    var rect = SystemInformation.VirtualScreen;
+//    topmostForm.Location = new Point(rect.Bottom + 10, rect.Right + 10);
+//    topmostForm.Show();
+//    topmostForm.Focus();
+//    topmostForm.BringToFront();
+//    topmostForm.TopMost = true;
+//    return topmostForm;
+//    MessageBox.Show(TopMostForm(), "hello world");
+//}
