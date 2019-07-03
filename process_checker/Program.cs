@@ -11,7 +11,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Linq;
 
-namespace ConsoleApp1
+namespace dotnet
 {
     class Program
     {
