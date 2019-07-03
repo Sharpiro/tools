@@ -53,6 +53,7 @@ namespace dotnet
 
             try
             {
+                await Task.Delay(TimeSpan.FromSeconds(15));
                 await Task.Run(UpdateRulesFile);
             }
                catch(Exception ex)
