@@ -1,5 +1,4 @@
-from pathlib import Path, PosixPath
-from hashlib import sha256
+from pathlib import Path
 import shutil
 
 iphone_directory = Path(
