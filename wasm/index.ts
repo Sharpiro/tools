@@ -1,11 +1,16 @@
-// cspell:ignore wasm wabt
+// cspell:ignore wasm wabt anyfunc
 
 async function main() {
-    const watFileName = "main.wat"
     const loadFileFunc = env == "browser" ? loadFileRemote : loadFileLocal
-    const watText = await loadFileFunc(watFileName)
-    const wasmBinary = build(watText, watFileName)
-    run(wasmBinary)
+    const sourceFileNames = ["main.wat", "shared.wat"]
+    const wasmBinaries = []
+    for (const fileName of sourceFileNames) {
+        const watText = await loadFileFunc(fileName)
+        const wasmBinary = build(watText, fileName)
+        wasmBinaries.push(wasmBinary)
+    }
+
+    run(wasmBinaries)
 }
 
 function loadFileLocal(fileName: string): Promise<string> {
@@ -26,22 +31,32 @@ async function loadFileRemote(fileName: string): Promise<string> {
     return bytes
 }
 
-function build(inputWat: string, watFileName: string) {
+function build(inputWat: string, watFileName: string): Uint8Array {
     let wabt: any = env == "browser" ? WabtModule() : require("wabt")()
     const wasmModule = wabt.parseWat(watFileName, inputWat);
     const { buffer: wasmBinary } = wasmModule.toBinary({});
     return wasmBinary
 }
 
-async function run(wasmBinary: ArrayBuffer) {
-    var importObject = { console: { log: consoleLogString }, js: { mem: memory } };
-    const { instance } = await WebAssembly.instantiate(wasmBinary, importObject);
-    let exports: Exports = instance.exports;
-    let result = exports.callByIndex(0)
+async function run(wasmBinaries: ArrayBuffer[]) {
+    var importObject = { console: { log: consoleLogString }, js: { memory: memory, table: table } };
+
+    const promises: Promise<WebAssembly.WebAssemblyInstantiatedSource>[] = []
+    for (const wasmBinary of wasmBinaries) {
+        promises.push(WebAssembly.instantiate(wasmBinary, importObject))
+    }
+
+    const instanceSources = await Promise.all(promises)
+
+    let mainExports: MainExports = instanceSources[0].instance.exports;
+    let sharedExports: any = instanceSources[1].instance.exports;
+    let result = mainExports.callByIndex(0)
     console.log(result);
-    result = exports.callByIndex(1)
+    result = mainExports.callByIndex(1)
     console.log(result);
-    exports.writeHi()
+    mainExports.writeHi()
+    result = sharedExports.doIt()
+    console.log(result);
 }
 
 function consoleLogString(offset: number, length: number) {
@@ -54,16 +69,17 @@ function getString(buffer: Uint8Array): string {
     return env === "browser" ? new TextDecoder('utf8').decode(buffer) : Buffer.from(buffer).toString();
 }
 
-interface Exports {
-    getAnswerPlus1: (x: number, y: number) => number
-    getData: () => number
-    temp: () => number
+interface MainExports {
     writeHi(): void
     callByIndex(index: number): number
-    helloWorld(): number
+}
+
+interface SharedExports {
+    doIt(): number
 }
 
 let WabtModule: any
 const env = WabtModule ? "browser" : "node"
 var memory = new WebAssembly.Memory({ initial: 1 });
+var table = new WebAssembly.Table({ initial: 3, element: "anyfunc" })
 main()
