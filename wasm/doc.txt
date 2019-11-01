@@ -1,0 +1,14 @@
+memory
+    untyped
+    array of bytes
+    indexed by i32
+    simulates virtual memory in a pc
+    stack-like
+    data size must be known at compile type
+    stores values
+table
+    T typed
+    array of T items
+    indexed by i32
+    heap-like
+    stores references
