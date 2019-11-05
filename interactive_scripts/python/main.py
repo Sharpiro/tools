@@ -6,6 +6,7 @@ import secrets
 import base64
 from pathlib import Path
 import os
+import datetime
 
 irreduciblePolynomial = 0x11b
 
@@ -227,3 +228,6 @@ def fast(start, end):
 
 def sig(func):
     return inspect.signature(func)
+
+def utc():
+    return datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "z"
