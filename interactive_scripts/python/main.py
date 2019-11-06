@@ -7,6 +7,7 @@ import base64
 from pathlib import Path
 import os
 import datetime
+import time
 
 irreduciblePolynomial = 0x11b
 
@@ -228,6 +229,12 @@ def fast(start, end):
 
 def sig(func):
     return inspect.signature(func)
+
+# ISO 8601 format
+def timestamp():
+    utc_offset_sec = time.altzone if time.localtime().tm_isdst else time.timezone
+    utc_offset = datetime.timedelta(seconds=-utc_offset_sec)
+    return datetime.datetime.now().replace(microsecond=0, tzinfo=datetime.timezone(offset=utc_offset)).isoformat()
 
 def utc():
     return datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "z"
