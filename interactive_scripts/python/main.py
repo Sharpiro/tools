@@ -8,6 +8,7 @@ from pathlib import Path
 import os
 import datetime
 import time
+import uuid
 
 irreduciblePolynomial = 0x11b
 
@@ -238,3 +239,6 @@ def timestamp():
 
 def utc():
     return datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "z"
+
+def guid():
+    return str(uuid.uuid4())
