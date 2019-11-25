@@ -4,11 +4,11 @@
   (type $void_to_i32 (func (result i32)))
   (func (export "doIt") (result i32)
    i32.const 0
-   i32.const 42
-   i32.store  ;; store 42 at address 0
-   i32.const 0
+   i32.const 100
+   i32.store  ;; store 100 at address 0
+   i32.const 2
    call_indirect (type $void_to_i32)
-   i32.const 9000
+   i32.const 100
    i32.add
    )
 )
