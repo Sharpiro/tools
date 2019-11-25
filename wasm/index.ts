@@ -3,6 +3,7 @@
 async function main() {
     const loadFileFunc = env == "browser" ? loadFileRemote : loadFileLocal
     const sourceFileNames = ["main.wat", "shared.wat"]
+    // const sourceFileNames = ["temp.wat"]
     const wasmBinaries = []
     for (const fileName of sourceFileNames) {
         const watText = await loadFileFunc(fileName)
@@ -47,20 +48,26 @@ async function run(wasmBinaries: ArrayBuffer[]) {
     }
 
     const instanceSources = await Promise.all(promises)
+    let mainExports: any = instanceSources[0].instance.exports;
+    // let sharedExports: any = instanceSources[1].instance.exports;
 
-    let mainExports: MainExports = instanceSources[0].instance.exports;
-    let sharedExports: any = instanceSources[1].instance.exports;
+    const wasmFunc = table.get(1)
+    table.set(0, wasmFunc)
     let result = mainExports.callByIndex(0)
     console.log(result);
-    result = mainExports.callByIndex(1)
-    console.log(result);
-    mainExports.writeHi()
-    result = sharedExports.doIt()
-    console.log(result);
+    // result = mainExports.callByIndex(1)
+    // console.log(result);
+    // mainExports.writeHi()
+    // result = sharedExports.doIt()
+    // console.log(result);
+
+    //     let result = mainExports.callFuncPointer()
+    //     console.log(result);
 }
 
+const closureTest = 5
 function consoleLogString(offset: number, length: number) {
-    var bytes = new Uint8Array(memory.buffer, offset, length);
+    var bytes = new Uint8Array(memory.buffer, offset, length + closureTest);
     var data = getString(bytes)
     console.log(data);
 }
@@ -69,17 +76,9 @@ function getString(buffer: Uint8Array): string {
     return env === "browser" ? new TextDecoder('utf8').decode(buffer) : Buffer.from(buffer).toString();
 }
 
-interface MainExports {
-    writeHi(): void
-    callByIndex(index: number): number
-}
-
-interface SharedExports {
-    doIt(): number
-}
-
 let WabtModule: any
 const env = WabtModule ? "browser" : "node"
 var memory = new WebAssembly.Memory({ initial: 1 });
 var table = new WebAssembly.Table({ initial: 3, element: "anyfunc" })
+// table.set(0, functionDeclarationPointer)
 main()

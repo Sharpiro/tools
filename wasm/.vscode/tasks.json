@@ -4,7 +4,7 @@
         {
             "label": "run",
             "type": "shell",
-            "command": "node build/index.js",
+            "command": "ts-node index.ts",
         },
         {
             "label": "watch",
