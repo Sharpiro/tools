@@ -1,0 +1,3 @@
+source /home/sharpiro/.local/share/virtualenvs/youtube_downloader-Nuxfqm1J/bin/activate
+python3 /home/sharpiro/gitbase/Tools/youtube_downloader/main.py $1 $2 $3
+deactivate
