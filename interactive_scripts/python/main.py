@@ -251,7 +251,7 @@ def seconds(time_str: str):
     return total_seconds
 
 def clip(start, stop):
-    startSeconds = clip_seconds(start)
-    stopSeconds = clip_seconds(stop)
+    startSeconds = seconds(start)
+    stopSeconds = seconds(stop)
     durationSeconds = stopSeconds - startSeconds
     return ("(start, stop, duration)", startSeconds, stopSeconds, durationSeconds)
