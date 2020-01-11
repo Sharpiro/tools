@@ -242,3 +242,16 @@ def utc():
 
 def guid():
     return str(uuid.uuid4())
+
+def seconds(time_str: str):
+    split_time = time_str.split(":")
+    if len(split_time) != 3:
+        raise Exception("bad time input")
+    total_seconds = int(split_time[0]) * 60 * 60 + int(split_time[1]) * 60 + int(split_time[2])
+    return total_seconds
+
+def clip(start, stop):
+    startSeconds = clip_seconds(start)
+    stopSeconds = clip_seconds(stop)
+    durationSeconds = stopSeconds - startSeconds
+    return ("(start, stop, duration)", startSeconds, stopSeconds, durationSeconds)
