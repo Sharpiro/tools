@@ -29,8 +29,7 @@ pub fn execute(commands: std::str::Chars, input: &[u8]) -> Execution {
 
 #[cfg(test)]
 mod tests {
-  use crate::brain_freak::execute;
-  use crate::brain_freak::Execution;
+  use crate::brain_freak::{execute, Execution};
 
   #[test]
   fn print_input() {
