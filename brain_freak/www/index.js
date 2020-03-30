@@ -1,3 +1,7 @@
-import * as wasm from "brain_freak";
+import { ProgramIterator } from "brain_freak";
 
-wasm.greet();
+const iterator = ProgramIterator.new(">123>", 12);
+
+for (let v; v = iterator.next();) {
+  console.log(v);
+}
