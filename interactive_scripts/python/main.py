@@ -255,3 +255,6 @@ def clip(start, stop):
     stopSeconds = seconds(stop)
     durationSeconds = stopSeconds - startSeconds
     return ("(start, stop, duration)", startSeconds, stopSeconds, durationSeconds)
+
+def fmt(num):
+  return format(num, ",")
