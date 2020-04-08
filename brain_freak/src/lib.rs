@@ -17,14 +17,21 @@ macro_rules! log {
 pub struct ProgramIterator {
   program_counter: usize,
   the_pointer: usize,
+  loop_pointer: Option<usize>,
   commands: Vec<char>,
-  output: Vec<u8>,
   memory: Vec<u8>,
+  output: Vec<u8>,
+  input: Vec<u8>,
+  loop_counter: usize,
 }
 
 impl ProgramIterator {
   fn process_next_command(&mut self) -> Option<char> {
     for &c in self.commands[self.program_counter..self.commands.len()].iter() {
+      self.loop_counter += 1;
+      if self.loop_counter > 1_000 {
+        panic!("infinite loop ohh boy");
+      }
       self.program_counter += 1;
       match c {
         '>' => {
@@ -44,7 +51,43 @@ impl ProgramIterator {
           return Some(c);
         }
         '.' => {
+          if self.output.len() == self.output.capacity() {
+            log!(
+              "WARNING: exceeding output capacity {:?}",
+              self.output.capacity()
+            );
+          }
           self.output.push(self.memory[self.the_pointer]);
+          return Some(c);
+        }
+        ',' => {
+          if self.input.len() == 0 {
+            log!("ERROR: no inputs found");
+          }
+          self.memory[self.the_pointer] = self.input[0];
+          self.input = self.input[1..].to_owned();
+          return Some(c);
+        }
+        '[' => {
+          if self.memory[self.the_pointer] == 0 {
+            let loop_commands = &self.commands[self.program_counter..];
+            for &v in loop_commands {
+              self.program_counter += 1;
+              if v == ']' {
+                break;
+              }
+            }
+          } else {
+            self.loop_pointer = Some(self.program_counter - 1);
+          }
+          return Some(c);
+        }
+        ']' => {
+          if let Some(x) = self.loop_pointer.take() {
+            self.program_counter = x
+          } else {
+            log!("ERROR: invalid end of loop");
+          }
           return Some(c);
         }
         _ => (),
@@ -56,13 +99,21 @@ impl ProgramIterator {
 
 #[wasm_bindgen]
 impl ProgramIterator {
-  pub fn new(program: String, memory_size: usize) -> ProgramIterator {
+  pub fn new(
+    program: String,
+    memory_size: usize,
+    output_capacity: usize,
+    input: Vec<u8>,
+  ) -> ProgramIterator {
     ProgramIterator {
       program_counter: 0,
       the_pointer: 0,
       commands: program.chars().collect(),
-      output: Vec::with_capacity(1),
       memory: vec![0; memory_size],
+      output: Vec::with_capacity(output_capacity),
+      input,
+      loop_pointer: None,
+      loop_counter: 0,
     }
   }
 
@@ -77,6 +128,10 @@ impl ProgramIterator {
 
   pub fn get_output(&self) -> Vec<u8> {
     self.output.clone()
+  }
+
+  pub fn get_output_len(&self) -> usize {
+    self.output.len()
   }
 
   pub fn get_memory_ptr(&self) -> *const u8 {
