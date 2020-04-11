@@ -1,44 +1,43 @@
 import { memory as sharedMem } from "brain_freak/brain_freak_bg";
 import { ProgramIterator } from "brain_freak";
 
-const program = ",>,<[->+<]";
-// const program = "[...]";
+let program = ",>,<[->+<]";
 const memSize = 10;
 const outputCapacity = 10;
 const iterator = ProgramIterator.new(
   program,
   10,
   outputCapacity,
-  new Uint8Array([1, 2])
+  new Uint8Array([2, 2])
 );
-// iterator.the_pointer = 10000000000
 const memPointer = iterator.get_memory_ptr();
 const memory = new Uint8Array(sharedMem.buffer, memPointer, memSize);
 const outputPointer = iterator.get_output_ptr();
+
 const memoryEl = document.getElementById("memoryEl");
-if (!memoryEl) throw new Error();
+
+/** @type {HTMLInputElement} */
+const programInputEl = (document.getElementById("programInputEl"));
+programInputEl.value = program;
+
+const programCodeEl = document.getElementById("programCodeEl");
+if (!programCodeEl) throw new Error();
+programCodeEl.innerHTML = program;
 
 /** @type {State[]} */
 const states = [{
   command: "",
   memory: Array.from(memory),
   output: [],
-  thePointer: 0
+  thePointer: 0,
+  programCounter: 0
 }
 ];
 let stateIndex = 0;
 let lazyLoading = true;
 
-memoryEl.innerHTML = toDebugString(states[0]);
-
-// for (let i = 0, v; v = iterator.next(); i++) {
-//   console.log(`\ncommand ${i + 1}: ${v}`);
-//   console.log(memory);
-//   memoryEl.innerHTML = toDebugString(memory);
-//   // const outputLen = iterator.get_output_len();
-//   // const output = new Uint8Array(sharedMem.buffer, outputPointer, outputLen);
-//   // console.log(output);
-// }
+updateMemoryEl(states[0]);
+updateProgramEl(states[0]);
 
 /**
  * @param {any} ev
@@ -47,11 +46,16 @@ window.onkeydown = ev => {
   if (ev.key === "ArrowLeft") {
     if (stateIndex === 0) return;
     const state = states[--stateIndex];
-    memoryEl.innerHTML = toDebugString(state);
+    updateMemoryEl(state);
+    updateProgramEl(state);
     console.log("command:", state.command);
   }
   else if (ev.key === "ArrowRight") {
-    loadRight();
+    const state = loadRight();
+    if (state) {
+      updateMemoryEl(state);
+      updateProgramEl(state);
+    }
   }
 };
 
@@ -64,7 +68,7 @@ function loadRight() {
       console.log(1, "lazy", state.command);
     } else {
       lazyLoading = false;
-      console.log(1, "lazy fail", "same state");
+      console.log(1, "lazy done", "kept same state");
     }
   }
   else if (lazyLoading && stateIndex < states.length - 1) {
@@ -83,10 +87,7 @@ function loadRight() {
   else {
     throw new Error("unexpected path");
   }
-  if (!memoryEl) throw new Error();
-  if (state) {
-    memoryEl.innerHTML = toDebugString(state);
-  }
+  return state;
 }
 
 /** @returns {State | undefined} */
@@ -100,23 +101,41 @@ function lazyLoadRight() {
     command,
     memory: Array.from(memory),
     output,
-    thePointer: iterator.the_pointer
+    thePointer: iterator.the_pointer,
+    programCounter: iterator.program_counter
   };
   states.push(state);
   return state;
 }
+
+updateButton.onclick = () => {
+  console.log("updated");
+  program = programInputEl.value;
+  programCodeEl.innerHTML = program;
+};
 
 debugButton.onclick = () => {
   console.log(states);
 };
 
 /** @param {State} state */
-function toDebugString(state) {
+function updateMemoryEl(state) {
   const memDisplay = state.memory.join(", ");
   const spaces = 1 + state.thePointer * 3;
   const thePtrDisplay = " ".repeat(spaces) + "^";
   const display = `[${memDisplay}]\n${thePtrDisplay}`;
-  return display;
+  if (!memoryEl) throw new Error();
+  memoryEl.innerHTML = display;
+}
+
+/** @param {State} state */
+function updateProgramEl(state) {
+  const programDisplay = Array.from(program).join(" ");
+  const spaces = state.programCounter * 2;
+  const prgCounterDisplay = " ".repeat(spaces) + "^";
+  const display = `${programDisplay}\n${prgCounterDisplay}`;
+  if (!programCodeEl) throw new Error();
+  programCodeEl.innerHTML = display;
 }
 
 /**
@@ -125,5 +144,6 @@ function toDebugString(state) {
  * memory: number[];
  * output: number[];
  * thePointer: number
+ * programCounter: number
  * }} State
  */

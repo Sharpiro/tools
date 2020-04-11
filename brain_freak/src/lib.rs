@@ -15,9 +15,9 @@ macro_rules! log {
 
 #[wasm_bindgen]
 pub struct ProgramIterator {
-  program_counter: usize,
+  pub program_counter: usize,
   pub the_pointer: usize,
-  loop_pointer: Option<usize>,
+  start_loop_pointer: Option<usize>,
   commands: Vec<char>,
   memory: Vec<u8>,
   output: Vec<u8>,
@@ -70,20 +70,26 @@ impl ProgramIterator {
         }
         '[' => {
           if self.memory[self.the_pointer] == 0 {
+            // todo: jump to end of loop pointer?
             let loop_commands = &self.commands[self.program_counter..];
             for &v in loop_commands {
               self.program_counter += 1;
+              log!("{:?}", v);
               if v == ']' {
-                break;
+                return Some(c);
               }
             }
+            log!("ERROR: could not find end of loop");
           } else {
-            self.loop_pointer = Some(self.program_counter - 1);
+            if let Some(_) = self.start_loop_pointer {
+              log!("ERROR: invalid start of loop");
+            }
+            self.start_loop_pointer = Some(self.program_counter - 1);
           }
           return Some(c);
         }
         ']' => {
-          if let Some(x) = self.loop_pointer.take() {
+          if let Some(x) = self.start_loop_pointer.take() {
             self.program_counter = x
           } else {
             log!("ERROR: invalid end of loop");
@@ -112,7 +118,7 @@ impl ProgramIterator {
       memory: vec![0; memory_size],
       output: Vec::with_capacity(output_capacity),
       input,
-      loop_pointer: None,
+      start_loop_pointer: None,
       loop_counter: 0,
     }
   }
