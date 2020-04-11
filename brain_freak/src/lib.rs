@@ -16,7 +16,7 @@ macro_rules! log {
 #[wasm_bindgen]
 pub struct ProgramIterator {
   program_counter: usize,
-  the_pointer: usize,
+  pub the_pointer: usize,
   loop_pointer: Option<usize>,
   commands: Vec<char>,
   memory: Vec<u8>,
