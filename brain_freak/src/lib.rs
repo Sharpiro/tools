@@ -35,10 +35,16 @@ impl ProgramIterator {
       self.program_counter += 1;
       match c {
         '>' => {
+          if self.the_pointer + 1 == self.memory.len() {
+            log!("ERROR: memory out of bounds");
+          }
           self.the_pointer += 1;
           return Some(c);
         }
         '<' => {
+          if self.the_pointer == 0 {
+            log!("ERROR: memory out of bounds");
+          }
           self.the_pointer -= 1;
           return Some(c);
         }
@@ -136,6 +142,13 @@ impl ProgramIterator {
     self.output.clone()
   }
 
+  pub fn get_input_len(&self) -> usize {
+    // log!("input len: {:?}", self.input.len());
+    // log!("input cap: {:?}", self.input.capacity());
+    // log!("input ptr: {:?}", self.input.as_ptr());
+    self.input.len()
+  }
+
   pub fn get_output_len(&self) -> usize {
     self.output.len()
   }
@@ -144,9 +157,15 @@ impl ProgramIterator {
     self.memory.as_ptr()
   }
 
+  pub fn get_input_ptr(&self) -> *const u8 {
+    // log!("input len: {:?}", self.input.len());
+    // log!("input cap: {:?}", self.input.capacity());
+    self.input.as_ptr()
+  }
+
   pub fn get_output_ptr(&self) -> *const u8 {
-    log!("output len: {:?}", self.output.len());
-    log!("output cap: {:?}", self.output.capacity());
+    // log!("output len: {:?}", self.output.len());
+    // log!("output cap: {:?}", self.output.capacity());
     self.output.as_ptr()
   }
 
