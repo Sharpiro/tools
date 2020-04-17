@@ -6,7 +6,63 @@
   <title>brain_freak</title>
 </head>
 
-<body>
+<style>
+  pre {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .section-label {
+    display: inline-block;
+    width: 75px;
+  }
+
+  input{
+    background: whitesmoke;
+  }
+
+</style>
+
+<body style="background: aliceblue">
+  <div style="width:75%; margin: auto; margin-top:85px;">
+    <form onsubmit="return false">
+      <div>
+        <div>
+          <span class="section-label">Input:</span>
+          <input style="font-size:200%;" type="text" id="inputDataEl">
+        </div>
+        <div>
+          <span class="section-label">Program:</span>
+          <input style="font-size:200%;" type="text" id="programInputEl">
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <button id="updateButton" type="submit">Update</button>
+        <button id="debugButton" type="button">Debug</button>
+      </div>
+    </form>
+
+    <div style="margin-top:25px;">
+      <div>
+        <span class="section-label">Program:</span>
+        <pre style="font-size:200%;" id="programCodeEl"></pre>
+      </div>
+      <div>
+        <span class="section-label">Input:</span>
+        <pre style="font-size:200%;" id="inputEl"></pre>
+      </div>
+      <div>
+        <span class="section-label">Output:</span>
+        <pre style="font-size:200%;" id="outputEl"></pre>
+      </div>
+      <div>
+        <span class="section-label">Memory:</span>
+        <pre style="font-size:200%;" id="memoryEl"></pre>
+      </div>
+    </div>
+
+  </div>
   <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
   <script src="./bootstrap.js"></script>
 </body>
