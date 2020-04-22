@@ -17,52 +17,61 @@
     width: 75px;
   }
 
-  input{
-    background: whitesmoke;
+  input {
+    background: 0 0;
   }
 
 </style>
 
-<body style="background: aliceblue">
+<body style="background: rgba(0,0,0,.02)">
   <div style="width:75%; margin: auto; margin-top:85px;">
     <form onsubmit="return false">
       <div>
+        <span class="section-label">Description:</span>
+        <input style="font-size:200%;" type="text" id="descriptionEl" autocomplete="off">
+      </div>
+      <div>
         <div>
           <span class="section-label">Input:</span>
-          <input style="font-size:200%;" type="text" id="inputDataEl">
+          <input style="font-size:200%;" type="text" id="inputDataEl" autocomplete="off">
         </div>
         <div>
           <span class="section-label">Program:</span>
-          <input style="font-size:200%;" type="text" id="programInputEl">
+          <input style="font-size:200%;" type="text" id="programInputEl" autocomplete="off">
         </div>
       </div>
 
       <div style="margin-top:10px;">
         <button id="updateButton" type="submit">Update</button>
         <button id="resetButton" type="button">Reset</button>
+        <button id="importButton" type="button">Import</button>
+        <button id="exportButton" type="button">Export</button>
         <button id="debugButton" type="button">Debug</button>
       </div>
     </form>
 
     <div style="margin-top:25px;">
       <div>
+        <span class="section-label">Input:</span>
+        <pre style="font-size:200%;" id="inputEl"></pre>
+      </div>
+      <div>
         <span class="section-label">Program:</span>
         <pre style="font-size:200%;" id="programCodeEl"></pre>
       </div>
       <div>
-        <span class="section-label">Input:</span>
-        <pre style="font-size:200%;" id="inputEl"></pre>
+        <span class="section-label">Memory:</span>
+        <pre style="font-size:200%;" id="memoryEl"></pre>
       </div>
       <div>
         <span class="section-label">Output:</span>
         <pre style="font-size:200%;" id="outputEl"></pre>
       </div>
       <div>
-        <span class="section-label">Memory:</span>
-        <pre style="font-size:200%;" id="memoryEl"></pre>
+        <span class="section-label">Ticks:</span>
+        <pre style="font-size:200%;" id="ticksEl"></pre>
       </div>
     </div>
-
   </div>
   <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
   <script src="./bootstrap.js"></script>

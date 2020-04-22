@@ -17,7 +17,9 @@ macro_rules! log {
 pub struct ProgramIterator {
   pub program_counter: usize,
   pub the_pointer: usize,
-  start_loop_pointer: Option<usize>,
+  // start_loop_pointer: Option<usize>,
+  start_loop_stack: Vec<usize>,
+  end_loop_stack: Vec<usize>,
   commands: Vec<char>,
   memory: Vec<u8>,
   output: Vec<u8>,
@@ -75,37 +77,44 @@ impl ProgramIterator {
           return Some(c);
         }
         '[' => {
-          if self.memory[self.the_pointer] == 0 {
-            // todo: jump to end of loop pointer?
-            let loop_commands = &self.commands[self.program_counter..];
-            for &v in loop_commands {
-              self.program_counter += 1;
-              log!("{:?}", v);
-              if v == ']' {
-                return Some(c);
-              }
-            }
-            log!("ERROR: could not find end of loop");
-          } else {
-            if let Some(_) = self.start_loop_pointer {
-              log!("ERROR: invalid start of loop");
-            }
-            self.start_loop_pointer = Some(self.program_counter - 1);
-          }
+          self.process_loop_start();
           return Some(c);
         }
         ']' => {
-          if let Some(x) = self.start_loop_pointer.take() {
-            self.program_counter = x
-          } else {
-            log!("ERROR: invalid end of loop");
-          }
+          self.process_loop_end();
           return Some(c);
         }
         _ => (),
       };
     }
     None
+  }
+
+  fn process_loop_start(&mut self) {
+    if self.memory[self.the_pointer] == 0 {
+      if let Some(end_loop_pointer) = self.end_loop_stack.pop() {
+        self.program_counter = end_loop_pointer;
+        if self.start_loop_stack.len() > 0 {
+          log!("WARNING: end of inner loop");
+        }
+      } else {
+        log!("ERROR: could not find end of loop pointer");
+      }
+    } else {
+      if self.start_loop_stack.len() > 0 {
+        log!("WARNING: start of inner loop");
+      }
+      self.start_loop_stack.push(self.program_counter - 1);
+    }
+  }
+
+  fn process_loop_end(&mut self) {
+    if let Some(start_loop_pointer) = self.start_loop_stack.pop() {
+      self.end_loop_stack.push(self.program_counter);
+      self.program_counter = start_loop_pointer;
+    } else {
+      log!("ERROR: invalid end of loop");
+    }
   }
 }
 
@@ -124,7 +133,8 @@ impl ProgramIterator {
       memory: vec![0; memory_size],
       output: Vec::with_capacity(output_capacity),
       input,
-      start_loop_pointer: None,
+      start_loop_stack: Vec::new(),
+      end_loop_stack: Vec::new(),
       loop_counter: 0,
     }
   }

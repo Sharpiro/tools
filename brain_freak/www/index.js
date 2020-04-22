@@ -1,10 +1,13 @@
 import { memory as sharedMem } from "brain_freak/brain_freak_bg";
 import { ProgramIterator } from "brain_freak";
 
+// bugged {"description":"add all inputs w/ spec length","input":[3,0,1,2],"program":",[>,[->+<]<-]>>."}
+// bugged {"description":"outer loop block is never run","input":[0,0,1,2],"program":",[>,[->+<]<-]>>."}
 // const defaultProgram = ",.>,.<[->+<]>.";
 // const defaultProgram = ",.,.,.,.,.,.,.";
 const defaultProgram = ",.,.,.,.,.,.,.";
 const defaultInput = [1, 2, 3, 4, 5, 6, 7];
+let description = localStorage.getItem("description");
 const programJson = localStorage.getItem("program");
 let program = programJson ? programJson : defaultProgram;
 const inputJson = localStorage.getItem("input");
@@ -15,6 +18,7 @@ const outputCapacity = 10;
 
 let states = /** @type {State[]} */ ([]);
 let stateIndex = 0;
+let ticks = 0;
 let lazyLoading = true;
 let outputPointer = 0;
 /** @type {Uint8Array} */ let memory;
@@ -23,9 +27,11 @@ initialize();
 updatePage(states[0]);
 
 /** @type {HTMLInputElement} */
+const descriptionEl = (document.getElementById("descriptionEl"));
+descriptionEl.value = description ? description : "";
+/** @type {HTMLInputElement} */
 const inputDataEl = (document.getElementById("inputDataEl"));
 inputDataEl.value = input.join("");
-
 /** @type {HTMLInputElement} */
 const programInputEl = (document.getElementById("programInputEl"));
 programInputEl.value = program;
@@ -50,7 +56,8 @@ function initialize() {
     input: initialInput,
     output: [],
     thePointer: 0,
-    programCounter: 0
+    programCounter: 0,
+    ticks: 0
   };
   states = [initialState];
   lazyLoading = true;
@@ -63,24 +70,24 @@ function loadRight() {
     state = lazyLoadRight();
     if (state) {
       stateIndex++;
-      console.log(1, "lazy", state.command);
+      // console.log(1, "lazy", state.command);
     } else {
       lazyLoading = false;
-      console.log(1, "lazy done", "kept same state");
+      // console.log(1, "lazy done", "kept same state");
     }
   }
   else if (lazyLoading && stateIndex < states.length - 1) {
     ++stateIndex;
     state = states[stateIndex];
-    console.log(2, "pre", state.command);
+    // console.log(2, "pre", state.command);
   }
   else if (stateIndex < states.length - 1) {
     ++stateIndex;
     state = states[stateIndex];
-    console.log(3, "pre", state.command);
+    // console.log(3, "pre", state.command);
   }
   else if (!lazyLoading && stateIndex === states.length - 1) {
-    console.log(4, "done");
+    // console.log(4, "done");
   }
   else {
     throw new Error("unexpected path");
@@ -105,19 +112,20 @@ function lazyLoadRight() {
     input,
     output,
     thePointer: iterator.the_pointer,
-    programCounter: iterator.program_counter
+    programCounter: iterator.program_counter,
+    ticks: ++ticks
   };
   states.push(state);
   return state;
 }
 
-/** @param {{key:string}} ev */
+/** @param {{key: string}} ev */
 window.onkeydown = ev => {
   if (ev.key === "ArrowLeft") {
     if (stateIndex === 0) return;
     const state = states[--stateIndex];
     updatePage(state);
-    console.log("command:", state.command);
+    // console.log("command:", state.command);
   }
   else if (ev.key === "ArrowRight") {
     const state = loadRight();
@@ -125,11 +133,22 @@ window.onkeydown = ev => {
       updatePage(state);
     }
   }
+  else if (ev.key === "ArrowUp") {
+    stateIndex = 0;
+    updatePage(states[stateIndex]);
+  }
+  else if (ev.key === "ArrowDown") {
+    while (loadRight()) { }
+    updatePage(states[states.length - 1]);
+  }
 };
 
 updateButton.onclick = () => {
+  console.log("update");
+  description = descriptionEl.value;
   program = programInputEl.value;
   input = inputDataEl.value.split("").map(s => +s);
+  localStorage.setItem("description", description);
   localStorage.setItem("program", program);
   localStorage.setItem("input", JSON.stringify(input));
 
@@ -140,12 +159,31 @@ updateButton.onclick = () => {
 };
 
 resetButton.onclick = () => {
+  descriptionEl.value = "";
   input = defaultInput;
   programInputEl.value = program = defaultProgram;
   inputDataEl.value = input.join("");
   localStorage.clear();
   initialize();
   updatePage(states[0]);
+};
+
+importButton.onclick = () => {
+  const fullProgram = prompt("Input program json");
+  if (fullProgram) {
+    console.log(JSON.parse(fullProgram));
+  }
+};
+
+exportButton.onclick = () => {
+  const exportObj = { description, input, program };
+  const exportJson = JSON.stringify(exportObj);
+  const blob = new Blob([exportJson], { type: "application/json" }); //type
+  const downloadEl = document.createElement("a");
+  const blobUrl = URL.createObjectURL(blob);
+  downloadEl.download = "export";
+  downloadEl.href = blobUrl;
+  downloadEl.click();
 };
 
 debugButton.onclick = () => {
@@ -158,6 +196,10 @@ function updatePage(state) {
   updateProgramEl(state);
   updateInputEl(state);
   updateOutputEl(state);
+
+  const ticksEl = document.getElementById("ticksEl");
+  if (!ticksEl) throw new Error();
+  ticksEl.innerHTML = state.ticks.toString();
 }
 
 /** @param {State} state */
@@ -213,5 +255,6 @@ function updateOutputEl(state) {
  * output: number[];
  * thePointer: number
  * programCounter: number
+ * ticks: number
  * }} State
  */
