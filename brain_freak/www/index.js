@@ -1,8 +1,10 @@
 import { memory as sharedMem } from "brain_freak/brain_freak_bg";
 import { ProgramIterator } from "brain_freak";
 
-// bugged {"description":"add all inputs w/ spec length","input":[3,0,1,2],"program":",[>,[->+<]<-]>>."}
-// bugged {"description":"outer loop block is never run","input":[0,0,1,2],"program":",[>,[->+<]<-]>>."}
+// {"description":"","input":[],"program":"[]"}
+// {"description":"","input":[],"program":"[[.]..]"}
+// {"description":"add all inputs w/ spec length","input":[3,0,1,2],"program":",[>,[->+<]<-]>>."}
+// {"description":"outer loop block is never run","input":[0,0,1,2],"program":",[>,[->+<]<-]>>."}
 // const defaultProgram = ",.>,.<[->+<]>.";
 // const defaultProgram = ",.,.,.,.,.,.,.";
 const defaultProgram = ",.,.,.,.,.,.,.";
@@ -159,19 +161,38 @@ updateButton.onclick = () => {
 };
 
 resetButton.onclick = () => {
-  descriptionEl.value = "";
+  description = "";
   input = defaultInput;
-  programInputEl.value = program = defaultProgram;
+  program = defaultProgram;
+
+  descriptionEl.value = "";
   inputDataEl.value = input.join("");
+  programInputEl.value = program;
   localStorage.clear();
   initialize();
   updatePage(states[0]);
 };
 
 importButton.onclick = () => {
-  const fullProgram = prompt("Input program json");
-  if (fullProgram) {
-    console.log(JSON.parse(fullProgram));
+  const fullProgramJson = prompt("Input program json");
+  if (fullProgramJson) {
+    /** @type { FullProgram } */
+    const fullProgram = JSON.parse(fullProgramJson);
+
+    description = fullProgram.description;
+    input = fullProgram.input;
+    program = fullProgram.program;
+
+    descriptionEl.value = description;
+    inputDataEl.value = input.join("");
+    programInputEl.value = program;
+
+    localStorage.setItem("description", description);
+    localStorage.setItem("program", program);
+    localStorage.setItem("input", JSON.stringify(input));
+
+    initialize();
+    updatePage(states[0]);
   }
 };
 
@@ -258,3 +279,5 @@ function updateOutputEl(state) {
  * ticks: number
  * }} State
  */
+
+/** @typedef { { description: string, input: number[], program: string } } FullProgram */
