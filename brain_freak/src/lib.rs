@@ -1,5 +1,4 @@
 extern crate web_sys;
-mod brain_freak;
 mod utils;
 use wasm_bindgen::prelude::*;
 
@@ -61,7 +60,7 @@ impl ProgramIterator {
         '.' => {
           if self.output.len() == self.output.capacity() {
             log!(
-              "WARNING: exceeding output capacity {:?}",
+              "ERROR: exceeding output capacity {:?}",
               self.output.capacity()
             );
           }
@@ -98,7 +97,21 @@ impl ProgramIterator {
           log!("WARNING: end of inner loop");
         }
       } else {
-        log!("ERROR: could not find end of loop pointer");
+        // loop block never executed so we need to find corresponding end bracket w/o a pointer
+        let mut stack = vec!['['];
+        for &v in &self.commands[self.program_counter..self.commands.len()] {
+          self.program_counter += 1;
+          if v == '[' {
+            stack.push(v);
+          } else if v == ']' {
+            stack.pop();
+            if stack.len() == 0 {
+              return;
+            }
+          }
+        }
+
+        log!("ERROR: could not find end of loop pointer or skip to matching end of loop bracket");
       }
     } else {
       if self.start_loop_stack.len() > 0 {
@@ -121,7 +134,7 @@ impl ProgramIterator {
 #[wasm_bindgen]
 impl ProgramIterator {
   pub fn new(
-    program: String,
+    program: &str,
     memory_size: usize,
     output_capacity: usize,
     input: Vec<u8>,
@@ -187,5 +200,29 @@ impl ProgramIterator {
   pub fn bump_output(&mut self) {
     self.output.push(self.program_counter as u8);
     self.program_counter += 1;
+  }
+}
+
+// struct Brackets {
+//   start_pointer: usize,
+//   end_pointer: Option<usize>,
+// }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn print_input() {
+    let expected_memory = [1, 2, 0, 0, 0];
+    let expected_output = [1, 2];
+
+    let input = vec![1, 2];
+    let program = ",.>,.";
+    let mut iterator = ProgramIterator::new(program, 5, 10, input);
+    while let Some(_) = iterator.next() {}
+
+    assert_eq!(expected_output, &iterator.output[..]);
+    assert_eq!(&expected_memory[..], &iterator.memory[..]);
   }
 }
