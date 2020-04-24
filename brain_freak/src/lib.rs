@@ -1,22 +1,10 @@
-extern crate web_sys;
 mod utils;
 use wasm_bindgen::prelude::*;
-
-#[cfg(feature = "wee_alloc")]
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
-macro_rules! log {
-  ( $( $t:tt )* ) => {
-      web_sys::console::log_1(&format!( $( $t )* ).into());
-  }
-}
 
 #[wasm_bindgen]
 pub struct ProgramIterator {
   pub program_counter: usize,
   pub the_pointer: usize,
-  // start_loop_pointer: Option<usize>,
   start_loop_stack: Vec<usize>,
   end_loop_stack: Vec<usize>,
   commands: Vec<char>,
@@ -24,12 +12,14 @@ pub struct ProgramIterator {
   output: Vec<u8>,
   input: Vec<u8>,
   loop_counter: usize,
+  ticks: usize,
 }
 
 impl ProgramIterator {
   fn process_next_command(&mut self) -> Option<char> {
     for &c in self.commands[self.program_counter..self.commands.len()].iter() {
       self.loop_counter += 1;
+      self.ticks += 1;
       if self.loop_counter > 1_000 {
         panic!("infinite loop ohh boy");
       }
@@ -94,10 +84,11 @@ impl ProgramIterator {
       if let Some(end_loop_pointer) = self.end_loop_stack.pop() {
         self.program_counter = end_loop_pointer;
         if self.start_loop_stack.len() > 0 {
-          log!("WARNING: end of inner loop");
+          log!("VERBOSE: end of inner loop");
         }
       } else {
         // loop block never executed so we need to find corresponding end bracket w/o a pointer
+        log!("VERBOSE: no end loop pointer, trying to find end of current loop");
         let mut stack = vec!['['];
         for &v in &self.commands[self.program_counter..self.commands.len()] {
           self.program_counter += 1;
@@ -115,7 +106,7 @@ impl ProgramIterator {
       }
     } else {
       if self.start_loop_stack.len() > 0 {
-        log!("WARNING: start of inner loop");
+        log!("VERBOSE: start of inner loop");
       }
       self.start_loop_stack.push(self.program_counter - 1);
     }
@@ -149,6 +140,7 @@ impl ProgramIterator {
       start_loop_stack: Vec::new(),
       end_loop_stack: Vec::new(),
       loop_counter: 0,
+      ticks: 0,
     }
   }
 
@@ -214,15 +206,109 @@ mod tests {
 
   #[test]
   fn print_input() {
-    let expected_memory = [1, 2, 0, 0, 0];
+    let expected_memory = [1, 2];
     let expected_output = [1, 2];
 
     let input = vec![1, 2];
     let program = ",.>,.";
-    let mut iterator = ProgramIterator::new(program, 5, 10, input);
+    let mut iterator = ProgramIterator::new(program, 2, 2, input);
     while let Some(_) = iterator.next() {}
 
     assert_eq!(expected_output, &iterator.output[..]);
     assert_eq!(&expected_memory[..], &iterator.memory[..]);
+  }
+
+  #[test]
+  fn decrement_zero() {
+    let expected_memory = [255];
+
+    let program = "-";
+    let mut iterator = ProgramIterator::new(program, 1, 0, vec![]);
+    while let Some(_) = iterator.next() {}
+
+    assert_eq!(&expected_memory[..], &iterator.memory[..]);
+  }
+
+  #[test]
+  fn looping() {
+    let expected_memory = [0];
+    let expected_output = [3, 2, 1];
+
+    let input = vec![3];
+    let program = ",[.-]";
+    let mut iterator = ProgramIterator::new(program, 1, 3, input);
+    while let Some(_) = iterator.next() {}
+
+    assert_eq!(expected_output, &iterator.output[..]);
+    assert_eq!(expected_memory, &iterator.memory[..]);
+  }
+
+  #[test]
+  fn addition() {
+    let expected_memory = [0, 5];
+    let expected_output = [5];
+
+    let input = vec![3, 2];
+    let program = ",>,<[->+<]>.";
+    let mut iterator = ProgramIterator::new(program, 2, 1, input);
+    while let Some(_) = iterator.next() {}
+
+    assert_eq!(expected_output, &iterator.output[..]);
+    assert_eq!(expected_memory, &iterator.memory[..]);
+  }
+
+  #[test]
+  fn outer_loop_never_runs() {
+    let expected_memory = [0];
+
+    let input = vec![];
+    let program = "[+[+]]";
+    let mut iterator = ProgramIterator::new(program, 1, 0, input);
+    while let Some(_) = iterator.next() {}
+
+    assert_eq!(expected_memory, &iterator.memory[..]);
+  }
+
+  #[test]
+  fn inner_loop_never_runs() {
+    let expected_memory = [255];
+    let expected_output = [255];
+
+    let input = vec![1];
+    let program = ",[-[+.]]-.";
+    let mut iterator = ProgramIterator::new(program, 1, 1, input);
+    while let Some(_) = iterator.next() {}
+
+    assert_eq!(expected_memory, &iterator.memory[..]);
+    assert_eq!(expected_output, &iterator.output[..]);
+  }
+
+  #[test]
+  fn add_n_numbers() {
+    let expected_memory = [0, 0, 3];
+    let expected_output = [3];
+
+    let input = vec![3, 0, 1, 2];
+    let program = ",[>,[->+<]<-]>>.";
+    let mut iterator =
+      ProgramIterator::new(program, expected_memory.len(), expected_output.len(), input);
+    while let Some(_) = iterator.next() {}
+
+    assert_eq!(expected_memory, &iterator.memory[..]);
+    assert_eq!(expected_output, &iterator.output[..]);
+  }
+
+  #[test]
+  fn jump_to_inner_end_loop_pointer() {
+    // {"description":"end_loop_pointer","input":[2],"program":",[>[+]<-]"}
+    let expected_memory = [1, 0];
+
+    let input = vec![2];
+    let program = ",[>[+]<-]";
+    let mut iterator = ProgramIterator::new(program, expected_memory.len(), 0, input);
+    while let Some(_) = iterator.next() {}
+
+    assert_eq!(expected_memory, &iterator.memory[..]);
+    assert_eq!(14, iterator.ticks);
   }
 }

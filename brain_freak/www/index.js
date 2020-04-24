@@ -1,12 +1,6 @@
 import { memory as sharedMem } from "brain_freak/brain_freak_bg";
 import { ProgramIterator } from "brain_freak";
 
-// {"description":"","input":[],"program":"[]"}
-// {"description":"","input":[],"program":"[[.]..]"}
-// {"description":"add all inputs w/ spec length","input":[3,0,1,2],"program":",[>,[->+<]<-]>>."}
-// {"description":"outer loop block is never run","input":[0,0,1,2],"program":",[>,[->+<]<-]>>."}
-// const defaultProgram = ",.>,.<[->+<]>.";
-// const defaultProgram = ",.,.,.,.,.,.,.";
 const defaultProgram = ",.,.,.,.,.,.,.";
 const defaultInput = [1, 2, 3, 4, 5, 6, 7];
 let description = localStorage.getItem("description");
@@ -146,10 +140,11 @@ window.onkeydown = ev => {
 };
 
 updateButton.onclick = () => {
-  console.log("update");
   description = descriptionEl.value;
   program = programInputEl.value;
   input = inputDataEl.value.split("").map(s => +s);
+  ticks = 0;
+
   localStorage.setItem("description", description);
   localStorage.setItem("program", program);
   localStorage.setItem("input", JSON.stringify(input));
@@ -164,6 +159,7 @@ resetButton.onclick = () => {
   description = "";
   input = defaultInput;
   program = defaultProgram;
+  ticks = 0;
 
   descriptionEl.value = "";
   inputDataEl.value = input.join("");
@@ -182,6 +178,7 @@ importButton.onclick = () => {
     description = fullProgram.description;
     input = fullProgram.input;
     program = fullProgram.program;
+    ticks = 0;
 
     descriptionEl.value = description;
     inputDataEl.value = input.join("");
@@ -199,12 +196,24 @@ importButton.onclick = () => {
 exportButton.onclick = () => {
   const exportObj = { description, input, program };
   const exportJson = JSON.stringify(exportObj);
-  const blob = new Blob([exportJson], { type: "application/json" }); //type
-  const downloadEl = document.createElement("a");
-  const blobUrl = URL.createObjectURL(blob);
-  downloadEl.download = "export";
-  downloadEl.href = blobUrl;
-  downloadEl.click();
+
+  const inputEl = document.createElement("input");
+  inputEl.value = exportJson;
+  inputEl.style.left = "-10000px";
+  inputEl.style.position = "absolute";
+  document.body.appendChild(inputEl);
+  inputEl.select();
+  document.execCommand("copy");
+  document.body.removeChild(inputEl);
+  console.log("copied?");
+  console.log(exportJson);
+
+  // const blob = new Blob([exportJson], { type: "application/json" }); //type
+  // const downloadEl = document.createElement("a");
+  // const blobUrl = URL.createObjectURL(blob);
+  // downloadEl.download = "export";
+  // downloadEl.href = blobUrl;
+  // downloadEl.click();
 };
 
 debugButton.onclick = () => {
