@@ -3,10 +3,10 @@ import { ProgramIterator } from "brain_freak";
 
 const defaultProgram = ",.,.,.,.,.,.,.";
 const defaultInput = [1, 2, 3, 4, 5, 6, 7];
-let description = localStorage.getItem("description");
-const programJson = localStorage.getItem("program");
+let description = sessionStorage.getItem("description");
+const programJson = sessionStorage.getItem("program");
 let program = programJson ? programJson : defaultProgram;
-const inputJson = localStorage.getItem("input");
+const inputJson = sessionStorage.getItem("input");
 /** @type {number[]} */
 let input = inputJson ? JSON.parse(inputJson) : defaultInput;
 const memSize = 10;
@@ -145,9 +145,9 @@ updateButton.onclick = () => {
   input = inputDataEl.value.split("").map(s => +s);
   ticks = 0;
 
-  localStorage.setItem("description", description);
-  localStorage.setItem("program", program);
-  localStorage.setItem("input", JSON.stringify(input));
+  sessionStorage.setItem("description", description);
+  sessionStorage.setItem("program", program);
+  sessionStorage.setItem("input", JSON.stringify(input));
 
   initialize();
   updatePage(states[0]);
@@ -164,7 +164,7 @@ resetButton.onclick = () => {
   descriptionEl.value = "";
   inputDataEl.value = input.join("");
   programInputEl.value = program;
-  localStorage.clear();
+  sessionStorage.clear();
   initialize();
   updatePage(states[0]);
 };
@@ -184,9 +184,9 @@ importButton.onclick = () => {
     inputDataEl.value = input.join("");
     programInputEl.value = program;
 
-    localStorage.setItem("description", description);
-    localStorage.setItem("program", program);
-    localStorage.setItem("input", JSON.stringify(input));
+    sessionStorage.setItem("description", description);
+    sessionStorage.setItem("program", program);
+    sessionStorage.setItem("input", JSON.stringify(input));
 
     initialize();
     updatePage(states[0]);
