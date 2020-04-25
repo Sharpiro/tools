@@ -5,8 +5,8 @@ use wasm_bindgen::prelude::*;
 pub struct ProgramIterator {
   pub program_counter: usize,
   pub the_pointer: usize,
-  start_loop_stack: Vec<usize>,
-  end_loop_stack: Vec<usize>,
+  blocks: Vec<Block>,
+  current_block: Option<Block>,
   commands: Vec<char>,
   memory: Vec<u8>,
   output: Vec<u8>,
@@ -79,46 +79,73 @@ impl ProgramIterator {
     None
   }
 
+  /// if '['
   fn process_loop_start(&mut self) {
     if self.memory[self.the_pointer] == 0 {
-      if let Some(end_loop_pointer) = self.end_loop_stack.pop() {
-        self.program_counter = end_loop_pointer;
-        if self.start_loop_stack.len() > 0 {
-          log!("VERBOSE: end of inner loop");
-        }
-      } else {
-        // loop block never executed so we need to find corresponding end bracket w/o a pointer
-        log!("VERBOSE: no end loop pointer, trying to find end of current loop");
-        let mut stack = vec!['['];
-        for &v in &self.commands[self.program_counter..self.commands.len()] {
-          self.program_counter += 1;
-          if v == '[' {
-            stack.push(v);
-          } else if v == ']' {
-            stack.pop();
-            if stack.len() == 0 {
-              return;
-            }
-          }
-        }
-
-        log!("ERROR: could not find end of loop pointer or skip to matching end of loop bracket");
-      }
+      self.skip_loop_block();
     } else {
-      if self.start_loop_stack.len() > 0 {
-        log!("VERBOSE: start of inner loop");
-      }
-      self.start_loop_stack.push(self.program_counter - 1);
+      self.enter_loop_block();
     }
   }
 
-  fn process_loop_end(&mut self) {
-    if let Some(start_loop_pointer) = self.start_loop_stack.pop() {
-      self.end_loop_stack.push(self.program_counter);
-      self.program_counter = start_loop_pointer;
+  fn skip_loop_block(&mut self) {
+    // todo: combined if let expressions could make this simpler and more readable
+    if let Some(current_block) = &self.current_block {
+      if current_block.start_pointer == self.program_counter - 1 {
+        log!("VERBOSE: exit current block by end pointer");
+        self.program_counter = current_block
+          .end_pointer
+          .expect("ERROR: always expected end pointer available at this point");
+        self.current_block = self.blocks.pop();
+      } else {
+        log!("VERBOSE: skip and find inner block pointer");
+        self.skip_never_ran_block();
+      }
     } else {
-      log!("ERROR: invalid end of loop");
+      log!("VERBOSE: NOT in a block we must also skip block and find end block pointer");
+      self.skip_never_ran_block();
     }
+  }
+
+  fn skip_never_ran_block(&mut self) {
+    let mut stack = vec!['['];
+    for &v in &self.commands[self.program_counter..self.commands.len()] {
+      self.program_counter += 1;
+      if v == '[' {
+        stack.push(v);
+      } else if v == ']' {
+        stack.pop();
+        if stack.len() == 0 {
+          return;
+        }
+      }
+    }
+    log!("ERROR: could not find end of loop pointer or skip to matching end of loop bracket");
+  }
+
+  fn enter_loop_block(&mut self) {
+    if let Some(current_block) = self.current_block.as_ref() {
+      if current_block.start_pointer == self.program_counter - 1 {
+        log!("VERBOSE: continuing loop");
+      } else {
+        log!("VERBOSE: starting new inner loop");
+        let current_block = self.current_block.take().unwrap();
+        self.blocks.push(current_block);
+        self.current_block = Some(Block::new(self.program_counter - 1));
+      }
+    } else {
+      log!("VERBOSE: starting new loop");
+      self.current_block = Some(Block::new(self.program_counter - 1));
+    }
+  }
+
+  /// if ']'
+  fn process_loop_end(&mut self) {
+    let curr_block = (self.current_block)
+      .as_mut()
+      .expect("ERROR: expected current block at end of loop block");
+    curr_block.end_pointer = Some(self.program_counter);
+    self.program_counter = curr_block.start_pointer;
   }
 }
 
@@ -137,8 +164,8 @@ impl ProgramIterator {
       memory: vec![0; memory_size],
       output: Vec::with_capacity(output_capacity),
       input,
-      start_loop_stack: Vec::new(),
-      end_loop_stack: Vec::new(),
+      blocks: Vec::new(),
+      current_block: None,
       loop_counter: 0,
       ticks: 0,
     }
@@ -195,10 +222,19 @@ impl ProgramIterator {
   }
 }
 
-// struct Brackets {
-//   start_pointer: usize,
-//   end_pointer: Option<usize>,
-// }
+struct Block {
+  start_pointer: usize,
+  end_pointer: Option<usize>,
+}
+
+impl Block {
+  fn new(start_pointer: usize) -> Block {
+    Block {
+      start_pointer,
+      end_pointer: None,
+    }
+  }
+}
 
 #[cfg(test)]
 mod tests {
@@ -299,9 +335,23 @@ mod tests {
   }
 
   #[test]
+  fn add_n_numbers_two() {
+    let expected_memory = [0, 0, 3];
+    let expected_output = [3];
+
+    let input = vec![2, 2, 1];
+    let program = ",[>,[->+<]<-]>>.";
+    let mut iterator =
+      ProgramIterator::new(program, expected_memory.len(), expected_output.len(), input);
+    while let Some(_) = iterator.next() {}
+
+    assert_eq!(expected_memory, &iterator.memory[..]);
+    assert_eq!(expected_output, &iterator.output[..]);
+  }
+
+  #[test]
   fn jump_to_inner_end_loop_pointer() {
-    // {"description":"end_loop_pointer","input":[2],"program":",[>[+]<-]"}
-    let expected_memory = [1, 0];
+    let expected_memory = [0, 0];
 
     let input = vec![2];
     let program = ",[>[+]<-]";
@@ -310,5 +360,18 @@ mod tests {
 
     assert_eq!(expected_memory, &iterator.memory[..]);
     assert_eq!(14, iterator.ticks);
+  }
+
+  #[test]
+  fn skip_inner_loop_once() {
+    let expected_memory = [0, 1];
+
+    let input = vec![2];
+    let program = ",[>[-]+<-]";
+    let mut iterator = ProgramIterator::new(program, expected_memory.len(), 0, input);
+    while let Some(_) = iterator.next() {}
+
+    assert_eq!(expected_memory, &iterator.memory[..]);
+    assert_eq!(19, iterator.ticks);
   }
 }
