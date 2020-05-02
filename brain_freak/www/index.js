@@ -1,6 +1,7 @@
 import { memory as sharedMem } from "brain_freak/brain_freak_bg";
-import { ProgramIterator } from "brain_freak";
+import { ProgramIterator, set_panic_hook } from "brain_freak";
 
+set_panic_hook();
 const defaultProgram = ",.,.,.,.,.,.,.";
 const defaultInput = [1, 2, 3, 4, 5, 6, 7];
 let description = sessionStorage.getItem("description");
@@ -63,7 +64,12 @@ function initialize() {
 function loadRight() {
   let state;
   if (lazyLoading && stateIndex === states.length - 1) {
-    state = lazyLoadRight();
+    try {
+      state = lazyLoadRight();
+    } catch (err) {
+      alert("An error occurred, see console for details");
+      return;
+    }
     if (state) {
       stateIndex++;
       // console.log(1, "lazy", state.command);
@@ -115,8 +121,10 @@ function lazyLoadRight() {
   return state;
 }
 
-/** @param {{key: string}} ev */
+/** @param {{key: string, target: any}} ev */
 window.onkeydown = ev => {
+  if (ev.target.localName === "input") return;
+
   if (ev.key === "ArrowLeft") {
     if (stateIndex === 0) return;
     const state = states[--stateIndex];
