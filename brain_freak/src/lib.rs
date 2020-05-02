@@ -27,14 +27,14 @@ impl ProgramIterator {
       match c {
         '>' => {
           if self.the_pointer + 1 == self.memory.len() {
-            log!("ERROR: memory out of bounds");
+            panic!("ERROR: memory out of bounds");
           }
           self.the_pointer += 1;
           return Some(c);
         }
         '<' => {
           if self.the_pointer == 0 {
-            log!("ERROR: memory out of bounds");
+            panic!("ERROR: memory out of bounds");
           }
           self.the_pointer -= 1;
           return Some(c);
@@ -49,7 +49,7 @@ impl ProgramIterator {
         }
         '.' => {
           if self.output.len() == self.output.capacity() {
-            log!(
+            panic!(
               "ERROR: exceeding output capacity {:?}",
               self.output.capacity()
             );
@@ -59,7 +59,7 @@ impl ProgramIterator {
         }
         ',' => {
           if self.input.len() == 0 {
-            log!("ERROR: no inputs found");
+            panic!("ERROR: no inputs found");
           }
           self.memory[self.the_pointer] = self.input[0];
           self.input = self.input[1..].to_owned();
@@ -98,11 +98,11 @@ impl ProgramIterator {
           .expect("ERROR: always expected end pointer available at this point");
         self.current_block = self.blocks.pop();
       } else {
-        log!("VERBOSE: skip and find inner block pointer");
+        log!("VERBOSE: skip inner block and find inner block pointer");
         self.skip_never_ran_block();
       }
     } else {
-      log!("VERBOSE: NOT in a block we must also skip block and find end block pointer");
+      log!("VERBOSE: NOT in a block thus we must skip block and find end block pointer");
       self.skip_never_ran_block();
     }
   }
@@ -120,7 +120,7 @@ impl ProgramIterator {
         }
       }
     }
-    log!("ERROR: could not find end of loop pointer or skip to matching end of loop bracket");
+    panic!("ERROR: could not find end of loop pointer or skip to matching end of loop bracket");
   }
 
   fn enter_loop_block(&mut self) {
