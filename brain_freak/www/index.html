@@ -21,6 +21,17 @@
     background: 0 0;
   }
 
+  .program-pre {
+    font-size: 200%;
+    margin: 10px 0 10px 0;
+  }
+
+  .program-input {
+    width: 420px;
+    height: 250px;
+    font-size: 150%;
+  }
+
 </style>
 
 <body style="background: rgba(0,0,0,.02)">
@@ -36,23 +47,23 @@
             ⬆️
       Left ⬅️ ➡️ Right
             ⬇️
-           End
-    </pre>
+           End</pre>
   </div>
   <div style="width:75%; margin: auto;">
     <form onsubmit="return false">
       <div>
-        <span class="section-label">Description:</span>
-        <input style="font-size:200%;" type="text" id="descriptionEl" autocomplete="off">
-      </div>
-      <div>
-        <div>
+        <div style="margin: 5px 0 5px 0;">
+          <span class="section-label">Description:</span>
+          <input style="font-size:200%;" type="text" id="descriptionEl" autocomplete="off">
+        </div>
+        <div style="margin: 5px 0 5px 0;">
           <span class="section-label">Input:</span>
           <input style="font-size:200%;" type="text" id="inputDataEl" autocomplete="off">
         </div>
-        <div>
+        <div style="margin: 5px 0 5px 0;">
           <span class="section-label">Program:</span>
-          <input style="font-size:200%;" type="text" id="programInputEl" autocomplete="off">
+          <!-- <input style="font-size:200%;" type="text" id="programInputEl" autocomplete="off"> -->
+          <textarea id="programInputEl" class="program-input"></textarea>
         </div>
       </div>
 
@@ -68,23 +79,23 @@
     <div style="margin-top:25px;">
       <div>
         <span class="section-label">Input:</span>
-        <pre style="font-size:200%;" id="inputEl"></pre>
+        <pre class="program-pre" id="inputEl"></pre>
       </div>
       <div>
         <span class="section-label">Program:</span>
-        <pre style="font-size:200%;" id="programCodeEl"></pre>
+        <pre class="program-pre" id="programCodeEl"></pre>
       </div>
       <div>
         <span class="section-label">Memory:</span>
-        <pre style="font-size:200%;" id="memoryEl"></pre>
+        <pre class="program-pre" id="memoryEl"></pre>
       </div>
       <div>
         <span class="section-label">Output:</span>
-        <pre style="font-size:200%;" id="outputEl"></pre>
+        <pre class="program-pre" id="outputEl"></pre>
       </div>
       <div>
         <span class="section-label">Ticks:</span>
-        <pre style="font-size:200%;" id="ticksEl"></pre>
+        <pre class="program-pre" id="ticksEl"></pre>
       </div>
     </div>
   </div>
