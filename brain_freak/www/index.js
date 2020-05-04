@@ -4,10 +4,11 @@ import { ProgramIterator, set_panic_hook } from "brain_freak";
 set_panic_hook();
 const defaultProgram = ",.,.,.,.,.,.,.";
 const defaultInput = [1, 2, 3, 4, 5, 6, 7];
-let description = sessionStorage.getItem("description");
-const programJson = sessionStorage.getItem("program");
+let description = localStorage.getItem("description");
+const programJson = localStorage.getItem("program");
 let program = programJson ? programJson : defaultProgram;
-const inputJson = sessionStorage.getItem("input");
+let cleansedProgram = getCleansedProgram(program);
+const inputJson = localStorage.getItem("input");
 /** @type {number[]} */
 let input = inputJson ? JSON.parse(inputJson) : defaultInput;
 const memSize = 10;
@@ -35,7 +36,7 @@ programInputEl.value = program;
 
 function initialize() {
   iterator = ProgramIterator.new(
-    program,
+    cleansedProgram,
     memSize,
     outputCapacity,
     new Uint8Array(input)
@@ -123,7 +124,7 @@ function lazyLoadRight() {
 
 /** @param {{key: string, target: any}} ev */
 window.onkeydown = ev => {
-  if (ev.target.localName === "input") return;
+  if (ev.target.localName === "input" || ev.target.localName === "textarea") return;
 
   if (ev.key === "ArrowLeft") {
     if (stateIndex === 0) return;
@@ -149,13 +150,14 @@ window.onkeydown = ev => {
 
 updateButton.onclick = () => {
   description = descriptionEl.value;
-  program = programInputEl.value;
   input = inputDataEl.value.split("").map(s => +s);
+  program = programInputEl.value;
+  cleansedProgram = getCleansedProgram(program);
   ticks = 0;
 
-  sessionStorage.setItem("description", description);
-  sessionStorage.setItem("program", program);
-  sessionStorage.setItem("input", JSON.stringify(input));
+  localStorage.setItem("description", description);
+  localStorage.setItem("program", program);
+  localStorage.setItem("input", JSON.stringify(input));
 
   initialize();
   updatePage(states[0]);
@@ -167,12 +169,13 @@ resetButton.onclick = () => {
   description = "";
   input = defaultInput;
   program = defaultProgram;
+  cleansedProgram = getCleansedProgram(program);
   ticks = 0;
 
   descriptionEl.value = "";
   inputDataEl.value = input.join("");
   programInputEl.value = program;
-  sessionStorage.clear();
+  localStorage.clear();
   initialize();
   updatePage(states[0]);
 };
@@ -186,15 +189,16 @@ importButton.onclick = () => {
     description = fullProgram.description;
     input = fullProgram.input;
     program = fullProgram.program;
+    cleansedProgram = getCleansedProgram(program);
     ticks = 0;
 
     descriptionEl.value = description;
     inputDataEl.value = input.join("");
     programInputEl.value = program;
 
-    sessionStorage.setItem("description", description);
-    sessionStorage.setItem("program", program);
-    sessionStorage.setItem("input", JSON.stringify(input));
+    localStorage.setItem("description", description);
+    localStorage.setItem("program", program);
+    localStorage.setItem("input", JSON.stringify(input));
 
     initialize();
     updatePage(states[0]);
@@ -213,8 +217,6 @@ exportButton.onclick = () => {
   inputEl.select();
   document.execCommand("copy");
   document.body.removeChild(inputEl);
-  console.log("copied?");
-  console.log(exportJson);
 
   // const blob = new Blob([exportJson], { type: "application/json" }); //type
   // const downloadEl = document.createElement("a");
@@ -254,7 +256,7 @@ function updateMemoryEl(state) {
 
 /** @param {State} state */
 function updateProgramEl(state) {
-  const arrDisplay = Array.from(program).join(" ");
+  const arrDisplay = Array.from(cleansedProgram).join(" ");
   const spaces = state.programCounter * 2;
   const prgCounterDisplay = " ".repeat(spaces) + "^";
   const display = `${arrDisplay}\n${prgCounterDisplay}`;
@@ -284,6 +286,15 @@ function updateOutputEl(state) {
   outputEl.innerHTML = display;
 }
 
+/** @param {string} program */
+function getCleansedProgram(program) {
+  const lines = program.split("\n").filter(l => !(!l[0] || l[0] === ";" || l[0] === ""));
+  const modProgram = lines.join("");
+  const cleansePattern = /[.,<>+\-[\]]+/g;
+  const matches = modProgram.match(cleansePattern);
+  const cleansedProgram = matches ? matches.join("") : "";
+  return cleansedProgram;
+}
 
 /**
  * @typedef {{

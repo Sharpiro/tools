@@ -374,4 +374,19 @@ mod tests {
     assert_eq!(expected_memory, &iterator.memory[..]);
     assert_eq!(19, iterator.ticks);
   }
+
+  #[test]
+  fn multiplication() {
+    let expected_memory = [0, 6];
+    let expected_output = [6];
+
+    let input = vec![3, 2];
+    let program = ",>,<[->+<]>.";
+    let mut iterator = ProgramIterator::new(program, 2, 1, input);
+    while let Some(_) = iterator.next() {}
+
+    assert_eq!(expected_output, &iterator.output[..]);
+    assert_eq!(expected_memory, &iterator.memory[..]);
+    assert_eq!(100, iterator.ticks);
+  }
 }
