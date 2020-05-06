@@ -17,19 +17,19 @@ pub struct ProgramIterator {
 
 impl ProgramIterator {
   fn process_next_command(&mut self) -> Option<char> {
-    for &c in self.commands[self.program_counter..self.commands.len()].iter() {
+    for &c in &self.commands[self.program_counter..self.commands.len()] {
+      self.program_counter += 1;
       self.loop_counter += 1;
-      self.ticks += 1;
-      if self.loop_counter > 1_000 {
+      if self.loop_counter > 5_000 {
         panic!("infinite loop ohh boy");
       }
-      self.program_counter += 1;
       match c {
         '>' => {
           if self.the_pointer + 1 == self.memory.len() {
             panic!("ERROR: memory out of bounds");
           }
           self.the_pointer += 1;
+          self.ticks += 1;
           return Some(c);
         }
         '<' => {
@@ -37,14 +37,17 @@ impl ProgramIterator {
             panic!("ERROR: memory out of bounds");
           }
           self.the_pointer -= 1;
+          self.ticks += 1;
           return Some(c);
         }
         '+' => {
           self.memory[self.the_pointer] = self.memory[self.the_pointer].wrapping_add(1);
+          self.ticks += 1;
           return Some(c);
         }
         '-' => {
           self.memory[self.the_pointer] = self.memory[self.the_pointer].wrapping_sub(1);
+          self.ticks += 1;
           return Some(c);
         }
         '.' => {
@@ -55,6 +58,7 @@ impl ProgramIterator {
             );
           }
           self.output.push(self.memory[self.the_pointer]);
+          self.ticks += 1;
           return Some(c);
         }
         ',' => {
@@ -63,14 +67,17 @@ impl ProgramIterator {
           }
           self.memory[self.the_pointer] = self.input[0];
           self.input = self.input[1..].to_owned();
+          self.ticks += 1;
           return Some(c);
         }
         '[' => {
           self.process_loop_start();
+          self.ticks += 1;
           return Some(c);
         }
         ']' => {
           self.process_loop_end();
+          self.ticks += 1;
           return Some(c);
         }
         _ => (),
@@ -172,12 +179,7 @@ impl ProgramIterator {
   }
 
   pub fn next(&mut self) -> Option<char> {
-    let result = if self.program_counter < self.commands.len() {
-      self.process_next_command()
-    } else {
-      None
-    };
-    result
+    self.process_next_command()
   }
 
   pub fn get_output(&self) -> Vec<u8> {
@@ -185,9 +187,6 @@ impl ProgramIterator {
   }
 
   pub fn get_input_len(&self) -> usize {
-    // log!("input len: {:?}", self.input.len());
-    // log!("input cap: {:?}", self.input.capacity());
-    // log!("input ptr: {:?}", self.input.as_ptr());
     self.input.len()
   }
 
@@ -200,14 +199,10 @@ impl ProgramIterator {
   }
 
   pub fn get_input_ptr(&self) -> *const u8 {
-    // log!("input len: {:?}", self.input.len());
-    // log!("input cap: {:?}", self.input.capacity());
     self.input.as_ptr()
   }
 
   pub fn get_output_ptr(&self) -> *const u8 {
-    // log!("output len: {:?}", self.output.len());
-    // log!("output cap: {:?}", self.output.capacity());
     self.output.as_ptr()
   }
 
@@ -376,17 +371,49 @@ mod tests {
   }
 
   #[test]
-  fn multiplication() {
-    let expected_memory = [0, 6];
-    let expected_output = [6];
+  fn skip_other_characters() {
+    let expected_memory = [1];
+    let expected_output = [1];
 
-    let input = vec![3, 2];
-    let program = ",>,<[->+<]>.";
-    let mut iterator = ProgramIterator::new(program, 2, 1, input);
+    let input = vec![1];
+    let program = "  test , .  // here is a comment";
+    let mut iterator = ProgramIterator::new(program, 1, 1, input);
+    while let Some(_cmd) = iterator.next() {}
+
+    assert_eq!(expected_memory, &iterator.memory[..]);
+    assert_eq!(expected_output, &iterator.output[..]);
+    assert_eq!(2, iterator.ticks);
+  }
+
+  #[test]
+  fn duplicate_in_place() {
+    let expected_memory = [2, 2, 0];
+
+    let input = vec![2];
+    let program = ",[>+>+<<-] >> [<<+>>-]";
+    let mut iterator = ProgramIterator::new(program, 3, 0, input);
+    while let Some(_cmd) = iterator.next() {}
+
+    assert_eq!(expected_memory, &iterator.memory[..]);
+    assert_eq!(39, iterator.ticks);
+  }
+
+  #[test]
+  fn multiplication() {
+    let expected_memory = [0, 9, 54, 0];
+    let expected_output = [54];
+
+    let input = vec![6, 9];
+    let program = ",>,< // read input (x y)
+    [> // duplicate y x times
+    [>+>+<<-] >> [<<+>>-] << // duplicate y
+    <-]
+    >>. // print";
+    let mut iterator = ProgramIterator::new(program, 4, 1, input);
     while let Some(_) = iterator.next() {}
 
     assert_eq!(expected_output, &iterator.output[..]);
     assert_eq!(expected_memory, &iterator.memory[..]);
-    assert_eq!(100, iterator.ticks);
+    assert_eq!(992, iterator.ticks);
   }
 }
