@@ -1,9 +1,9 @@
 import { memory as sharedMem } from "brain_freak/brain_freak_bg";
 import { ProgramIterator, set_panic_hook } from "brain_freak";
 
-set_panic_hook();
-const defaultProgram = ",.,.,.,.,.,.,.";
-const defaultInput = [1, 2, 3, 4, 5, 6, 7];
+set_panic_hook(); // additional console info on wasm panic
+const defaultProgram = ",[>+.<-]";
+const defaultInput = [2, 1];
 let description = localStorage.getItem("description");
 const programJson = localStorage.getItem("program");
 let program = programJson ? programJson : defaultProgram;
@@ -29,7 +29,7 @@ const descriptionEl = (document.getElementById("descriptionEl"));
 descriptionEl.value = description ? description : "";
 /** @type {HTMLInputElement} */
 const inputDataEl = (document.getElementById("inputDataEl"));
-inputDataEl.value = input.join("");
+inputDataEl.value = input.join(",");
 /** @type {HTMLInputElement} */
 const programInputEl = (document.getElementById("programInputEl"));
 programInputEl.value = program;
@@ -150,7 +150,7 @@ window.onkeydown = ev => {
 
 updateButton.onclick = () => {
   description = descriptionEl.value;
-  input = inputDataEl.value.split("").map(s => +s);
+  input = inputDataEl.value.split(",").map(s => +s);
   program = programInputEl.value;
   cleansedProgram = getCleansedProgram(program);
   ticks = 0;
@@ -173,7 +173,7 @@ resetButton.onclick = () => {
   ticks = 0;
 
   descriptionEl.value = "";
-  inputDataEl.value = input.join("");
+  inputDataEl.value = input.join(",");
   programInputEl.value = program;
   localStorage.clear();
   initialize();
@@ -193,7 +193,7 @@ importButton.onclick = () => {
     ticks = 0;
 
     descriptionEl.value = description;
-    inputDataEl.value = input.join("");
+    inputDataEl.value = input.join(",");
     programInputEl.value = program;
 
     localStorage.setItem("description", description);
@@ -228,6 +228,14 @@ exportButton.onclick = () => {
 
 debugButton.onclick = () => {
   console.log(states);
+};
+
+/** @param {{key: string, shiftKey: boolean}} ev */
+programInputEl.onkeydown = ev => {
+  if (!ev.shiftKey && ev.key === "Enter") {
+    updateButton.onclick();
+    return false;
+  }
 };
 
 /** @param {State} state */
