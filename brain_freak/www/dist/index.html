@@ -14,7 +14,7 @@
 
   .section-label {
     display: inline-block;
-    width: 75px;
+    width: 100px;
   }
 
   .program-pre {
@@ -22,8 +22,13 @@
     margin: 10px 0 10px 0;
   }
 
-  .program-input {
-    width: 420px;
+  .std-input {
+    width: 425px;
+    font-size: 200%;
+  }
+
+  .program-text-area {
+    width: 425px;
     height: 250px;
     font-size: 150%;
   }
@@ -50,16 +55,16 @@
       <div>
         <div style="margin: 5px 0 5px 0;">
           <span class="section-label">Description:</span>
-          <input style="font-size:200%;" type="text" id="descriptionEl" autocomplete="off">
+          <input class="std-input" type="text" id="descriptionEl" autocomplete="off">
         </div>
         <div style="margin: 5px 0 5px 0;">
           <span class="section-label">Input:</span>
-          <input style="font-size:200%;" type="text" id="inputDataEl" autocomplete="off">
+          <input class="std-input" type="text" id="inputDataEl" autocomplete="off">
         </div>
         <div style="margin: 5px 0 5px 0;">
           <span class="section-label">Program:</span>
-          <!-- <input style="font-size:200%;" type="text" id="programInputEl" autocomplete="off"> -->
-          <textarea id="programInputEl" class="program-input"></textarea>
+          <textarea id="programInputEl" class="program-text-area"></textarea>
+          <!-- <button type="button">Edit</button> -->
         </div>
       </div>
 
