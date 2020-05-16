@@ -3,6 +3,8 @@ import { LazyLoader } from "./brain_freak";
 
 set_panic_hook(); // additional console info on wasm panic
 
+// {"description":"","input":[1],"program":", // read it\n+ // increment it\n. // write it"}
+
 const defaultProgram = ",[>+.<-]";
 const defaultInput = [2, 1];
 let description = localStorage.getItem("description");
@@ -41,6 +43,7 @@ window.onkeydown = ev => {
   else if (ev.key === "ArrowRight") {
     const state = lazyLoader.loadRight();
     if (state) {
+      console.log(state);
       updatePage(state);
     }
   }
@@ -52,6 +55,13 @@ window.onkeydown = ev => {
     while (lazyLoader.loadRight()) { }
     updatePage(lazyLoader.states[lazyLoader.states.length - 1]);
   }
+};
+
+editButton.onclick = () => {
+  console.log("edit");
+  const testPre = document.getElementById("testPre");
+  if (!testPre) throw new Error();
+  testPre.innerText = lazyLoader.program;
 };
 
 updateButton.onclick = () => {
@@ -158,10 +168,18 @@ function updateMemoryEl(state) {
 
 /** @param {State} state */
 function updateProgramEl(state) {
-  const arrDisplay = Array.from(lazyLoader.cleansedProgram).join(" ");
-  const spaces = state.programCounter * 2;
-  const prgCounterDisplay = " ".repeat(spaces) + "^";
-  const display = `${arrDisplay}\n${prgCounterDisplay}`;
+  // const arrDisplay = Array.from(lazyLoader.cleansedProgram).join(" ");
+  // const arrDisplay = lazyLoader.program.replace(/\n/g, "\n\n");
+  const arrDisplay = lazyLoader.program;
+  // const spaces = state.programCounter * 2;
+  // const spaces = state.programCounter;
+  const start = lazyLoader.program.slice(0, state.programCounter);
+  let nextNewlineIndex = lazyLoader.program.slice(state.programCounter).indexOf("\n");
+  const line = lazyLoader.program.slice(state.programCounter, nextNewlineIndex)
+  let end = lazyLoader.program.slice(nextNewlineIndex);
+  // const prgCounterDisplay = " ".repeat(spaces) + "^";
+  // const display = `${arrDisplay}\n${prgCounterDisplay}`;
+  const display = start + line + "\n^" + end;
 
   const programCodeEl = document.getElementById("programCodeEl");
   if (!programCodeEl) throw new Error();

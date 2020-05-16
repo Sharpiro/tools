@@ -21,12 +21,13 @@ export class LazyLoader {
     this.memSize = memSize;
     this.outputCapacity = outputCapacity;
     this.input = input;
-    this.iterator = ProgramIterator.new(cleansedProgram, memSize, outputCapacity, inputBuffer);
+    // this.iterator = ProgramIterator.new(cleansedProgram, memSize, outputCapacity, inputBuffer);
+    this.iterator = ProgramIterator.new(program, memSize, outputCapacity, inputBuffer);
     this.stateIndex = 0;
     this.lazyLoading = true;
     this.outputPointer = this.iterator.get_output_ptr();
     this.memory = new Uint8Array(sharedMem.buffer, this.iterator.get_memory_ptr(), memSize);
-    this.ticks = -1;
+    this.ticks = 0;
     this.states = /** @type {State[]} */ ([{
       command: "",
       memory: Array.from(this.memory),
@@ -34,7 +35,7 @@ export class LazyLoader {
       output: [],
       thePointer: 0,
       programCounter: 0,
-      ticks: 0
+      ticks: this.ticks
     }]);
   }
 
@@ -91,10 +92,11 @@ export class LazyLoader {
       memory: Array.from(this.memory),
       input: input,
       output: output,
-      thePointer: this.iterator.the_pointer,
-      programCounter: this.iterator.program_counter,
+      thePointer: this.iterator.get_the_pointer(),
+      programCounter: this.iterator.get_program_counter(),
       ticks: ++this.ticks
     };
+    console.log("program_counter:", this.iterator.get_program_counter());
     this.states.push(state);
     return state;
   }

@@ -137,17 +137,19 @@ fn skip_inner_loop_once() {
 
 #[test]
 fn skip_other_characters() {
-  let expected_memory = [1];
-  let expected_output = [1];
+  let expected_memory = [2];
+  let expected_output = [2];
 
   let input = vec![1];
-  let program = "  test , .  // here is a comment";
+  let program = "  test , +  // here is a comment .";
   let mut iterator = ProgramIterator::new(program, 1, 1, input);
   while let Some(_cmd) = iterator.next() {}
 
   assert_eq!(expected_memory, iterator.get_memory());
   assert_eq!(expected_output, iterator.get_output());
-  assert_eq!(2, iterator.get_ticks());
+  assert_eq!(3, iterator.get_ticks());
+  assert_eq!(3, iterator.get_program_counter());
+  assert_eq!(34, iterator.get_source_location());
 }
 
 #[test]
@@ -181,3 +183,22 @@ fn multiplication() {
   assert_eq!(expected_memory, iterator.get_memory());
   assert_eq!(992, iterator.get_ticks());
 }
+
+// #[test]
+// fn source_location_test() {
+//   let expected_memory = [2];
+//   let expected_output = [2];
+
+//   let input = vec![1];
+//   let program = ", // read it
+//   + // increment it
+//   . // write it";
+//   let mut iterator = ProgramIterator::new(program, 1, 1, input);
+//   while let Some(_) = iterator.next() {}
+
+//   assert_eq!(expected_output, iterator.get_output());
+//   assert_eq!(expected_memory, iterator.get_memory());
+//   assert_eq!(3, iterator.get_ticks());
+//   assert_eq!(3, iterator.get_program_counter());
+//   assert_eq!(48, iterator.get_source_location());
+// }

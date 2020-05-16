@@ -3,8 +3,9 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct ProgramIterator {
-  pub program_counter: usize,
-  pub the_pointer: usize,
+  program_counter: usize,
+  source_location: usize,
+  the_pointer: usize,
   blocks: Vec<Block>,
   current_block: Option<Block>,
   commands: Vec<char>,
@@ -26,6 +27,7 @@ impl ProgramIterator {
 
   fn process_next_command(&mut self) -> Option<char> {
     for &c in &self.commands[self.program_counter..self.commands.len()] {
+      // self.source_location += 1;
       self.program_counter += 1;
       self.loop_counter += 1;
       if self.loop_counter > 5_000 {
@@ -159,7 +161,11 @@ impl ProgramIterator {
     let curr_block = (self.current_block)
       .as_mut()
       .expect("ERROR: expected current block at end of loop block");
-    curr_block.end_pointer = Some(self.program_counter);
+
+    if let None = curr_block.end_pointer {
+      log!("VERBOSE: assigning current block end pointer");
+      curr_block.end_pointer = Some(self.program_counter);
+    }
     self.program_counter = curr_block.start_pointer;
   }
 }
@@ -174,6 +180,7 @@ impl ProgramIterator {
   ) -> ProgramIterator {
     ProgramIterator {
       program_counter: 0,
+      source_location: 0,
       the_pointer: 0,
       commands: program.chars().collect(),
       memory: vec![0; memory_size],
@@ -210,8 +217,20 @@ impl ProgramIterator {
     self.output.as_ptr()
   }
 
+  pub fn get_source_location(&self) -> usize {
+    self.source_location
+  }
+
   pub fn get_ticks(&self) -> usize {
     self.ticks
+  }
+
+  pub fn get_program_counter(&self) -> usize {
+    self.program_counter
+  }
+
+  pub fn get_the_pointer(&self) -> usize {
+    self.the_pointer
   }
 }
 
