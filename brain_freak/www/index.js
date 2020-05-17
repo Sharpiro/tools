@@ -167,38 +167,36 @@ function updateMemoryEl(state) {
 
 /** @param {State} state */
 function updateProgramEl(state) {
-  // const arrDisplay = Array.from(lazyLoader.cleansedProgram).join(" ");
-  // const arrDisplay = lazyLoader.program.replace(/\n/g, "\n\n");
-  // const arrDisplay = lazyLoader.program;
-  // const spaces = state.programCounter * 2;
-  // const spaces = state.programCounter;
+  let trimmedProgram = lazyLoader.program;
+  if (!lazyLoader.program.endsWith("\n")) {
+    trimmedProgram = lazyLoader.program + "\n";
+  }
+  let startOfLine = revIndexOf(trimmedProgram, "\n", state.programCounter) + 1;
+  startOfLine = startOfLine >= 0 ? startOfLine : 0;
+  let endOfLine = trimmedProgram.indexOf("\n", state.programCounter);
+  endOfLine = endOfLine >= 0 ? endOfLine : trimmedProgram.length - 1;
+  let lineOffset = state.programCounter - startOfLine;
+  lineOffset = lineOffset >= 0 ? lineOffset : 0;
+  console.log("programCounter", state.programCounter);
+  console.log("startOfLine", startOfLine);
+  console.log("lineOffset", lineOffset);
+  console.log("endOfLine", endOfLine);
+
+  const start = trimmedProgram.slice(0, endOfLine + 1);
+  const debugLine = `${" ".repeat(lineOffset)}^\n`;
+  const end = trimmedProgram.slice(endOfLine + 1);
+  // console.log(start);
+  // console.log("--------------");
+  // console.log(debugLine);
+  // console.log("--------------");
+  // console.log(end);
+  console.log("\n\n-------total-------");
+  const display = startOfLine <= endOfLine ? `${start}${debugLine}${end}` : `${lazyLoader.program}\n^`;
+
   const programCodeEl = document.getElementById("programCodeEl");
   if (!programCodeEl) throw new Error();
-
-  if (state.programCounter < 1) {
-    programCodeEl.innerHTML = lazyLoader.program;
-    return;
-  }
-
-  const pcIndex = state.programCounter - 1;
-  const startOfLine = revIndexOf(lazyLoader.program, "\n", pcIndex);
-  const nextEndOfLine = lazyLoader.program.indexOf("\n", pcIndex);
-  const offset = pcIndex - startOfLine;
-  // console.log("start", startOfLine);
-  // console.log("offset", offset);
-  // console.log("end", nextEndOfLine);
-
-  const start = lazyLoader.program.slice(0, nextEndOfLine);
-  const debugLine = `\n${" ".repeat(offset - 1)}^`;
-  let end = lazyLoader.program.slice(nextEndOfLine);
-  const display = start + debugLine + end;
-
   programCodeEl.innerHTML = display;
 }
-
-// const data = "hello, world";
-// const revIndex = revIndexOf(data, "e", 5);
-// console.log(revIndex);
 
 /**
  * @param {string} data

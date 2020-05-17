@@ -31,7 +31,7 @@ export class LazyLoader {
       input: this.input,
       output: [],
       thePointer: 0,
-      programCounter: 0,
+      programCounter: this.iterator.get_program_counter(),
       commandIndex: 0,
       ticks: this.ticks
     }]);

@@ -26,94 +26,99 @@ impl ProgramIterator {
   }
 
   fn parse_to_next_command(&mut self) {
+    if self.program_counter >= self.commands.len() {
+      return;
+    }
     for &c in &self.commands[self.program_counter..self.commands.len()] {
+      match c {
+        '>' => return,
+        '<' => return,
+        '+' => return,
+        '-' => return,
+        '.' => return,
+        ',' => return,
+        '[' => return,
+        ']' => return,
+        _ => (),
+      };
+      log!("VERBOSE: skipping invalid character");
       self.program_counter += 1;
       self.loop_counter += 1;
-      if self.loop_counter > 5_000 {
+      if self.loop_counter > 10_000 {
         panic!("infinite loop ohh boy");
       }
     }
   }
 
   fn process_next_command(&mut self) -> Option<char> {
-    for &c in &self.commands[self.program_counter..self.commands.len()] {
-      self.program_counter += 1;
-      self.loop_counter += 1;
-      if self.loop_counter > 5_000 {
-        panic!("infinite loop ohh boy");
+    let command = self.commands.get(self.program_counter).copied();
+    match command {
+      Some('>') => {
+        self.command_index = self.program_counter;
+        if self.the_pointer + 1 == self.memory.len() {
+          panic!("ERROR: memory out of bounds");
+        }
+        self.the_pointer += 1;
+        self.ticks += 1;
+        self.program_counter += 1;
       }
-      match c {
-        '>' => {
-          self.command_index = self.program_counter - 1;
-          if self.the_pointer + 1 == self.memory.len() {
-            panic!("ERROR: memory out of bounds");
-          }
-          self.the_pointer += 1;
-          self.ticks += 1;
-          return Some(c);
+      Some('<') => {
+        self.command_index = self.program_counter;
+        if self.the_pointer == 0 {
+          panic!("ERROR: memory out of bounds");
         }
-        '<' => {
-          self.command_index = self.program_counter - 1;
-          if self.the_pointer == 0 {
-            panic!("ERROR: memory out of bounds");
-          }
-          self.the_pointer -= 1;
-          self.ticks += 1;
-          return Some(c);
+        self.the_pointer -= 1;
+        self.ticks += 1;
+        self.program_counter += 1;
+      }
+      Some('+') => {
+        self.command_index = self.program_counter;
+        self.memory[self.the_pointer] = self.memory[self.the_pointer].wrapping_add(1);
+        self.ticks += 1;
+        self.program_counter += 1;
+      }
+      Some('-') => {
+        self.command_index = self.program_counter;
+        self.memory[self.the_pointer] = self.memory[self.the_pointer].wrapping_sub(1);
+        self.ticks += 1;
+        self.program_counter += 1;
+      }
+      Some('.') => {
+        self.command_index = self.program_counter;
+        if self.output.len() == self.output.capacity() {
+          panic!(
+            "ERROR: exceeding output capacity {:?}",
+            self.output.capacity()
+          );
         }
-        '+' => {
-          self.command_index = self.program_counter - 1;
-          self.memory[self.the_pointer] = self.memory[self.the_pointer].wrapping_add(1);
-          self.ticks += 1;
-          return Some(c);
+        self.output.push(self.memory[self.the_pointer]);
+        self.ticks += 1;
+        self.program_counter += 1;
+      }
+      Some(',') => {
+        self.command_index = self.program_counter;
+        if self.input.len() == 0 {
+          panic!("ERROR: no inputs found");
         }
-        '-' => {
-          self.command_index = self.program_counter - 1;
-          self.memory[self.the_pointer] = self.memory[self.the_pointer].wrapping_sub(1);
-          self.ticks += 1;
-          return Some(c);
-        }
-        '.' => {
-          self.command_index = self.program_counter - 1;
-          if self.output.len() == self.output.capacity() {
-            panic!(
-              "ERROR: exceeding output capacity {:?}",
-              self.output.capacity()
-            );
-          }
-          self.output.push(self.memory[self.the_pointer]);
-          self.ticks += 1;
-          return Some(c);
-        }
-        ',' => {
-          self.command_index = self.program_counter - 1;
-          if self.input.len() == 0 {
-            panic!("ERROR: no inputs found");
-          }
-          self.memory[self.the_pointer] = self.input[0];
-          self.input = self.input[1..].to_owned();
-          self.ticks += 1;
-          return Some(c);
-        }
-        '[' => {
-          self.command_index = self.program_counter - 1;
-          self.process_loop_start();
-          self.ticks += 1;
-          return Some(c);
-        }
-        ']' => {
-          self.command_index = self.program_counter - 1;
-          self.process_loop_end();
-          self.ticks += 1;
-          return Some(c);
-        }
-        _ => {
-          log!("VERBOSE: skipping invalid character");
-          ()
-        }
-      };
-    }
-    None
+        self.memory[self.the_pointer] = self.input[0];
+        self.input = self.input[1..].to_owned();
+        self.ticks += 1;
+        self.program_counter += 1;
+      }
+      Some('[') => {
+        self.command_index = self.program_counter;
+        self.process_loop_start();
+        self.ticks += 1;
+      }
+      Some(']') => {
+        self.command_index = self.program_counter;
+        self.process_loop_end();
+        self.ticks += 1;
+      }
+      None => log!("VERBOSE: end of characters"),
+      _ => panic!("Error: invalid character when trying to process"),
+    };
+    command
   }
 
   /// if '['
@@ -122,13 +127,14 @@ impl ProgramIterator {
       self.skip_loop_block();
     } else {
       self.enter_loop_block();
+      self.program_counter += 1;
     }
   }
 
   fn skip_loop_block(&mut self) {
     // todo: combined if let expressions could make this simpler and more readable
     if let Some(current_block) = &self.current_block {
-      if current_block.start_pointer == self.program_counter - 1 {
+      if current_block.start_pointer == self.program_counter {
         log!("VERBOSE: exit current block by end pointer");
         self.program_counter = current_block
           .end_pointer
@@ -145,6 +151,7 @@ impl ProgramIterator {
   }
 
   fn skip_never_ran_block(&mut self) {
+    self.program_counter += 1;
     let mut stack = vec!['['];
     for &v in &self.commands[self.program_counter..self.commands.len()] {
       self.program_counter += 1;
@@ -162,17 +169,17 @@ impl ProgramIterator {
 
   fn enter_loop_block(&mut self) {
     if let Some(current_block) = self.current_block.as_ref() {
-      if current_block.start_pointer == self.program_counter - 1 {
+      if current_block.start_pointer == self.program_counter {
         log!("VERBOSE: continuing loop");
       } else {
         log!("VERBOSE: starting new inner loop");
         let current_block = self.current_block.take().unwrap();
         self.blocks.push(current_block);
-        self.current_block = Some(Block::new(self.program_counter - 1));
+        self.current_block = Some(Block::new(self.program_counter));
       }
     } else {
       log!("VERBOSE: starting new loop");
-      self.current_block = Some(Block::new(self.program_counter - 1));
+      self.current_block = Some(Block::new(self.program_counter));
     }
   }
 
@@ -184,7 +191,7 @@ impl ProgramIterator {
 
     if let None = curr_block.end_pointer {
       log!("VERBOSE: assigning current block end pointer");
-      curr_block.end_pointer = Some(self.program_counter);
+      curr_block.end_pointer = Some(self.program_counter + 1);
     }
     self.program_counter = curr_block.start_pointer;
   }
@@ -198,7 +205,7 @@ impl ProgramIterator {
     output_capacity: usize,
     input: Vec<u8>,
   ) -> ProgramIterator {
-    ProgramIterator {
+    let mut iterator = ProgramIterator {
       program_counter: 0,
       command_index: 0,
       the_pointer: 0,
@@ -210,11 +217,17 @@ impl ProgramIterator {
       current_block: None,
       loop_counter: 0,
       ticks: 0,
-    }
+    };
+    iterator.parse_to_next_command();
+    iterator
   }
 
   pub fn next(&mut self) -> Option<char> {
-    self.process_next_command()
+    let processed_command = self.process_next_command();
+    if let Some(_) = processed_command {
+      self.parse_to_next_command();
+    }
+    processed_command
   }
 
   pub fn get_input_len(&self) -> usize {
