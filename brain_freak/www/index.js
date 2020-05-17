@@ -43,7 +43,6 @@ window.onkeydown = ev => {
   else if (ev.key === "ArrowRight") {
     const state = lazyLoader.loadRight();
     if (state) {
-      console.log(state);
       updatePage(state);
     }
   }
@@ -57,12 +56,12 @@ window.onkeydown = ev => {
   }
 };
 
-editButton.onclick = () => {
-  console.log("edit");
-  const testPre = document.getElementById("testPre");
-  if (!testPre) throw new Error();
-  testPre.innerText = lazyLoader.program;
-};
+// editButton.onclick = () => {
+//   console.log("edit");
+//   const testPre = document.getElementById("testPre");
+//   if (!testPre) throw new Error();
+//   testPre.innerText = lazyLoader.program;
+// };
 
 updateButton.onclick = () => {
   description = descriptionEl.value;
@@ -170,20 +169,49 @@ function updateMemoryEl(state) {
 function updateProgramEl(state) {
   // const arrDisplay = Array.from(lazyLoader.cleansedProgram).join(" ");
   // const arrDisplay = lazyLoader.program.replace(/\n/g, "\n\n");
-  const arrDisplay = lazyLoader.program;
+  // const arrDisplay = lazyLoader.program;
   // const spaces = state.programCounter * 2;
   // const spaces = state.programCounter;
-  const start = lazyLoader.program.slice(0, state.programCounter);
-  let nextNewlineIndex = lazyLoader.program.slice(state.programCounter).indexOf("\n");
-  const line = lazyLoader.program.slice(state.programCounter, nextNewlineIndex)
-  let end = lazyLoader.program.slice(nextNewlineIndex);
-  // const prgCounterDisplay = " ".repeat(spaces) + "^";
-  // const display = `${arrDisplay}\n${prgCounterDisplay}`;
-  const display = start + line + "\n^" + end;
-
   const programCodeEl = document.getElementById("programCodeEl");
   if (!programCodeEl) throw new Error();
+
+  if (state.programCounter < 1) {
+    programCodeEl.innerHTML = lazyLoader.program;
+    return;
+  }
+
+  const pcIndex = state.programCounter - 1;
+  const startOfLine = revIndexOf(lazyLoader.program, "\n", pcIndex);
+  const nextEndOfLine = lazyLoader.program.indexOf("\n", pcIndex);
+  const offset = pcIndex - startOfLine;
+  // console.log("start", startOfLine);
+  // console.log("offset", offset);
+  // console.log("end", nextEndOfLine);
+
+  const start = lazyLoader.program.slice(0, nextEndOfLine);
+  const debugLine = `\n${" ".repeat(offset - 1)}^`;
+  let end = lazyLoader.program.slice(nextEndOfLine);
+  const display = start + debugLine + end;
+
   programCodeEl.innerHTML = display;
+}
+
+// const data = "hello, world";
+// const revIndex = revIndexOf(data, "e", 5);
+// console.log(revIndex);
+
+/**
+ * @param {string} data
+ * @param {string} searchString
+ * @param {number} startIndex
+ */
+function revIndexOf(data, searchString, startIndex) {
+  for (let i = startIndex; i >= 0; i--) {
+    if (data[i] === searchString) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 /** @param {State} state */

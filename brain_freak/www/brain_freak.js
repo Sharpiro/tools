@@ -13,15 +13,12 @@ export class LazyLoader {
    * @param {number[]} input
    */
   constructor(program, memSize, outputCapacity, input) {
-    const cleansedProgram = getCleansedProgram(program);
-    const inputBuffer = new Uint8Array(input);
-
     this.program = program;
-    this.cleansedProgram = cleansedProgram;
     this.memSize = memSize;
     this.outputCapacity = outputCapacity;
     this.input = input;
-    // this.iterator = ProgramIterator.new(cleansedProgram, memSize, outputCapacity, inputBuffer);
+    this.cleansedProgram = getCleansedProgram(program);
+    const inputBuffer = new Uint8Array(input);
     this.iterator = ProgramIterator.new(program, memSize, outputCapacity, inputBuffer);
     this.stateIndex = 0;
     this.lazyLoading = true;
@@ -35,6 +32,7 @@ export class LazyLoader {
       output: [],
       thePointer: 0,
       programCounter: 0,
+      commandIndex: 0,
       ticks: this.ticks
     }]);
   }
@@ -46,6 +44,7 @@ export class LazyLoader {
     if (this.lazyLoading && this.stateIndex === this.states.length - 1) {
       try {
         const command = this.iterator.next();
+        console.log(command);
         if (command) {
           state = this.addState(command);
           this.stateIndex++;
@@ -94,9 +93,11 @@ export class LazyLoader {
       output: output,
       thePointer: this.iterator.get_the_pointer(),
       programCounter: this.iterator.get_program_counter(),
+      commandIndex: this.iterator.get_command_index(),
       ticks: ++this.ticks
     };
-    console.log("program_counter:", this.iterator.get_program_counter());
+    console.log("program_counter", this.iterator.get_program_counter());
+    // console.log(state);
     this.states.push(state);
     return state;
   }
@@ -120,6 +121,7 @@ function getCleansedProgram(program) {
   * output: number[];
   * thePointer: number
   * programCounter: number
+  * commandIndex: number
   * ticks: number
   * }} State
   */

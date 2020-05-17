@@ -4,7 +4,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 pub struct ProgramIterator {
   program_counter: usize,
-  source_location: usize,
+  command_index: usize,
   the_pointer: usize,
   blocks: Vec<Block>,
   current_block: Option<Block>,
@@ -25,9 +25,18 @@ impl ProgramIterator {
     &self.output
   }
 
+  fn parse_to_next_command(&mut self) {
+    for &c in &self.commands[self.program_counter..self.commands.len()] {
+      self.program_counter += 1;
+      self.loop_counter += 1;
+      if self.loop_counter > 5_000 {
+        panic!("infinite loop ohh boy");
+      }
+    }
+  }
+
   fn process_next_command(&mut self) -> Option<char> {
     for &c in &self.commands[self.program_counter..self.commands.len()] {
-      // self.source_location += 1;
       self.program_counter += 1;
       self.loop_counter += 1;
       if self.loop_counter > 5_000 {
@@ -35,6 +44,7 @@ impl ProgramIterator {
       }
       match c {
         '>' => {
+          self.command_index = self.program_counter - 1;
           if self.the_pointer + 1 == self.memory.len() {
             panic!("ERROR: memory out of bounds");
           }
@@ -43,6 +53,7 @@ impl ProgramIterator {
           return Some(c);
         }
         '<' => {
+          self.command_index = self.program_counter - 1;
           if self.the_pointer == 0 {
             panic!("ERROR: memory out of bounds");
           }
@@ -51,16 +62,19 @@ impl ProgramIterator {
           return Some(c);
         }
         '+' => {
+          self.command_index = self.program_counter - 1;
           self.memory[self.the_pointer] = self.memory[self.the_pointer].wrapping_add(1);
           self.ticks += 1;
           return Some(c);
         }
         '-' => {
+          self.command_index = self.program_counter - 1;
           self.memory[self.the_pointer] = self.memory[self.the_pointer].wrapping_sub(1);
           self.ticks += 1;
           return Some(c);
         }
         '.' => {
+          self.command_index = self.program_counter - 1;
           if self.output.len() == self.output.capacity() {
             panic!(
               "ERROR: exceeding output capacity {:?}",
@@ -72,6 +86,7 @@ impl ProgramIterator {
           return Some(c);
         }
         ',' => {
+          self.command_index = self.program_counter - 1;
           if self.input.len() == 0 {
             panic!("ERROR: no inputs found");
           }
@@ -81,16 +96,21 @@ impl ProgramIterator {
           return Some(c);
         }
         '[' => {
+          self.command_index = self.program_counter - 1;
           self.process_loop_start();
           self.ticks += 1;
           return Some(c);
         }
         ']' => {
+          self.command_index = self.program_counter - 1;
           self.process_loop_end();
           self.ticks += 1;
           return Some(c);
         }
-        _ => (),
+        _ => {
+          log!("VERBOSE: skipping invalid character");
+          ()
+        }
       };
     }
     None
@@ -180,7 +200,7 @@ impl ProgramIterator {
   ) -> ProgramIterator {
     ProgramIterator {
       program_counter: 0,
-      source_location: 0,
+      command_index: 0,
       the_pointer: 0,
       commands: program.chars().collect(),
       memory: vec![0; memory_size],
@@ -217,8 +237,8 @@ impl ProgramIterator {
     self.output.as_ptr()
   }
 
-  pub fn get_source_location(&self) -> usize {
-    self.source_location
+  pub fn get_command_index(&self) -> usize {
+    self.command_index
   }
 
   pub fn get_ticks(&self) -> usize {

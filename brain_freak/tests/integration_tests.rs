@@ -148,8 +148,7 @@ fn skip_other_characters() {
   assert_eq!(expected_memory, iterator.get_memory());
   assert_eq!(expected_output, iterator.get_output());
   assert_eq!(3, iterator.get_ticks());
-  assert_eq!(3, iterator.get_program_counter());
-  assert_eq!(34, iterator.get_source_location());
+  assert_eq!(34, iterator.get_program_counter());
 }
 
 #[test]
