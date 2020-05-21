@@ -29,7 +29,7 @@ impl ProgramIterator {
     if self.program_counter >= self.commands.len() {
       return;
     }
-    for &c in &self.commands[self.program_counter..self.commands.len()] {
+    for c in &self.commands[self.program_counter..self.commands.len()] {
       match c {
         '>' => return,
         '<' => return,
@@ -155,13 +155,18 @@ impl ProgramIterator {
     let mut stack = vec!['['];
     for &v in &self.commands[self.program_counter..self.commands.len()] {
       self.program_counter += 1;
-      if v == '[' {
-        stack.push(v);
-      } else if v == ']' {
-        stack.pop();
-        if stack.len() == 0 {
-          return;
+
+      match v {
+        '[' => stack.push(v),
+        ']' => {
+          if None == stack.pop() {
+            panic!("ERROR: expected closing bracket on stack");
+          }
+          if stack.len() == 0 {
+            return;
+          }
         }
+        _ => (),
       }
     }
     panic!("ERROR: could not find end of loop pointer or skip to matching end of loop bracket");
@@ -189,7 +194,7 @@ impl ProgramIterator {
       .as_mut()
       .expect("ERROR: expected current block at end of loop block");
 
-    if let None = curr_block.end_pointer {
+    if None == curr_block.end_pointer {
       log!("VERBOSE: assigning current block end pointer");
       curr_block.end_pointer = Some(self.program_counter + 1);
     }
