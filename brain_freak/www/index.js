@@ -3,8 +3,6 @@ import { LazyLoader } from "./brain_freak";
 
 set_panic_hook(); // additional console info on wasm panic
 
-// {"description":"","input":[1],"program":", // read it\n+ // increment it\n. // write it"}
-
 const defaultProgram = ",[>+.<-]";
 const defaultInput = [2, 1];
 let description = localStorage.getItem("description");
@@ -56,22 +54,18 @@ window.onkeydown = ev => {
   }
 };
 
-// editButton.onclick = () => {
-//   console.log("edit");
-//   const testPre = document.getElementById("testPre");
-//   if (!testPre) throw new Error();
-//   testPre.innerText = lazyLoader.program;
-// };
-
 updateButton.onclick = () => {
   description = descriptionEl.value;
   input = inputDataEl.value.split(",").map(s => +s);
   program = programInputEl.value;
+  console.log(program);
   lazyLoader.ticks = 0;
-
+  
   localStorage.setItem("description", description);
   localStorage.setItem("program", program);
   localStorage.setItem("input", JSON.stringify(input));
+
+  program = program.trim() + "\n\n";
 
   lazyLoader = new LazyLoader(program, memSize, outputCapacity, input);
   updatePage(lazyLoader.states[0]);
@@ -100,15 +94,17 @@ importButton.onclick = () => {
 
     description = fullProgram.description;
     input = fullProgram.input;
-    program = fullProgram.program;
-
-    descriptionEl.value = description;
-    inputDataEl.value = input.join(",");
-    programInputEl.value = program;
+    program = fullProgram.program.trim() + "\n\n";
 
     localStorage.setItem("description", description);
     localStorage.setItem("program", program);
     localStorage.setItem("input", JSON.stringify(input));
+
+    program = program.trim() + "\n\n";
+
+    descriptionEl.value = description;
+    inputDataEl.value = input.join(",");
+    programInputEl.value = program;
 
     lazyLoader = new LazyLoader(program, memSize, outputCapacity, input);
     updatePage(lazyLoader.states[0]);
@@ -168,9 +164,9 @@ function updateMemoryEl(state) {
 /** @param {State} state */
 function updateProgramEl(state) {
   let trimmedProgram = lazyLoader.program;
-  if (!lazyLoader.program.endsWith("\n")) {
-    trimmedProgram = lazyLoader.program + "\n";
-  }
+  // if (!lazyLoader.program.endsWith("\n")) {
+  //   trimmedProgram = lazyLoader.program + "\n";
+  // }
   let startOfLine = revIndexOf(trimmedProgram, "\n", state.programCounter) + 1;
   startOfLine = startOfLine >= 0 ? startOfLine : 0;
   let endOfLine = trimmedProgram.indexOf("\n", state.programCounter);
@@ -191,7 +187,7 @@ function updateProgramEl(state) {
   // console.log("--------------");
   // console.log(end);
   console.log("\n\n-------total-------");
-  const display = startOfLine <= endOfLine ? `${start}${debugLine}${end}` : `${lazyLoader.program}\n^`;
+  const display = startOfLine <= endOfLine ? `${start}${debugLine}${end}` : `${lazyLoader.program}^`;
 
   const programCodeEl = document.getElementById("programCodeEl");
   if (!programCodeEl) throw new Error();
