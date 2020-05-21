@@ -13,8 +13,6 @@ let program = programJson ? programJson : defaultProgram;
 const programInputEl = (document.getElementById("programInputEl"));
 programInputEl.value = program;
 
-program = program.trim() + "\n\n";
-
 const inputJson = localStorage.getItem("input");
 /** @type {number[]} */
 let input = inputJson ? JSON.parse(inputJson) : defaultInput;
@@ -61,12 +59,10 @@ updateButton.onclick = () => {
   description = descriptionEl.value;
   input = inputDataEl.value.split(",").map(s => +s);
   program = programInputEl.value;
-  
+
   localStorage.setItem("description", description);
   localStorage.setItem("input", JSON.stringify(input));
   localStorage.setItem("program", program);
-
-  program = program.trim() + "\n\n";
 
   lazyLoader = new LazyLoader(program, memSize, outputCapacity, input);
   updatePage(lazyLoader.states[0]);
@@ -103,7 +99,7 @@ importButton.onclick = () => {
 
     description = fullProgram.description;
     input = fullProgram.input;
-    program = fullProgram.program.trim() + "\n\n";
+    program = fullProgram.program;
 
     lazyLoader = new LazyLoader(program, memSize, outputCapacity, input);
     updatePage(lazyLoader.states[0]);
@@ -162,35 +158,31 @@ function updateMemoryEl(state) {
 
 /** @param {State} state */
 function updateProgramEl(state) {
-  let startOfLine = revIndexOf(lazyLoader.program, "\n", state.programCounter) + 1;
-  startOfLine = startOfLine >= 0 ? startOfLine : 0;
-  let endOfLine = lazyLoader.program.indexOf("\n", state.programCounter);
-  endOfLine = endOfLine >= 0 ? endOfLine : lazyLoader.program.length - 1;
-  let lineOffset = state.programCounter - startOfLine;
-  lineOffset = lineOffset >= 0 ? lineOffset : 0;
-
-  const start = lazyLoader.program.slice(0, endOfLine + 1);
-  const debugLine = `${" ".repeat(lineOffset)}^\n`;
-  const end = lazyLoader.program.slice(endOfLine + 1);
-  const display = startOfLine <= endOfLine ? `${start}${debugLine}${end}` : `${lazyLoader.program}^`;
-
   const programCodeEl = document.getElementById("programCodeEl");
   if (!programCodeEl) throw new Error();
-  programCodeEl.innerHTML = display;
-}
+  programCodeEl.innerText = "";
 
-/**
- * @param {string} data
- * @param {string} searchString
- * @param {number} startIndex
- */
-function revIndexOf(data, searchString, startIndex) {
-  for (let i = startIndex; i >= 0; i--) {
-    if (data[i] === searchString) {
-      return i;
+  const programDisplay = lazyLoader.program.trim() + " ";
+  let lineDiv = document.createElement("div");
+  for (let i = 0; i < programDisplay.length; i++) {
+    const char = programDisplay[i];
+    if (char === "\n") {
+      programCodeEl.appendChild(lineDiv);
+      lineDiv = document.createElement("div");
+      continue;
     }
+    const charSpan = document.createElement("span");
+    charSpan.innerText = char;
+    const highlightColor = "cornflowerblue";
+    if (i === state.programCounter) {
+      charSpan.style.backgroundColor = highlightColor;
+    }
+    else if (state.programCounter >= programDisplay.length && i === programDisplay.length - 1) {
+      charSpan.style.backgroundColor = highlightColor;
+    }
+    lineDiv.appendChild(charSpan);
   }
-  return -1;
+  programCodeEl.appendChild(lineDiv);
 }
 
 /** @param {State} state */
