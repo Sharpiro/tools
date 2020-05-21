@@ -8,6 +8,13 @@ const defaultInput = [2, 1];
 let description = localStorage.getItem("description");
 const programJson = localStorage.getItem("program");
 let program = programJson ? programJson : defaultProgram;
+
+/** @type {HTMLInputElement} */
+const programInputEl = (document.getElementById("programInputEl"));
+programInputEl.value = program;
+
+program = program.trim() + "\n\n";
+
 const inputJson = localStorage.getItem("input");
 /** @type {number[]} */
 let input = inputJson ? JSON.parse(inputJson) : defaultInput;
@@ -24,10 +31,6 @@ descriptionEl.value = description ? description : "";
 /** @type {HTMLInputElement} */
 const inputDataEl = (document.getElementById("inputDataEl"));
 inputDataEl.value = input.join(",");
-/** @type {HTMLInputElement} */
-const programInputEl = (document.getElementById("programInputEl"));
-programInputEl.value = program;
-
 
 /** @param {{key: string, target: any}} ev */
 window.onkeydown = ev => {
@@ -58,12 +61,10 @@ updateButton.onclick = () => {
   description = descriptionEl.value;
   input = inputDataEl.value.split(",").map(s => +s);
   program = programInputEl.value;
-  console.log(program);
-  lazyLoader.ticks = 0;
   
   localStorage.setItem("description", description);
-  localStorage.setItem("program", program);
   localStorage.setItem("input", JSON.stringify(input));
+  localStorage.setItem("program", program);
 
   program = program.trim() + "\n\n";
 
@@ -92,19 +93,17 @@ importButton.onclick = () => {
     /** @type { FullProgram } */
     const fullProgram = JSON.parse(fullProgramJson);
 
+    localStorage.setItem("description", fullProgram.description);
+    localStorage.setItem("input", JSON.stringify(fullProgram.input));
+    localStorage.setItem("program", fullProgram.program);
+
+    descriptionEl.value = fullProgram.description;
+    inputDataEl.value = fullProgram.input.join(",");
+    programInputEl.value = fullProgram.program;
+
     description = fullProgram.description;
     input = fullProgram.input;
     program = fullProgram.program.trim() + "\n\n";
-
-    localStorage.setItem("description", description);
-    localStorage.setItem("program", program);
-    localStorage.setItem("input", JSON.stringify(input));
-
-    program = program.trim() + "\n\n";
-
-    descriptionEl.value = description;
-    inputDataEl.value = input.join(",");
-    programInputEl.value = program;
 
     lazyLoader = new LazyLoader(program, memSize, outputCapacity, input);
     updatePage(lazyLoader.states[0]);
@@ -163,30 +162,16 @@ function updateMemoryEl(state) {
 
 /** @param {State} state */
 function updateProgramEl(state) {
-  let trimmedProgram = lazyLoader.program;
-  // if (!lazyLoader.program.endsWith("\n")) {
-  //   trimmedProgram = lazyLoader.program + "\n";
-  // }
-  let startOfLine = revIndexOf(trimmedProgram, "\n", state.programCounter) + 1;
+  let startOfLine = revIndexOf(lazyLoader.program, "\n", state.programCounter) + 1;
   startOfLine = startOfLine >= 0 ? startOfLine : 0;
-  let endOfLine = trimmedProgram.indexOf("\n", state.programCounter);
-  endOfLine = endOfLine >= 0 ? endOfLine : trimmedProgram.length - 1;
+  let endOfLine = lazyLoader.program.indexOf("\n", state.programCounter);
+  endOfLine = endOfLine >= 0 ? endOfLine : lazyLoader.program.length - 1;
   let lineOffset = state.programCounter - startOfLine;
   lineOffset = lineOffset >= 0 ? lineOffset : 0;
-  console.log("programCounter", state.programCounter);
-  console.log("startOfLine", startOfLine);
-  console.log("lineOffset", lineOffset);
-  console.log("endOfLine", endOfLine);
 
-  const start = trimmedProgram.slice(0, endOfLine + 1);
+  const start = lazyLoader.program.slice(0, endOfLine + 1);
   const debugLine = `${" ".repeat(lineOffset)}^\n`;
-  const end = trimmedProgram.slice(endOfLine + 1);
-  // console.log(start);
-  // console.log("--------------");
-  // console.log(debugLine);
-  // console.log("--------------");
-  // console.log(end);
-  console.log("\n\n-------total-------");
+  const end = lazyLoader.program.slice(endOfLine + 1);
   const display = startOfLine <= endOfLine ? `${start}${debugLine}${end}` : `${lazyLoader.program}^`;
 
   const programCodeEl = document.getElementById("programCodeEl");

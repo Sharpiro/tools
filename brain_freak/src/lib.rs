@@ -43,17 +43,18 @@ impl ProgramIterator {
       };
       log!("VERBOSE: skipping invalid character");
       self.program_counter += 1;
-      self.loop_counter += 1;
-      if self.loop_counter > 10_000 {
-        panic!("infinite loop ohh boy");
-      }
     }
+    log!("VERBOSE: end of characters");
   }
 
   fn process_next_command(&mut self) -> Option<char> {
-    let command = self.commands.get(self.program_counter).copied();
+    let command = self.commands.get(self.program_counter).copied()?;
+    self.loop_counter += 1; // todo: move this
+    if self.loop_counter > 10_000 {
+      panic!("infinite loop ohh boy");
+    }
     match command {
-      Some('>') => {
+      '>' => {
         self.command_index = self.program_counter;
         if self.the_pointer + 1 == self.memory.len() {
           panic!("ERROR: memory out of bounds");
@@ -62,7 +63,7 @@ impl ProgramIterator {
         self.ticks += 1;
         self.program_counter += 1;
       }
-      Some('<') => {
+      '<' => {
         self.command_index = self.program_counter;
         if self.the_pointer == 0 {
           panic!("ERROR: memory out of bounds");
@@ -71,19 +72,19 @@ impl ProgramIterator {
         self.ticks += 1;
         self.program_counter += 1;
       }
-      Some('+') => {
+      '+' => {
         self.command_index = self.program_counter;
         self.memory[self.the_pointer] = self.memory[self.the_pointer].wrapping_add(1);
         self.ticks += 1;
         self.program_counter += 1;
       }
-      Some('-') => {
+      '-' => {
         self.command_index = self.program_counter;
         self.memory[self.the_pointer] = self.memory[self.the_pointer].wrapping_sub(1);
         self.ticks += 1;
         self.program_counter += 1;
       }
-      Some('.') => {
+      '.' => {
         self.command_index = self.program_counter;
         if self.output.len() == self.output.capacity() {
           panic!(
@@ -95,7 +96,7 @@ impl ProgramIterator {
         self.ticks += 1;
         self.program_counter += 1;
       }
-      Some(',') => {
+      ',' => {
         self.command_index = self.program_counter;
         if self.input.len() == 0 {
           panic!("ERROR: no inputs found");
@@ -105,20 +106,19 @@ impl ProgramIterator {
         self.ticks += 1;
         self.program_counter += 1;
       }
-      Some('[') => {
+      '[' => {
         self.command_index = self.program_counter;
         self.process_loop_start();
         self.ticks += 1;
       }
-      Some(']') => {
+      ']' => {
         self.command_index = self.program_counter;
         self.process_loop_end();
         self.ticks += 1;
       }
-      None => log!("VERBOSE: end of characters"),
       _ => panic!("Error: invalid character when trying to process"),
     };
-    command
+    Some(command)
   }
 
   /// if '['
@@ -141,7 +141,7 @@ impl ProgramIterator {
           .expect("ERROR: always expected end pointer available at this point");
         self.current_block = self.blocks.pop();
       } else {
-        log!("VERBOSE: skip inner block and find inner block pointer");
+        log!("VERBOSE: skip inner block and find inner block end pointer");
         self.skip_never_ran_block();
       }
     } else {

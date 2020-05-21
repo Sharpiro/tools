@@ -44,7 +44,6 @@ export class LazyLoader {
     if (this.lazyLoading && this.stateIndex === this.states.length - 1) {
       try {
         const command = this.iterator.next();
-        console.log(command);
         if (command) {
           state = this.addState(command);
           this.stateIndex++;
@@ -96,8 +95,6 @@ export class LazyLoader {
       commandIndex: this.iterator.get_command_index(),
       ticks: ++this.ticks
     };
-    console.log("program_counter", this.iterator.get_program_counter());
-    // console.log(state);
     this.states.push(state);
     return state;
   }

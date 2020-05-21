@@ -1,6 +1,42 @@
 use brain_freak::ProgramIterator;
 
 #[test]
+fn empty_program() {
+  let program = "";
+  let mut iterator = ProgramIterator::new(program, 0, 0, vec![]);
+  while let Some(_) = iterator.next() {}
+
+  assert_eq!(0, iterator.get_ticks());
+}
+
+#[test]
+fn one_command_program() {
+  let program = "+";
+  let mut iterator = ProgramIterator::new(program, 1, 0, vec![]);
+  while let Some(_) = iterator.next() {}
+
+  assert_eq!(1, iterator.get_ticks());
+}
+
+#[test]
+fn two_command_program() {
+  let program = "+ + ";
+  let mut iterator = ProgramIterator::new(program, 1, 0, vec![]);
+  while let Some(_) = iterator.next() {}
+
+  assert_eq!(2, iterator.get_ticks());
+}
+
+#[test]
+#[should_panic]
+fn infinite_loop_test() {
+  let input = vec![1];
+  let program = ",[]";
+  let mut iterator = ProgramIterator::new(program, 1, 1, input);
+  while let Some(_) = iterator.next() {}
+}
+
+#[test]
 fn print_input() {
   let expected_memory = [1, 2];
   let expected_output = [1, 2];
@@ -184,7 +220,7 @@ fn multiplication() {
 }
 
 #[test]
-fn source_location_test() {
+fn command_index_test() {
   let expected_memory = [2];
   let expected_output = [2];
 
@@ -193,10 +229,17 @@ fn source_location_test() {
   + // increment it
   . // write it";
   let mut iterator = ProgramIterator::new(program, 1, 1, input);
-  while let Some(_) = iterator.next() {}
+  iterator.next();
+  assert_eq!(0, iterator.get_command_index());
+  assert_eq!(15, iterator.get_program_counter());
+  iterator.next();
+  assert_eq!(15, iterator.get_command_index());
+  assert_eq!(35, iterator.get_program_counter());
+  iterator.next();
+  assert_eq!(35, iterator.get_command_index());
+  assert_eq!(48, iterator.get_program_counter());
 
   assert_eq!(expected_output, iterator.get_output());
   assert_eq!(expected_memory, iterator.get_memory());
   assert_eq!(3, iterator.get_ticks());
-  assert_eq!(48, iterator.get_program_counter());
 }
