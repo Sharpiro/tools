@@ -4,6 +4,9 @@ import { LazyLoader } from "./brain_freak";
 set_panic_hook(); // additional console info on wasm panic
 
 let extendedMode = true;
+/** @type {HTMLInputElement} */
+const modeCheckbox = (document.getElementById("modeCheckbox"));
+
 const defaultProgram = ",[>+.<-]";
 const defaultInput = [2, 1];
 let description = localStorage.getItem("description");
@@ -30,6 +33,12 @@ descriptionEl.value = description ? description : "";
 /** @type {HTMLInputElement} */
 const inputDataEl = (document.getElementById("inputDataEl"));
 inputDataEl.value = input.join(",");
+
+modeCheckbox.onclick = () => {
+  extendedMode = modeCheckbox.checked;
+  lazyLoader = new LazyLoader(program, memSize, outputCapacity, input, extendedMode);
+  updatePage(lazyLoader.currentState);
+};
 
 /** @param {{key: string, target: any}} ev */
 window.onkeydown = ev => {
