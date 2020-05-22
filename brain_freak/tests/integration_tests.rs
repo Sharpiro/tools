@@ -3,7 +3,7 @@ use brain_freak::ProgramIterator;
 #[test]
 fn empty_program() {
   let program = "";
-  let mut iterator = ProgramIterator::new(program, 0, 0, vec![]);
+  let mut iterator = ProgramIterator::new(program, 0, 0, vec![], false);
   while let Some(_) = iterator.next() {}
 
   assert_eq!(0, iterator.get_ticks());
@@ -12,7 +12,7 @@ fn empty_program() {
 #[test]
 fn one_command_program() {
   let program = "+";
-  let mut iterator = ProgramIterator::new(program, 1, 0, vec![]);
+  let mut iterator = ProgramIterator::new(program, 1, 0, vec![], false);
   while let Some(_) = iterator.next() {}
 
   assert_eq!(1, iterator.get_ticks());
@@ -21,7 +21,7 @@ fn one_command_program() {
 #[test]
 fn two_command_program() {
   let program = "+ + ";
-  let mut iterator = ProgramIterator::new(program, 1, 0, vec![]);
+  let mut iterator = ProgramIterator::new(program, 1, 0, vec![], false);
   while let Some(_) = iterator.next() {}
 
   assert_eq!(2, iterator.get_ticks());
@@ -32,7 +32,7 @@ fn two_command_program() {
 fn infinite_loop_test() {
   let input = vec![1];
   let program = ",[]";
-  let mut iterator = ProgramIterator::new(program, 1, 1, input);
+  let mut iterator = ProgramIterator::new(program, 1, 1, input, false);
   while let Some(_) = iterator.next() {}
 }
 
@@ -43,7 +43,7 @@ fn print_input() {
 
   let input = vec![1, 2];
   let program = ",.>,.";
-  let mut iterator = ProgramIterator::new(program, 2, 2, input);
+  let mut iterator = ProgramIterator::new(program, 2, 2, input, false);
   while let Some(_) = iterator.next() {}
 
   assert_eq!(expected_output, iterator.get_output());
@@ -55,7 +55,7 @@ fn decrement_zero() {
   let expected_memory = [255];
 
   let program = "-";
-  let mut iterator = ProgramIterator::new(program, 1, 0, vec![]);
+  let mut iterator = ProgramIterator::new(program, 1, 0, vec![], false);
   while let Some(_) = iterator.next() {}
 
   assert_eq!(&expected_memory[..], iterator.get_memory());
@@ -68,7 +68,7 @@ fn looping() {
 
   let input = vec![3];
   let program = ",[.-]";
-  let mut iterator = ProgramIterator::new(program, 1, 3, input);
+  let mut iterator = ProgramIterator::new(program, 1, 3, input, false);
   while let Some(_) = iterator.next() {}
 
   assert_eq!(expected_output, iterator.get_output());
@@ -82,7 +82,7 @@ fn addition() {
 
   let input = vec![3, 2];
   let program = ",>,<[->+<]>.";
-  let mut iterator = ProgramIterator::new(program, 2, 1, input);
+  let mut iterator = ProgramIterator::new(program, 2, 1, input, false);
   while let Some(_) = iterator.next() {}
 
   assert_eq!(expected_output, iterator.get_output());
@@ -95,7 +95,7 @@ fn outer_loop_never_runs() {
 
   let input = vec![];
   let program = "[+[+]]";
-  let mut iterator = ProgramIterator::new(program, 1, 0, input);
+  let mut iterator = ProgramIterator::new(program, 1, 0, input, false);
   while let Some(_) = iterator.next() {}
 
   assert_eq!(expected_memory, iterator.get_memory());
@@ -108,7 +108,7 @@ fn inner_loop_never_runs() {
 
   let input = vec![1];
   let program = ",[-[+.]]-.";
-  let mut iterator = ProgramIterator::new(program, 1, 1, input);
+  let mut iterator = ProgramIterator::new(program, 1, 1, input, false);
   while let Some(_) = iterator.next() {}
 
   assert_eq!(expected_memory, iterator.get_memory());
@@ -122,8 +122,13 @@ fn add_n_numbers() {
 
   let input = vec![3, 0, 1, 2];
   let program = ",[>,[->+<]<-]>>.";
-  let mut iterator =
-    ProgramIterator::new(program, expected_memory.len(), expected_output.len(), input);
+  let mut iterator = ProgramIterator::new(
+    program,
+    expected_memory.len(),
+    expected_output.len(),
+    input,
+    false,
+  );
   while let Some(_) = iterator.next() {}
 
   assert_eq!(expected_memory, iterator.get_memory());
@@ -137,8 +142,13 @@ fn add_n_numbers_two() {
 
   let input = vec![2, 2, 1];
   let program = ",[>,[->+<]<-]>>.";
-  let mut iterator =
-    ProgramIterator::new(program, expected_memory.len(), expected_output.len(), input);
+  let mut iterator = ProgramIterator::new(
+    program,
+    expected_memory.len(),
+    expected_output.len(),
+    input,
+    false,
+  );
   while let Some(_) = iterator.next() {}
 
   assert_eq!(expected_memory, iterator.get_memory());
@@ -151,7 +161,7 @@ fn jump_to_inner_end_loop_pointer() {
 
   let input = vec![2];
   let program = ",[>[+]<-]";
-  let mut iterator = ProgramIterator::new(program, expected_memory.len(), 0, input);
+  let mut iterator = ProgramIterator::new(program, expected_memory.len(), 0, input, false);
   while let Some(_) = iterator.next() {}
 
   assert_eq!(expected_memory, iterator.get_memory());
@@ -164,7 +174,7 @@ fn skip_inner_loop_once() {
 
   let input = vec![2];
   let program = ",[>[-]+<-]";
-  let mut iterator = ProgramIterator::new(program, expected_memory.len(), 0, input);
+  let mut iterator = ProgramIterator::new(program, expected_memory.len(), 0, input, false);
   while let Some(_) = iterator.next() {}
 
   assert_eq!(expected_memory, iterator.get_memory());
@@ -178,7 +188,7 @@ fn skip_other_characters() {
 
   let input = vec![1];
   let program = "  test , +  // here is a comment .";
-  let mut iterator = ProgramIterator::new(program, 1, 1, input);
+  let mut iterator = ProgramIterator::new(program, 1, 1, input, false);
   while let Some(_cmd) = iterator.next() {}
 
   assert_eq!(expected_memory, iterator.get_memory());
@@ -193,7 +203,7 @@ fn duplicate_in_place() {
 
   let input = vec![2];
   let program = ",[>+>+<<-] >> [<<+>>-]";
-  let mut iterator = ProgramIterator::new(program, 3, 0, input);
+  let mut iterator = ProgramIterator::new(program, 3, 0, input, false);
   while let Some(_cmd) = iterator.next() {}
 
   assert_eq!(expected_memory, iterator.get_memory());
@@ -211,7 +221,7 @@ fn multiplication() {
     [>+>+<<-] >> [<<+>>-] << // duplicate y
     <-]
     >>. // print";
-  let mut iterator = ProgramIterator::new(program, 4, 1, input);
+  let mut iterator = ProgramIterator::new(program, 4, 1, input, false);
   while let Some(_) = iterator.next() {}
 
   assert_eq!(expected_output, iterator.get_output());
@@ -228,7 +238,7 @@ fn command_index_test() {
   let program = ", // read it
   + // increment it
   . // write it";
-  let mut iterator = ProgramIterator::new(program, 1, 1, input);
+  let mut iterator = ProgramIterator::new(program, 1, 1, input, false);
   iterator.next();
   assert_eq!(0, iterator.get_command_index());
   assert_eq!(15, iterator.get_program_counter());
@@ -242,4 +252,23 @@ fn command_index_test() {
   assert_eq!(expected_output, iterator.get_output());
   assert_eq!(expected_memory, iterator.get_memory());
   assert_eq!(3, iterator.get_ticks());
+}
+
+#[test]
+fn extended_mode_debug() {
+  let program = "// ++ ! - - - //";
+  let mut iterator = ProgramIterator::new(program, 1, 1, vec![], true);
+
+  iterator.next();
+  assert_eq!(3, iterator.get_command_index());
+  assert_eq!(4, iterator.get_program_counter());
+  iterator.next();
+  assert_eq!(4, iterator.get_command_index());
+  assert_eq!(6, iterator.get_program_counter());
+  iterator.next();
+  assert_eq!(6, iterator.get_command_index());
+  assert_eq!(8, iterator.get_program_counter());
+  while let Some(_) = iterator.next() {}
+
+  assert_eq!(5, iterator.get_ticks());
 }

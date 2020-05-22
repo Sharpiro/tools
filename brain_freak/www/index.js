@@ -3,6 +3,7 @@ import { LazyLoader } from "./brain_freak";
 
 set_panic_hook(); // additional console info on wasm panic
 
+let extendedMode = true;
 const defaultProgram = ",[>+.<-]";
 const defaultInput = [2, 1];
 let description = localStorage.getItem("description");
@@ -19,7 +20,7 @@ let input = inputJson ? JSON.parse(inputJson) : defaultInput;
 const memSize = 10;
 const outputCapacity = 10;
 
-let lazyLoader = new LazyLoader(program, memSize, outputCapacity, input);
+let lazyLoader = new LazyLoader(program, memSize, outputCapacity, input, extendedMode);
 
 updatePage(lazyLoader.currentState);
 
@@ -46,12 +47,24 @@ window.onkeydown = ev => {
     }
   }
   else if (ev.key === "ArrowUp") {
-    lazyLoader.stateIndex = 0;
-    updatePage(lazyLoader.states[lazyLoader.stateIndex]);
+    while (lazyLoader.stateIndex > 0) {
+      if (lazyLoader.currentState.command === "!") {
+        lazyLoader.stateIndex--;
+        break;
+      }
+      lazyLoader.stateIndex--;
+    }
+    updatePage(lazyLoader.currentState);
   }
   else if (ev.key === "ArrowDown") {
-    while (lazyLoader.loadRight()) { }
-    updatePage(lazyLoader.states[lazyLoader.states.length - 1]);
+    lazyLoader.loadRight();
+    for (let state; state = lazyLoader.loadRight();) {
+      if (state.command === "!") {
+        lazyLoader.stateIndex--;
+        break;
+      }
+    }
+    updatePage(lazyLoader.currentState);
   }
 };
 
@@ -64,7 +77,7 @@ updateButton.onclick = () => {
   localStorage.setItem("input", JSON.stringify(input));
   localStorage.setItem("program", program);
 
-  lazyLoader = new LazyLoader(program, memSize, outputCapacity, input);
+  lazyLoader = new LazyLoader(program, memSize, outputCapacity, input, extendedMode);
   updatePage(lazyLoader.states[0]);
   //@ts-ignore
   updateButton.focus();
@@ -79,7 +92,7 @@ resetButton.onclick = () => {
   inputDataEl.value = input.join(",");
   programInputEl.value = program;
   localStorage.clear();
-  lazyLoader = new LazyLoader(program, memSize, outputCapacity, input);
+  lazyLoader = new LazyLoader(program, memSize, outputCapacity, input, extendedMode);
   updatePage(lazyLoader.states[0]);
 };
 
@@ -101,7 +114,7 @@ importButton.onclick = () => {
     input = fullProgram.input;
     program = fullProgram.program;
 
-    lazyLoader = new LazyLoader(program, memSize, outputCapacity, input);
+    lazyLoader = new LazyLoader(program, memSize, outputCapacity, input, extendedMode);
     updatePage(lazyLoader.states[0]);
   }
 };
