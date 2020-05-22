@@ -97,14 +97,18 @@ updateButton.onclick = () => {
 };
 
 resetButton.onclick = () => {
+  extendedMode = false;
   description = "";
   input = defaultInput;
   program = defaultProgram;
 
+  modeCheckbox.checked = false;
   descriptionEl.value = "";
   inputDataEl.value = input.join(",");
   programInputEl.value = program;
+
   localStorage.clear();
+
   lazyLoader = new LazyLoader(program, memSize, outputCapacity, input, extendedMode);
   updatePage(lazyLoader.states[0]);
 };
