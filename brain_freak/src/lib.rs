@@ -14,6 +14,7 @@ pub struct ProgramIterator {
   input: Vec<u8>,
   loop_counter: usize,
   ticks: usize,
+  extended_mode: bool,
 }
 
 impl ProgramIterator {
@@ -39,6 +40,17 @@ impl ProgramIterator {
         ',' => return,
         '[' => return,
         ']' => return,
+        '!' => {
+          if self.extended_mode {
+            return;
+          }
+        }
+        // '#' => {
+        //   if !self.extended_mode {
+        //     panic!("command only available in extended mode");
+        //   }
+        //   return;
+        // }
         _ => (),
       };
       log!("VERBOSE: skipping invalid character");
@@ -115,6 +127,10 @@ impl ProgramIterator {
         self.command_index = self.program_counter;
         self.process_loop_end();
         self.ticks += 1;
+      }
+      '!' => {
+        self.command_index = self.program_counter;
+        self.program_counter += 1;
       }
       _ => panic!("Error: invalid character when trying to process"),
     };
@@ -209,6 +225,7 @@ impl ProgramIterator {
     memory_size: usize,
     output_capacity: usize,
     input: Vec<u8>,
+    extended_mode: bool,
   ) -> ProgramIterator {
     let mut iterator = ProgramIterator {
       program_counter: 0,
@@ -222,6 +239,7 @@ impl ProgramIterator {
       current_block: None,
       loop_counter: 0,
       ticks: 0,
+      extended_mode,
     };
     iterator.parse_to_next_command();
     iterator

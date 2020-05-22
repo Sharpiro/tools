@@ -12,14 +12,14 @@ export class LazyLoader {
    * @param {number} outputCapacity
    * @param {number[]} input
    */
-  constructor(program, memSize, outputCapacity, input) {
+  constructor(program, memSize, outputCapacity, input, extendedMode = false) {
     this.program = program;
     this.memSize = memSize;
     this.outputCapacity = outputCapacity;
     this.input = input;
     this.cleansedProgram = getCleansedProgram(program);
     const inputBuffer = new Uint8Array(input);
-    this.iterator = ProgramIterator.new(program, memSize, outputCapacity, inputBuffer);
+    this.iterator = ProgramIterator.new(program, memSize, outputCapacity, inputBuffer, extendedMode);
     this.stateIndex = 0;
     this.lazyLoading = true;
     this.outputPointer = this.iterator.get_output_ptr();
@@ -93,7 +93,7 @@ export class LazyLoader {
       thePointer: this.iterator.get_the_pointer(),
       programCounter: this.iterator.get_program_counter(),
       commandIndex: this.iterator.get_command_index(),
-      ticks: ++this.ticks
+      ticks: this.iterator.get_ticks()
     };
     this.states.push(state);
     return state;
