@@ -73,6 +73,10 @@ export class LazyLoader {
     else {
       throw new Error("unexpected path");
     }
+
+    if (state && state.command === "?") {
+      console.log(state);
+    }
     return state;
   }
 

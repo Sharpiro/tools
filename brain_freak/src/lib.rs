@@ -45,6 +45,11 @@ impl ProgramIterator {
             self.program_counter += 1;
             continue;
           }
+          '?' => {
+            if !skip_commands {
+              return;
+            }
+          }
           _ => (),
         }
       }
@@ -143,6 +148,10 @@ impl ProgramIterator {
         self.ticks += 1;
       }
       '!' => {
+        self.command_index = self.program_counter;
+        self.program_counter += 1;
+      }
+      '?' => {
         self.command_index = self.program_counter;
         self.program_counter += 1;
       }
