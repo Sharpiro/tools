@@ -40,19 +40,15 @@ impl ProgramIterator {
         ',' => return,
         '[' => return,
         ']' => return,
-        '!' => {
-          if self.extended_mode {
-            return;
-          }
-        }
-        // '#' => {
-        //   if !self.extended_mode {
-        //     panic!("command only available in extended mode");
-        //   }
-        //   return;
-        // }
         _ => (),
-      };
+      }
+      if self.extended_mode {
+        match c {
+          '!' => return,
+          // '#' => return,
+          _ => (),
+        }
+      }
       log!("VERBOSE: skipping invalid character");
       self.program_counter += 1;
     }

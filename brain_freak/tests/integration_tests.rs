@@ -256,7 +256,7 @@ fn command_index_test() {
 
 #[test]
 fn extended_mode_debug() {
-  let program = "// ++ ! - - - //";
+  let program = "// ++ ! - - -# //";
   let mut iterator = ProgramIterator::new(program, 1, 1, vec![], true);
 
   iterator.next();
