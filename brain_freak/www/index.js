@@ -3,13 +3,14 @@ import { LazyLoader } from "./brain_freak";
 
 set_panic_hook(); // additional console info on wasm panic
 
-let extendedMode = true;
+let extendedMode = !!JSON.parse(localStorage.getItem("extendedMode") || "false");
 /** @type {HTMLInputElement} */
 const modeCheckbox = (document.getElementById("modeCheckbox"));
+modeCheckbox.checked = extendedMode;
 
 const defaultProgram = ",[>+.<-]";
 const defaultInput = [2, 1];
-let description = localStorage.getItem("description");
+let description = localStorage.getItem("description") || "";
 const programJson = localStorage.getItem("program");
 let program = programJson ? programJson : defaultProgram;
 
@@ -36,8 +37,11 @@ inputDataEl.value = input.join(",");
 
 modeCheckbox.onclick = () => {
   extendedMode = modeCheckbox.checked;
+  localStorage.setItem("extendedMode", extendedMode.toString());
   lazyLoader = new LazyLoader(program, memSize, outputCapacity, input, extendedMode);
   updatePage(lazyLoader.currentState);
+  //@ts-ignore
+  updateButton.focus();
 };
 
 /** @param {{key: string, target: any}} ev */
@@ -111,14 +115,17 @@ importButton.onclick = () => {
     /** @type { FullProgram } */
     const fullProgram = JSON.parse(fullProgramJson);
 
+    localStorage.setItem("extendedMode", fullProgram.extendedMode.toString());
     localStorage.setItem("description", fullProgram.description);
     localStorage.setItem("input", JSON.stringify(fullProgram.input));
     localStorage.setItem("program", fullProgram.program);
 
+    modeCheckbox.checked = fullProgram.extendedMode;
     descriptionEl.value = fullProgram.description;
     inputDataEl.value = fullProgram.input.join(",");
     programInputEl.value = fullProgram.program;
 
+    extendedMode = fullProgram.extendedMode;
     description = fullProgram.description;
     input = fullProgram.input;
     program = fullProgram.program;
@@ -129,7 +136,8 @@ importButton.onclick = () => {
 };
 
 exportButton.onclick = () => {
-  const exportObj = { description, input, program };
+  /** @type { FullProgram } */
+  const exportObj = { extendedMode, description, input, program };
   const exportJson = JSON.stringify(exportObj);
 
   const inputEl = document.createElement("input");
@@ -228,4 +236,9 @@ function updateOutputEl(state) {
 }
 
 /** @typedef {import("./brain_freak").State} State */
-/** @typedef { { description: string, input: number[], program: string } } FullProgram */
+/** @typedef { {
+ *  extendedMode: boolean
+ *  description: string,
+ *  input: number[],
+ *  program: string
+*  } } FullProgram */
