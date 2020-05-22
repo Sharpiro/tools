@@ -272,3 +272,37 @@ fn extended_mode_debug() {
 
   assert_eq!(5, iterator.get_ticks());
 }
+
+#[test]
+fn skip_commands() {
+  let program = "++#--#--";
+  let mut iterator = ProgramIterator::new(program, 1, 1, vec![], true);
+  while let Some(_) = iterator.next() {}
+
+  assert_eq!(4, iterator.get_ticks());
+}
+
+
+#[test]
+fn skip_commands_multi_line() {
+  let program = "++#
+  
+  -
+
+  
+  -#-
+  -";
+  let mut iterator = ProgramIterator::new(program, 1, 1, vec![], true);
+  while let Some(_) = iterator.next() {}
+
+  assert_eq!(4, iterator.get_ticks());
+}
+
+#[test]
+fn debug_and_comments() {
+  let program = "++#!--!#!-#+";
+  let mut iterator = ProgramIterator::new(program, 1, 1, vec![], true);
+  while let Some(_) = iterator.next() {}
+
+  assert_eq!(3, iterator.get_ticks());
+}

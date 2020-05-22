@@ -30,7 +30,31 @@ impl ProgramIterator {
     if self.program_counter >= self.commands.len() {
       return;
     }
+
+    let mut skip_commands = false;
     for c in &self.commands[self.program_counter..self.commands.len()] {
+      if self.extended_mode {
+        match c {
+          '!' => {
+            if !skip_commands {
+              return;
+            }
+          }
+          '#' => {
+            skip_commands = !skip_commands;
+            self.program_counter += 1;
+            continue;
+          }
+          _ => (),
+        }
+      }
+
+      if skip_commands {
+        log!("VERBOSE: skipping commented command");
+        self.program_counter += 1;
+        continue;
+      }
+
       match c {
         '>' => return,
         '<' => return,
@@ -42,13 +66,7 @@ impl ProgramIterator {
         ']' => return,
         _ => (),
       }
-      if self.extended_mode {
-        match c {
-          '!' => return,
-          // '#' => return,
-          _ => (),
-        }
-      }
+
       log!("VERBOSE: skipping invalid character");
       self.program_counter += 1;
     }
