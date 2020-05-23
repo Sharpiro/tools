@@ -53,7 +53,9 @@ export class LazyLoader {
           // console.log(1, "lazy done", "kept same state");
         }
       } catch (err) {
-        alert("An error occurred, see console for details");
+        const pc = this.currentState.programCounter;
+        const command = this.program[pc];
+        alert(`An error occurred at command: '${command}' index: '${pc}', see console for details`);
         return;
       }
     }
