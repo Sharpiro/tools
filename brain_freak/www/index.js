@@ -154,7 +154,7 @@ exportButton.onclick = () => {
   document.body.removeChild(inputEl);
 };
 
-debugButton.onclick = () => {
+dumpButton.onclick = () => {
   console.log(lazyLoader.states);
 };
 

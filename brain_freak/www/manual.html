@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>brain_freak</title>
+</head>
+
+<style>
+  .container {
+    max-width: 800px;
+    width: 75%;
+    margin: auto;
+    margin-top: 50px;
+  }
+
+  code {
+    background: lightgray;
+    font-size: 200%;
+    margin-right: 15px;
+  }
+
+  .command-line {
+    line-height: 50px;
+  }
+
+</style>
+
+<body style="background: rgba(0,0,0,.02)">
+  <div class="container">
+    <h1 style="margin-bottom: 0;">Brain Freak</h1>
+    <span>A Rust, Wasm, lazy-loading Brain**** compiler</span>
+    <div><a href="/">Home</a></div>
+
+    <h2>Description</h2>
+    <p>Brain Freak is a brain**** compiler written in Rust, and compiled to Web Assembly. Commands process in
+      a lazy-loaded fashion where the javascript requests the wasm code to process a command when the user performs an
+      action.</p>
+
+    <h2>Navigation</h2>
+    <div>
+      <div class="command-line">
+        <code style="background: cornflowerblue;">&nbsp;</code>
+        Shows the next command to be executed
+      </div>
+      <div class="command-line">
+        <code>➡️</code>
+        Right Arrow lazy-loads the next command
+      </div>
+      <div class="command-line">
+        <code>⬅️</code>
+        Left Arrow reverses the previous command
+      </div>
+      <div class="command-line">
+        <code>⬇️</code>
+        Down Arrow seeks to the next break command or the end of program
+      </div>
+      <div class="command-line">
+        <code>⬆️</code>
+        Up Arrow seeks to the previous break command or the start of program
+      </div>
+    </div>
+
+    <h2>Commands</h2>
+    <div>
+      <h3>Standard Mode</h3>
+      <div class="command-line">
+        <code>&gt;</code>
+        Increment the pointer (++p;)
+      </div>
+      <div class="command-line">
+        <code>&lt;</code>
+        Decrement the pointer (--p;)
+      </div>
+      <div class="command-line">
+        <code>+</code>
+        Increment the byte at the pointer (++*p;)
+      </div>
+      <div class="command-line">
+        <code>-</code>
+        Decrement the byte at the pointer (--*p)
+      </div>
+      <div class="command-line">
+        <code>.</code>
+        Output the byte at the pointer (putchar(*p);)
+      </div>
+      <div class="command-line">
+        <code>,</code>
+        Input a byte and store it in the byte at the pointer (*p = getchar();)
+      </div>
+      <div class="command-line">
+        <code>[</code>
+        Jump forward past the matching ] if the byte at the pointer is zero (while (*p) {)
+      </div>
+      <div class="command-line">
+        <code>]</code>
+        Jump backward to the matching [ (})
+      </div>
+    </div>
+
+    <div>
+      <h3>Extended Mode</h3>
+      <div class="command-line">
+        <code>!</code>
+        Stop on this command when processing (break command)
+      </div>
+      <div class="command-line">
+        <code>?</code>
+        Log the current state (logger)
+      </div>
+      <div class="command-line">
+        <code>#</code>
+        Commands between 2 of these characters are skipped (comment)
+      </div>
+    </div>
+
+    <h2>Current Limitations</h2>
+    <ul>
+      <li>memory length is always 10</li>
+      <li>output capacity is capped at 10</li>
+      <li>no ascii mode</li>
+      <li>UI formatting and display</li>
+    </ul>
+  </div>
+</body>
+
+</html>
