@@ -7,19 +7,17 @@
 </head>
 
 <style>
-  pre {
-    display: inline-block;
-    vertical-align: middle;
-  }
-
   .section-label {
     display: inline-block;
     width: 100px;
   }
 
   .program-pre {
+    display: inline-block;
+    vertical-align: middle;
     font-size: 200%;
     margin: 10px 0 10px 0;
+    white-space: break-spaces;
   }
 
   .std-input {
@@ -40,7 +38,8 @@
     <div>
       <div style="margin-top: 50px;">
         <h1 style="margin-bottom: 0;">Brain Freak</h1>
-        <span>A Rust, Wasm, lazy-loading Brainf*** compiler</span>
+        <span>A Rust, Wasm, lazy-loading Brain**** compiler</span>
+        <div><a href="manual.html">Manual</a></div>
       </div>
     </div>
     <pre style="font-size:200%; margin-left:100px;margin-bottom: 0;">
@@ -76,7 +75,7 @@
         <button id="resetButton" type="button">Reset</button>
         <button id="importButton" type="button">Import</button>
         <button id="exportButton" type="button">Export</button>
-        <button id="debugButton" type="button">Debug</button>
+        <button id="dumpButton" type="button">Dump State</button>
       </div>
     </form>
 
