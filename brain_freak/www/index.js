@@ -21,8 +21,17 @@ programInputEl.value = program;
 const inputJson = localStorage.getItem("input");
 /** @type {number[]} */
 let input = inputJson ? JSON.parse(inputJson) : defaultInput;
-const memSize = 10;
-const outputCapacity = 10;
+
+let memSize = +(localStorage.getItem("memSize") || "10");
+let outputCapacity = +(localStorage.getItem("outputCapacity") || "10");
+
+/** @type {HTMLInputElement} */
+const memorySizeInput = (document.getElementById("memorySizeInput"));
+memorySizeInput.value = memSize.toString();
+
+/** @type {HTMLInputElement} */
+const outputCapacityInput = (document.getElementById("outputCapacityInput"));
+outputCapacityInput.value = outputCapacity.toString();
 
 let lazyLoader = new LazyLoader(program, memSize, outputCapacity, input, extendedMode);
 
@@ -86,10 +95,14 @@ window.onkeydown = ev => {
 };
 
 updateButton.onclick = () => {
+  memSize = +memorySizeInput.value;
+  outputCapacity = +outputCapacityInput.value;
   description = descriptionEl.value;
   input = inputDataEl.value.split(",").map(s => +s);
   program = programInputEl.value;
 
+  localStorage.setItem("memSize", memorySizeInput.value);
+  localStorage.setItem("outputCapacity", outputCapacityInput.value);
   localStorage.setItem("description", description);
   localStorage.setItem("input", JSON.stringify(input));
   localStorage.setItem("program", program);
@@ -102,11 +115,15 @@ updateButton.onclick = () => {
 
 resetButton.onclick = () => {
   extendedMode = false;
+  memSize = 0;
+  outputCapacity = 0;
   description = "";
   input = defaultInput;
   program = defaultProgram;
 
   modeCheckbox.checked = false;
+  memorySizeInput.value = "10";
+  outputCapacityInput.value = "10";
   descriptionEl.value = "";
   inputDataEl.value = input.join(",");
   programInputEl.value = program;
@@ -124,16 +141,22 @@ importButton.onclick = () => {
     const fullProgram = JSON.parse(fullProgramJson);
 
     localStorage.setItem("extendedMode", fullProgram.extendedMode.toString());
+    localStorage.setItem("memSize", fullProgram.memSize.toString());
+    localStorage.setItem("outputCapacity", fullProgram.outputCapacity.toString());
     localStorage.setItem("description", fullProgram.description);
     localStorage.setItem("input", JSON.stringify(fullProgram.input));
     localStorage.setItem("program", fullProgram.program);
 
     modeCheckbox.checked = fullProgram.extendedMode;
+    memorySizeInput.value = fullProgram.memSize.toString();
+    outputCapacityInput.value = fullProgram.outputCapacity.toString();
     descriptionEl.value = fullProgram.description;
     inputDataEl.value = fullProgram.input.join(",");
     programInputEl.value = fullProgram.program;
 
     extendedMode = fullProgram.extendedMode;
+    memSize = fullProgram.memSize;
+    outputCapacity = fullProgram.outputCapacity;
     description = fullProgram.description;
     input = fullProgram.input;
     program = fullProgram.program;
@@ -145,7 +168,7 @@ importButton.onclick = () => {
 
 exportButton.onclick = () => {
   /** @type { FullProgram } */
-  const exportObj = { extendedMode, description, input, program };
+  const exportObj = { extendedMode, description, input, program, memSize, outputCapacity };
   const exportJson = JSON.stringify(exportObj);
 
   const inputEl = document.createElement("input");
@@ -246,6 +269,8 @@ function updateOutputEl(state) {
 /** @typedef {import("./brain_freak").State} State */
 /** @typedef { {
  *  extendedMode: boolean
+ *  memSize: number
+ *  outputCapacity: number
  *  description: string,
  *  input: number[],
  *  program: string
