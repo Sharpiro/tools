@@ -90,6 +90,7 @@
         </div>
 
         <div style="margin-top:10px;">
+          <span id="focusSpan" tabindex="0"></span>
           <button id="updateButton" type="submit">Update</button>
           <button id="resetButton" type="button">Reset</button>
           <button id="importButton" type="button">Import</button>
@@ -99,24 +100,23 @@
       </form>
 
       <div style="margin-top:25px;">
-        <div style="overflow-x: auto;">
-          <span class="section-label">Memory:</span>
+        <div style="margin-top: 15px; overflow-x: auto;">
+          <div>Memory</div>
           <pre class="program-pre" id="memoryEl"></pre>
         </div>
-        <div style="overflow-x: auto;">
+        <div style="margin-top: 15px; overflow-x: auto;">
           <div>Input</div>
           <pre class="program-pre" id="inputEl"></pre>
         </div>
-        <div style="overflow-x: auto;">
+        <div style="margin-top: 15px; overflow-x: auto;">
           <div>Output</div>
           <pre class="program-pre" id="outputEl"></pre>
         </div>
-        <div>
-          <span class="section-label">Ticks:</span>
-          <pre class="program-pre" id="ticksEl"></pre>
-        </div>
-        <div style="margin-top: 25px; overflow: auto;">
-          <div>Program:</div>
+        <div style="margin-top: 15px; overflow: auto;">
+          <div>
+            <span>Program:</span>
+            (<span id="ticksEl"></span>)
+          </div>
           <pre class="program-pre" id="programCodeEl"></pre>
         </div>
       </div>
