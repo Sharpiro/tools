@@ -1,47 +1,42 @@
 import { set_panic_hook } from "brain_freak";
 import { LazyLoader } from "./brain_freak";
+import { selectElement, selectInput } from "./functions";
 
 set_panic_hook(); // additional console info on wasm panic
 
 let extendedMode = !!JSON.parse(localStorage.getItem("extendedMode") || "false");
-/** @type {HTMLInputElement} */
-const modeCheckbox = (document.getElementById("modeCheckbox"));
+const modeCheckbox = selectInput("#modeCheckbox");
 modeCheckbox.checked = extendedMode;
 
-const defaultProgram = ",[>+.<-]";
+const highlightColor = "cornflowerblue";
+const defaultProgram = "?,[!>+.<-]#+#";
 const defaultInput = [2, 1];
 let description = localStorage.getItem("description") || "";
 const programJson = localStorage.getItem("program");
 let program = programJson ? programJson : defaultProgram;
 
-/** @type {HTMLInputElement} */
-const programInputEl = (document.getElementById("programInputEl"));
+const programInputEl = selectInput("#programInputEl");
 programInputEl.value = program;
 
 const inputJson = localStorage.getItem("input");
-/** @type {number[]} */
-let input = inputJson ? JSON.parse(inputJson) : defaultInput;
+let input = inputJson ? /** @type {number[]} */ (JSON.parse(inputJson)) : defaultInput;
 
 let memSize = +(localStorage.getItem("memSize") || "10");
 let outputCapacity = +(localStorage.getItem("outputCapacity") || "10");
 
-/** @type {HTMLInputElement} */
-const memorySizeInput = (document.getElementById("memorySizeInput"));
+const memorySizeInput = selectInput("#memorySizeInput");
 memorySizeInput.value = memSize.toString();
 
-/** @type {HTMLInputElement} */
-const outputCapacityInput = (document.getElementById("outputCapacityInput"));
+const outputCapacityInput = selectInput("#outputCapacityInput");
 outputCapacityInput.value = outputCapacity.toString();
 
 let lazyLoader = new LazyLoader(program, memSize, outputCapacity, input, extendedMode);
 
 updatePage(lazyLoader.currentState);
 
-/** @type {HTMLInputElement} */
-const descriptionEl = (document.getElementById("descriptionEl"));
+const descriptionEl = selectInput("#descriptionEl");
 descriptionEl.value = description ? description : "";
-/** @type {HTMLInputElement} */
-const inputDataEl = (document.getElementById("inputDataEl"));
+const inputDataEl = selectInput("#inputDataEl");
 inputDataEl.value = input.join(",");
 
 modeCheckbox.onclick = () => {
@@ -49,12 +44,14 @@ modeCheckbox.onclick = () => {
   localStorage.setItem("extendedMode", extendedMode.toString());
   lazyLoader = new LazyLoader(program, memSize, outputCapacity, input, extendedMode);
   updatePage(lazyLoader.currentState);
-  //@ts-ignore
-  updateButton.focus();
 };
 
 /** @param {{key: string, target: any, preventDefault: Function}} ev */
 window.onkeydown = ev => {
+  if (ev.key == "Escape") {
+    selectElement("#focusSpan").focus();
+    return;
+  }
   if (ev.target.localName === "input" || ev.target.localName === "textarea") return;
 
   if (ev.key === "ArrowLeft") {
@@ -109,14 +106,13 @@ updateButton.onclick = () => {
 
   lazyLoader = new LazyLoader(program, memSize, outputCapacity, input, extendedMode);
   updatePage(lazyLoader.states[0]);
-  //@ts-ignore
-  updateButton.focus();
+  selectElement("#focusSpan").focus();
 };
 
 resetButton.onclick = () => {
   extendedMode = false;
-  memSize = 0;
-  outputCapacity = 0;
+  memSize = 10;
+  outputCapacity = 10;
   description = "";
   input = defaultInput;
   program = defaultProgram;
@@ -200,26 +196,32 @@ function updatePage(state) {
   updateInputEl(state);
   updateOutputEl(state);
 
-  const ticksEl = document.getElementById("ticksEl");
+  const ticksEl = selectElement("#ticksEl");
   if (!ticksEl) throw new Error();
   ticksEl.innerHTML = state.ticks.toString();
 }
 
 /** @param {State} state */
 function updateMemoryEl(state) {
-  const arrDisplay = state.memory.join(", ");
-  const spaces = 1 + state.thePointer * 3;
-  const thePtrDisplay = " ".repeat(spaces) + "^";
-  const display = `[${arrDisplay}]\n${thePtrDisplay}`;
+  let lineDiv = document.createElement("div");
+  for (let i = 0; i < state.memory.length; i++) {
+    const charSpan = document.createElement("span");
+    charSpan.innerText = `${state.memory[i].toString()}`;
+    if (i === state.thePointer) {
+      charSpan.style.backgroundColor = highlightColor;
+    }
+    lineDiv.appendChild(charSpan);
+    lineDiv.append(" ");
+  }
 
-  const memoryEl = document.getElementById("memoryEl");
-  if (!memoryEl) throw new Error();
-  memoryEl.innerHTML = display;
+  const memoryEl = selectElement("#memoryEl");
+  memoryEl.innerText = "";
+  memoryEl.appendChild(lineDiv);
 }
 
 /** @param {State} state */
 function updateProgramEl(state) {
-  const programCodeEl = document.getElementById("programCodeEl");
+  const programCodeEl = selectElement("#programCodeEl");
   if (!programCodeEl) throw new Error();
   programCodeEl.innerText = "";
 
@@ -234,7 +236,6 @@ function updateProgramEl(state) {
     }
     const charSpan = document.createElement("span");
     charSpan.innerText = char;
-    const highlightColor = "cornflowerblue";
     if (i === state.programCounter) {
       charSpan.style.backgroundColor = highlightColor;
     }
@@ -251,7 +252,7 @@ function updateInputEl(state) {
   const arrDisplay = state.input.join(", ");
   const display = `[${arrDisplay}]`;
 
-  const inputEl = document.getElementById("inputEl");
+  const inputEl = selectElement("#inputEl");
   if (!inputEl) throw new Error();
   inputEl.innerHTML = display;
 }
@@ -261,7 +262,7 @@ function updateOutputEl(state) {
   const arrDisplay = state.output.join(", ");
   const display = `[${arrDisplay}]`;
 
-  const outputEl = document.getElementById("outputEl");
+  const outputEl = selectElement("#outputEl");
   if (!outputEl) throw new Error();
   outputEl.innerHTML = display;
 }
