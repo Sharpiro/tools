@@ -44,22 +44,25 @@ modeCheckbox.onclick = () => {
   updateButton.focus();
 };
 
-/** @param {{key: string, target: any}} ev */
+/** @param {{key: string, target: any, preventDefault: Function}} ev */
 window.onkeydown = ev => {
   if (ev.target.localName === "input" || ev.target.localName === "textarea") return;
 
   if (ev.key === "ArrowLeft") {
+    ev.preventDefault();
     if (lazyLoader.stateIndex === 0) return;
     const state = lazyLoader.states[--lazyLoader.stateIndex];
     updatePage(state);
   }
   else if (ev.key === "ArrowRight") {
+    ev.preventDefault();
     const state = lazyLoader.loadRight();
     if (state) {
       updatePage(state);
     }
   }
   else if (ev.key === "ArrowUp") {
+    ev.preventDefault();
     while (lazyLoader.stateIndex > 0) {
       if (lazyLoader.currentState.command === "!") {
         lazyLoader.stateIndex--;
@@ -70,6 +73,7 @@ window.onkeydown = ev => {
     updatePage(lazyLoader.currentState);
   }
   else if (ev.key === "ArrowDown") {
+    ev.preventDefault();
     lazyLoader.loadRight();
     for (let state; state = lazyLoader.loadRight();) {
       if (state.command === "!") {

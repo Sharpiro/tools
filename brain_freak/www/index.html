@@ -18,87 +18,108 @@
     font-size: 200%;
     margin: 10px 0 10px 0;
     white-space: break-spaces;
+    max-height: 500px;
   }
 
   .std-input {
-    width: 425px;
+    width: 81%;
     font-size: 200%;
   }
 
   .program-text-area {
-    width: 425px;
+    width: 95%;
     height: 250px;
     font-size: 150%;
+  }
+
+  .container {
+    width: 75%;
+    margin: auto;
+    max-width: 800px;
   }
 
 </style>
 
 <body style="background: rgba(0,0,0,.02)">
-  <div style="display: flex; justify-content: space-between; width:75%; margin: auto;">
-    <div>
-      <div style="margin-top: 50px;">
-        <h1 style="margin-bottom: 0;">Brain Freak</h1>
-        <span>A Rust, Wasm, lazy-loading Brain**** compiler</span>
-        <div><a href="manual.html">Manual</a></div>
+  <div class="container">
+    <div style="display: flex; justify-content: space-between;">
+      <div>
+        <div style="margin-top: 50px;">
+          <h1 style="margin-bottom: 0;">Brain Freak</h1>
+          <span>A Rust, Wasm, lazy-loading Brain**** compiler</span>
+          <div><a href="manual.html">Manual</a></div>
+        </div>
       </div>
-    </div>
-    <pre style="font-size:200%; margin-left:100px;margin-bottom: 0;">
+      <pre style="font-size:200%; margin-left:100px;margin-bottom: 0;">
           Start
             ⬆️
       Left ⬅️ ➡️ Right
             ⬇️
            End</pre>
-  </div>
-  <div style="width:75%; margin: auto;">
-    <form onsubmit="return false">
-      <div>
-        <div style="margin: 5px 0 5px 0;">
-          <span class="section-label">Extended Mode:</span>
-          <input id="modeCheckbox" type="checkbox">
+    </div>
+    <div>
+      <form onsubmit="return false">
+        <div>
+          <div style="margin: 5px 0 5px 0;">
+            <div style="display: inline-block; margin-right: 25px;">
+              <span class="">Extended Mode:</span>
+              <input id="modeCheckbox" type="checkbox">
+            </div>
+            <div style="display: inline-block; margin-right: 25px;">
+              <span class="">Memory Size:</span>
+              <input id="memorySizeInput" type="number" style="width: 50px;" disabled>
+            </div>
+            <div style="display: inline-block;">
+              <span class="">Output Capacity:</span>
+              <input id="outputCapacityInput" type="number" style="width: 50px;" disabled>
+            </div>
+          </div>
+
+          <div style="margin: 5px 0 5px 0;">
+            <span class="section-label">Description:</span>
+            <input class="std-input" type="text" id="descriptionEl" autocomplete="off">
+          </div>
+          <div style="margin: 5px 0 5px 0;">
+            <span class="section-label">Input:</span>
+            <input class="std-input" type="text" id="inputDataEl" autocomplete="off">
+          </div>
+          <div style="margin: 5px 0 5px 0;">
+            <!-- <span class="section-label">Program:</span> -->
+            <div style="margin-top: 15px;">Program:</div>
+            <textarea id="programInputEl" class="program-text-area"></textarea>
+          </div>
         </div>
-        <div style="margin: 5px 0 5px 0;">
-          <span class="section-label">Description:</span>
-          <input class="std-input" type="text" id="descriptionEl" autocomplete="off">
+
+        <div style="margin-top:10px;">
+          <button id="updateButton" type="submit">Update</button>
+          <button id="resetButton" type="button">Reset</button>
+          <button id="importButton" type="button">Import</button>
+          <button id="exportButton" type="button">Export</button>
+          <button id="dumpButton" type="button">Dump State</button>
         </div>
-        <div style="margin: 5px 0 5px 0;">
+      </form>
+
+      <div style="margin-top:25px; overflow-x: auto;">
+        <div>
+          <span class="section-label">Memory:</span>
+          <pre class="program-pre" id="memoryEl"></pre>
+        </div>
+        <div>
           <span class="section-label">Input:</span>
-          <input class="std-input" type="text" id="inputDataEl" autocomplete="off">
+          <pre class="program-pre" id="inputEl"></pre>
         </div>
-        <div style="margin: 5px 0 5px 0;">
-          <span class="section-label">Program:</span>
-          <textarea id="programInputEl" class="program-text-area"></textarea>
+        <div>
+          <span class="section-label">Output:</span>
+          <pre class="program-pre" id="outputEl"></pre>
         </div>
-      </div>
-
-      <div style="margin-top:10px;">
-        <button id="updateButton" type="submit">Update</button>
-        <button id="resetButton" type="button">Reset</button>
-        <button id="importButton" type="button">Import</button>
-        <button id="exportButton" type="button">Export</button>
-        <button id="dumpButton" type="button">Dump State</button>
-      </div>
-    </form>
-
-    <div style="margin-top:25px;">
-      <div>
-        <span class="section-label">Input:</span>
-        <pre class="program-pre" id="inputEl"></pre>
-      </div>
-      <div>
-        <span class="section-label">Program:</span>
-        <pre class="program-pre" id="programCodeEl"></pre>
-      </div>
-      <div>
-        <span class="section-label">Memory:</span>
-        <pre class="program-pre" id="memoryEl"></pre>
-      </div>
-      <div>
-        <span class="section-label">Output:</span>
-        <pre class="program-pre" id="outputEl"></pre>
-      </div>
-      <div>
-        <span class="section-label">Ticks:</span>
-        <pre class="program-pre" id="ticksEl"></pre>
+        <div>
+          <span class="section-label">Ticks:</span>
+          <pre class="program-pre" id="ticksEl"></pre>
+        </div>
+        <div style="margin-top: 25px; overflow: auto;">
+          <div>Program:</div>
+          <pre class="program-pre" id="programCodeEl"></pre>
+        </div>
       </div>
     </div>
   </div>
