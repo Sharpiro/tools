@@ -230,6 +230,9 @@ function updateProgramEl(state) {
   for (let i = 0; i < programDisplay.length; i++) {
     const char = programDisplay[i];
     if (char === "\n") {
+      if (!lineDiv.innerText.length){
+        lineDiv.append(" ");
+      }
       programCodeEl.appendChild(lineDiv);
       lineDiv = document.createElement("div");
       continue;
