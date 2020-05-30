@@ -231,6 +231,9 @@ def fast(start, end):
 def sig(func):
     return inspect.signature(func)
 
+def whatis(func):
+    return sig(func)
+
 # ISO 8601 format
 def timestamp():
     utc_offset_sec = time.altzone if time.localtime().tm_isdst else time.timezone
@@ -258,3 +261,18 @@ def clip(start, stop):
 
 def fmt(num):
   return format(num, ",")
+
+def hex_bytes(bytes_input, encoding = "S", hex_display = "\\x", delimiter= ""):
+  """
+    Convert bytes to a hex string\n
+    S = Single byte\n
+    l = 16 bit little endian\n
+    b = 16 bit big endian
+  """
+  display_bytes= [(f"0x%0{2}x" % i).replace("0x", hex_display) for i in bytes(bytes_input)]
+  if encoding == "l":
+    display_bytes= [f"{i}{delimiter}{hex_display}00" for i in display_bytes]
+  if encoding == "b":
+    display_bytes= [f"{hex_display}00{delimiter}{i}" for i in display_bytes]
+  display_string = delimiter.join(display_bytes)
+  print(display_string)
