@@ -1,0 +1,45 @@
+0.20.0
+me
+  8aa0b1b14eaf325102729e678d2e8b666913f6ba5794e194aa5a95b44b6e5766  bitcoin-0.20.0-aarch64-linux-gnu-debug.tar.gz
+  081b30b0f1af95656242c83eef30bbf7216b1a30fa8e8f29b3b160fe520d28f6  bitcoin-0.20.0-aarch64-linux-gnu.tar.gz
+  7651dc5ba182bcb63c5cf59937eeb0d1a885ee5bf74882485f93632bbcd2e06d  bitcoin-0.20.0-arm-linux-gnueabihf-debug.tar.gz
+  05014c7ff00f4496b1f389f0961d807e04505d8721d5c6f69567f2a0ec1985cc  bitcoin-0.20.0-arm-linux-gnueabihf.tar.gz
+  bbddb2bd4c487f1a9d069a71472fc49ca87a2372bc3f0e9dbb7789e9b61d950b  bitcoin-0.20.0-riscv64-linux-gnu-debug.tar.gz
+  5b9cae3aa4197d1e557ff236754f489bce877ebba2267ce33af79b2ca4a13af6  bitcoin-0.20.0-riscv64-linux-gnu.tar.gz
+  9ca830d287728d82e68c4e47272605e154744a8349d2dd74d9a7e7b65acd310e  bitcoin-0.20.0-x86_64-linux-gnu-debug.tar.gz
+  35ec10f87b6bc1e44fd9cd1157e5dfa483eaf14d7d9a9c274774539e7824c427  bitcoin-0.20.0-x86_64-linux-gnu.tar.gz
+  ec5a2358ee868d845115dc4fc3ed631ff063c57d5e0a713562d083c5c45efb28  src/bitcoin-0.20.0.tar.gz
+  7a78379331780358d6a0cf61cfafeee859fa742dbf7939e5bdd916d08745c75a  bitcoin-core-linux-0.20-res.yml
+
+luk jr
+  8aa0b1b14eaf325102729e678d2e8b666913f6ba5794e194aa5a95b44b6e5766  bitcoin-0.20.0-aarch64-linux-gnu-debug.tar.gz
+  081b30b0f1af95656242c83eef30bbf7216b1a30fa8e8f29b3b160fe520d28f6  bitcoin-0.20.0-aarch64-linux-gnu.tar.gz
+  7651dc5ba182bcb63c5cf59937eeb0d1a885ee5bf74882485f93632bbcd2e06d  bitcoin-0.20.0-arm-linux-gnueabihf-debug.tar.gz
+  05014c7ff00f4496b1f389f0961d807e04505d8721d5c6f69567f2a0ec1985cc  bitcoin-0.20.0-arm-linux-gnueabihf.tar.gz
+  bbddb2bd4c487f1a9d069a71472fc49ca87a2372bc3f0e9dbb7789e9b61d950b  bitcoin-0.20.0-riscv64-linux-gnu-debug.tar.gz
+  5b9cae3aa4197d1e557ff236754f489bce877ebba2267ce33af79b2ca4a13af6  bitcoin-0.20.0-riscv64-linux-gnu.tar.gz
+  9ca830d287728d82e68c4e47272605e154744a8349d2dd74d9a7e7b65acd310e  bitcoin-0.20.0-x86_64-linux-gnu-debug.tar.gz
+  35ec10f87b6bc1e44fd9cd1157e5dfa483eaf14d7d9a9c274774539e7824c427  bitcoin-0.20.0-x86_64-linux-gnu.tar.gz
+  ec5a2358ee868d845115dc4fc3ed631ff063c57d5e0a713562d083c5c45efb28  src/bitcoin-0.20.0.tar.gz
+
+achow
+  8aa0b1b14eaf325102729e678d2e8b666913f6ba5794e194aa5a95b44b6e5766  bitcoin-0.20.0-aarch64-linux-gnu-debug.tar.gz
+  081b30b0f1af95656242c83eef30bbf7216b1a30fa8e8f29b3b160fe520d28f6  bitcoin-0.20.0-aarch64-linux-gnu.tar.gz
+  7651dc5ba182bcb63c5cf59937eeb0d1a885ee5bf74882485f93632bbcd2e06d  bitcoin-0.20.0-arm-linux-gnueabihf-debug.tar.gz
+  05014c7ff00f4496b1f389f0961d807e04505d8721d5c6f69567f2a0ec1985cc  bitcoin-0.20.0-arm-linux-gnueabihf.tar.gz
+  bbddb2bd4c487f1a9d069a71472fc49ca87a2372bc3f0e9dbb7789e9b61d950b  bitcoin-0.20.0-riscv64-linux-gnu-debug.tar.gz
+  5b9cae3aa4197d1e557ff236754f489bce877ebba2267ce33af79b2ca4a13af6  bitcoin-0.20.0-riscv64-linux-gnu.tar.gz
+  9ca830d287728d82e68c4e47272605e154744a8349d2dd74d9a7e7b65acd310e  bitcoin-0.20.0-x86_64-linux-gnu-debug.tar.gz
+  35ec10f87b6bc1e44fd9cd1157e5dfa483eaf14d7d9a9c274774539e7824c427  bitcoin-0.20.0-x86_64-linux-gnu.tar.gz
+  ec5a2358ee868d845115dc4fc3ed631ff063c57d5e0a713562d083c5c45efb28  src/bitcoin-0.20.0.tar.gz
+
+michagogo
+  8aa0b1b14eaf325102729e678d2e8b666913f6ba5794e194aa5a95b44b6e5766  bitcoin-0.20.0-aarch64-linux-gnu-debug.tar.gz
+  081b30b0f1af95656242c83eef30bbf7216b1a30fa8e8f29b3b160fe520d28f6  bitcoin-0.20.0-aarch64-linux-gnu.tar.gz
+  7651dc5ba182bcb63c5cf59937eeb0d1a885ee5bf74882485f93632bbcd2e06d  bitcoin-0.20.0-arm-linux-gnueabihf-debug.tar.gz
+  05014c7ff00f4496b1f389f0961d807e04505d8721d5c6f69567f2a0ec1985cc  bitcoin-0.20.0-arm-linux-gnueabihf.tar.gz
+  bbddb2bd4c487f1a9d069a71472fc49ca87a2372bc3f0e9dbb7789e9b61d950b  bitcoin-0.20.0-riscv64-linux-gnu-debug.tar.gz
+  5b9cae3aa4197d1e557ff236754f489bce877ebba2267ce33af79b2ca4a13af6  bitcoin-0.20.0-riscv64-linux-gnu.tar.gz
+  9ca830d287728d82e68c4e47272605e154744a8349d2dd74d9a7e7b65acd310e  bitcoin-0.20.0-x86_64-linux-gnu-debug.tar.gz
+  35ec10f87b6bc1e44fd9cd1157e5dfa483eaf14d7d9a9c274774539e7824c427  bitcoin-0.20.0-x86_64-linux-gnu.tar.gz
+  ec5a2358ee868d845115dc4fc3ed631ff063c57d5e0a713562d083c5c45efb28  src/bitcoin-0.20.0.tar.gz
