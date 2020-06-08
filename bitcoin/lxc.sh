@@ -1,3 +1,5 @@
+# todo: get this script working w/o modification
+
 # the version of lxc-start in Debian needs to run as root, so make sure
 # that the build script can execute it without providing a password
 # echo "%sudo ALL=NOPASSWD: /usr/bin/lxc-start" > /etc/sudoers.d/gitian-lxc
