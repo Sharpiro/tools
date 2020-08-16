@@ -260,7 +260,7 @@ def clip(start, stop):
     return ("(start, stop, duration)", startSeconds, stopSeconds, durationSeconds)
 
 def fmt(num):
-  return format(num, ",")
+  return format(num, ",").replace(",", "_")
 
 def hex_bytes(bytes_input, encoding = "S", hex_display = "\\x", delimiter= ""):
   """
