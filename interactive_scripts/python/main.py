@@ -282,7 +282,10 @@ def clip(start, stop):
     startSeconds = seconds(start)
     stopSeconds = seconds(stop)
     durationSeconds = stopSeconds - startSeconds
-    return ("(start, stop, duration)", startSeconds, stopSeconds, durationSeconds)
+    print("start:", startSeconds)
+    print("stop:", stopSeconds)
+    print("duration:", durationSeconds)
+    return {"start": startSeconds, "stop": stopSeconds, "duration": durationSeconds}
 
 
 def fmt(num):
@@ -309,3 +312,30 @@ def open_json(filepath: str):
     text = open(filepath).read()
     jsonObj = json.loads(text)
     return jsonObj
+
+
+def get_screen_info(res_x, res_y, diag_inches):
+    print("size:", diag_inches)
+    res_diag = (res_x**2 + res_y**2)**.5
+    res = f"{res_x}x{res_y}"
+    print("resolution:", f"{res_x}x{res_y}")
+    aspect_x, aspect_y = [[int(res_x/i), int(res_y/i)]
+                          for i in reversed(range(2, res_y)) if res_x % i == 0 and res_y % i == 0][0]
+    aspect_ratio = f"{aspect_x}x{aspect_y}"
+    print("aspect ratio:", f"{aspect_x}x{aspect_y}")
+    pixels = fmt(res_x*res_y)
+    print("pixels:", fmt(res_x*res_y))
+    ppi = math.ceil(res_diag/diag_inches)
+    print("ppi:", math.ceil(res_diag/diag_inches))
+    return {"size": diag_inches, "res": res, "aspect_ratio": aspect_ratio, "pixels": pixels, "ppi": ppi}
+
+
+print(get_screen_info(1920, 1080, 5.5))  # iphone 8
+# get_screen_info(1920, 1080, 24)  # standard monitor
+# get_screen_info(2560, 1440, 27)  # 2k monitor
+# get_screen_info(1440, 1080, 24)  # 4x3
+# get_screen_info(3840, 2160, 27)  # 4k
+# get_screen_info(3072, 1920, 16)  # 16inch macbook pro
+# get_screen_info(2532, 1170, 6.1)  # iphone 12
+# 2532-by-1170-pixel resolution at 460 ppi
+# 27 inch, 2560x1440, .803 meters VA, ppi 109
