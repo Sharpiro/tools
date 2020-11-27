@@ -328,14 +328,3 @@ def get_screen_info(res_x, res_y, diag_inches):
     ppi = math.ceil(res_diag/diag_inches)
     print("ppi:", math.ceil(res_diag/diag_inches))
     return {"size": diag_inches, "res": res, "aspect_ratio": aspect_ratio, "pixels": pixels, "ppi": ppi}
-
-
-print(get_screen_info(1920, 1080, 5.5))  # iphone 8
-# get_screen_info(1920, 1080, 24)  # standard monitor
-# get_screen_info(2560, 1440, 27)  # 2k monitor
-# get_screen_info(1440, 1080, 24)  # 4x3
-# get_screen_info(3840, 2160, 27)  # 4k
-# get_screen_info(3072, 1920, 16)  # 16inch macbook pro
-# get_screen_info(2532, 1170, 6.1)  # iphone 12
-# 2532-by-1170-pixel resolution at 460 ppi
-# 27 inch, 2560x1440, .803 meters VA, ppi 109
