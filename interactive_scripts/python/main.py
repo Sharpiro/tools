@@ -9,10 +9,11 @@ import os
 import datetime
 import time
 import uuid
+import json
 
 irreduciblePolynomial = 0x11b
+pwd = (lambda: os.getcwd())()
 
-pwd = (lambda  : os.getcwd())()
 
 def add_bin(x, y):
     carry = 0
@@ -26,6 +27,7 @@ def add_bin(x, y):
             z = z ^ two_power
         carry = (x_i & y_i) | (x_i & carry) | (y_i & carry)
     return z
+
 
 def double_and_add(n, x):
     """
@@ -45,25 +47,30 @@ def double_and_add(n, x):
 
     return result
 
+
 def random(length):
     return list(secrets.token_bytes(length))
 
+
 def rs1024_polymod(values):
-  GEN = [0xe0e040, 0x1c1c080, 0x3838100, 0x7070200, 0xe0e0009, 0x1c0c2412, 0x38086c24, 0x3090fc48, 0x21b1f890, 0x3f3f120]
-  chk = 1
-  for v in values:
-    b = (chk >> 20)
-    chk = (chk & 0xfffff) << 10 ^ v
-    for i in range(10):
-      chk ^= GEN[i] if ((b >> i) & 1) else 0
-  return chk
+    GEN = [0xe0e040, 0x1c1c080, 0x3838100, 0x7070200, 0xe0e0009,
+           0x1c0c2412, 0x38086c24, 0x3090fc48, 0x21b1f890, 0x3f3f120]
+    chk = 1
+    for v in values:
+        b = (chk >> 20)
+        chk = (chk & 0xfffff) << 10 ^ v
+        for i in range(10):
+            chk ^= GEN[i] if ((b >> i) & 1) else 0
+    return chk
+
 
 def rs1024_verify_checksum(cs, data):
-  return rs1024_polymod([ord(x) for x in cs] + data) == 1
+    return rs1024_polymod([ord(x) for x in cs] + data) == 1
+
 
 def rs1024_create_checksum(cs, data):
     values = [ord(x) for x in cs] + data
-    polymod = rs1024_polymod(values + [0,0,0]) ^ 1
+    polymod = rs1024_polymod(values + [0, 0, 0]) ^ 1
     return [(polymod >> 10 * (2 - i)) & 1023 for i in range(3)]
 
 
@@ -72,7 +79,6 @@ def be(big_endian_string):
         Converts a string of big endian bits to a number
     """
     return int(big_endian_string.replace("-", ""), 2)
-    
 
 
 def le(little_endian_string):
@@ -85,7 +91,6 @@ def le(little_endian_string):
         bits = "".join(bit_list)
         number = int(bits, 2)
         return number
-    
     bit_list = list(little_endian_string[i-8:i] for i in range(8, len(little_endian_string) + 1, 8))
     bit_list = bit_list[::-1]
     bits = "".join(bit_list)
@@ -100,12 +105,12 @@ def binary(number, endianness="be", sep=8, size=0, fmt="b"):
 
     def get_max_bits(number):
         min_bits = 0 if number == 0 else math.floor(math.log2(number)) + 1
-        min_bits_ceil =  8 if min_bits % 8 == 0 else (min_bits + 8) - (min_bits % 8)
+        min_bits_ceil = 8 if min_bits % 8 == 0 else (min_bits + 8) - (min_bits % 8)
         max_bits = min_bits_ceil if size == 0 else size
         max_bits = max_bits if max_bits >= min_bits else min_bits
         max_bits_ceil = max_bits if max_bits % 8 == 0 else (max_bits + 8) - (max_bits % 8)
         return (max_bits, max_bits_ceil)
-    
+
     # create padded binary in big endian
     if number >= 0:
         max_bits, max_bits_ceil = get_max_bits(number)
@@ -115,29 +120,34 @@ def binary(number, endianness="be", sep=8, size=0, fmt="b"):
         max_bits, max_bits_ceil = get_max_bits((-number << 1) - 1)
         mask = 2**max_bits_ceil - 1
         paddedBinary = bin(number & mask)[2:]
-    if endianness == "be" and max_bits_ceil == max_bits and sep <= 0: return paddedBinary
+    if endianness == "be" and max_bits_ceil == max_bits and sep <= 0:
+        return paddedBinary
 
     # trim bits and arrange endianness
     byteGroups = list((paddedBinary[i:i+8] for i in range(0, len(paddedBinary), 8)))
-    sig_bits = max_bits if len(byteGroups) <= 1 else max_bits % ((len(byteGroups) - 1)  * 8)
+    sig_bits = max_bits if len(byteGroups) <= 1 else max_bits % ((len(byteGroups) - 1) * 8)
     byteGroups[0] = byteGroups[0][-sig_bits:]
     byteGroups = byteGroups if endianness == "be" else byteGroups[::-1]
     trimmed_binary = "".join(byteGroups)
-    if sep <= 0: return trimmed_binary
+    if sep <= 0:
+        return trimmed_binary
 
     # create binary string with separator
     iterator = enumerate(trimmed_binary[::-1]) if endianness == "be" else enumerate(trimmed_binary)
     separated_binary = "".join(f"-{v}" if i != 0 and i % sep == 0 else v for i, v in iterator)
     separated_binary = separated_binary[::-1] if endianness == "be" else separated_binary
-    if fmt == "b": return separated_binary
-    
+    if fmt == "b":
+        return separated_binary
+
     # display separated groups in a different format
     formatted_groups = list((int(n, 2) for n in separated_binary.split("-")))
-    if fmt == "d": return formatted_groups
+    if fmt == "d":
+        return formatted_groups
     hex_length = (math.ceil((max_bits_ceil // 4) / len(formatted_groups)))
     hex_length_rounded = hex_length + (hex_length % 2)
     formatted_groups = list((f"0x%0{hex_length_rounded}x" % n for n in formatted_groups))
     return formatted_groups
+
 
 def bits(n):
     """
@@ -153,6 +163,7 @@ def bits(n):
             n >>= 1
 
     return list(get(n))
+
 
 def binList(byteIterable, maxPadding=8):
     """
@@ -231,20 +242,33 @@ def fast(start, end):
 def sig(func):
     return inspect.signature(func)
 
+
 def whatis(func):
     return sig(func)
 
-# ISO 8601 format
+
 def timestamp():
+    """
+    ISO 8601 format
+    """
     utc_offset_sec = time.altzone if time.localtime().tm_isdst else time.timezone
     utc_offset = datetime.timedelta(seconds=-utc_offset_sec)
     return datetime.datetime.now().replace(microsecond=0, tzinfo=datetime.timezone(offset=utc_offset)).isoformat()
 
-def utc():
-    return datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "z"
+
+def utc(epoch_seconds: int = None, ms: int = None):
+    if epoch_seconds is not None:
+        date = datetime.datetime.utcfromtimestamp(epoch_seconds)
+    else:
+        date = datetime.datetime.utcnow()
+    if ms is not None:
+        date = date.replace(microsecond=ms)
+    return date.isoformat() + "Z"
+
 
 def guid():
     return str(uuid.uuid4())
+
 
 def seconds(time_str: str):
     split_time = time_str.split(":")
@@ -253,26 +277,54 @@ def seconds(time_str: str):
     total_seconds = int(split_time[0]) * 60 * 60 + int(split_time[1]) * 60 + int(split_time[2])
     return total_seconds
 
+
 def clip(start, stop):
     startSeconds = seconds(start)
     stopSeconds = seconds(stop)
     durationSeconds = stopSeconds - startSeconds
-    return ("(start, stop, duration)", startSeconds, stopSeconds, durationSeconds)
+    print("start:", startSeconds)
+    print("stop:", stopSeconds)
+    print("duration:", durationSeconds)
+    return {"start": startSeconds, "stop": stopSeconds, "duration": durationSeconds}
+
 
 def fmt(num):
-  return format(num, ",")
+    return format(num, "_")
 
-def hex_bytes(bytes_input, encoding = "S", hex_display = "\\x", delimiter= ""):
-  """
-    Convert bytes to a hex string\n
-    S = Single byte\n
-    l = 16 bit little endian\n
-    b = 16 bit big endian
-  """
-  display_bytes= [(f"0x%0{2}x" % i).replace("0x", hex_display) for i in bytes(bytes_input)]
-  if encoding == "l":
-    display_bytes= [f"{i}{delimiter}{hex_display}00" for i in display_bytes]
-  if encoding == "b":
-    display_bytes= [f"{hex_display}00{delimiter}{i}" for i in display_bytes]
-  display_string = delimiter.join(display_bytes)
-  print(display_string)
+
+def hex_bytes(bytes_input, encoding="S", hex_display="\\x", delimiter=""):
+    """
+      Convert bytes to a hex string\n
+      S = Single byte\n
+      l = 16 bit little endian\n
+      b = 16 bit big endian
+    """
+    display_bytes = [(f"0x%0{2}x" % i).replace("0x", hex_display) for i in bytes(bytes_input)]
+    if encoding == "l":
+        display_bytes = [f"{i}{delimiter}{hex_display}00" for i in display_bytes]
+    if encoding == "b":
+        display_bytes = [f"{hex_display}00{delimiter}{i}" for i in display_bytes]
+    display_string = delimiter.join(display_bytes)
+    print(display_string)
+
+
+def open_json(filepath: str):
+    text = open(filepath).read()
+    jsonObj = json.loads(text)
+    return jsonObj
+
+
+def get_screen_info(res_x, res_y, diag_inches):
+    print("size:", diag_inches)
+    res_diag = (res_x**2 + res_y**2)**.5
+    res = f"{res_x}x{res_y}"
+    print("resolution:", f"{res_x}x{res_y}")
+    aspect_x, aspect_y = [[int(res_x/i), int(res_y/i)]
+                          for i in reversed(range(2, res_y)) if res_x % i == 0 and res_y % i == 0][0]
+    aspect_ratio = f"{aspect_x}x{aspect_y}"
+    print("aspect ratio:", f"{aspect_x}x{aspect_y}")
+    pixels = fmt(res_x*res_y)
+    print("pixels:", fmt(res_x*res_y))
+    ppi = math.ceil(res_diag/diag_inches)
+    print("ppi:", math.ceil(res_diag/diag_inches))
+    return {"size": diag_inches, "res": res, "aspect_ratio": aspect_ratio, "pixels": pixels, "ppi": ppi}
