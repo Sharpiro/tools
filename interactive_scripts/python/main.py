@@ -4,14 +4,19 @@ import binascii
 import math
 import secrets
 import base64
-from pathlib import Path
 import os
 import datetime
 import time
+from typing import Literal
 import uuid
 import json
 
-irreduciblePolynomial = 0x11b
+base64 = base64
+secrets = secrets
+
+format_mode: Literal["hex", "decimal"] | None = None
+
+irreduciblePolynomial = 0x11B
 pwd = (lambda: os.getcwd())()
 
 
@@ -23,7 +28,7 @@ def add_bin(x, y):
         x_i = (x & two_power) >> i
         y_i = (y & two_power) >> i
         sum_i_carry = x_i ^ y_i ^ carry
-        if (sum_i_carry == 1):
+        if sum_i_carry == 1:
             z = z ^ two_power
         carry = (x_i & y_i) | (x_i & carry) | (y_i & carry)
     return z
@@ -48,17 +53,23 @@ def double_and_add(n, x):
     return result
 
 
-def random(length):
-    return list(secrets.token_bytes(length))
-
-
 def rs1024_polymod(values):
-    GEN = [0xe0e040, 0x1c1c080, 0x3838100, 0x7070200, 0xe0e0009,
-           0x1c0c2412, 0x38086c24, 0x3090fc48, 0x21b1f890, 0x3f3f120]
+    GEN = [
+        0xE0E040,
+        0x1C1C080,
+        0x3838100,
+        0x7070200,
+        0xE0E0009,
+        0x1C0C2412,
+        0x38086C24,
+        0x3090FC48,
+        0x21B1F890,
+        0x3F3F120,
+    ]
     chk = 1
     for v in values:
-        b = (chk >> 20)
-        chk = (chk & 0xfffff) << 10 ^ v
+        b = chk >> 20
+        chk = (chk & 0xFFFFF) << 10 ^ v
         for i in range(10):
             chk ^= GEN[i] if ((b >> i) & 1) else 0
     return chk
@@ -76,14 +87,14 @@ def rs1024_create_checksum(cs, data):
 
 def be(big_endian_string):
     """
-        Converts a string of big endian bits to a number
+    Converts a string of big endian bits to a number
     """
     return int(big_endian_string.replace("-", ""), 2)
 
 
 def le(little_endian_string):
     """
-        Converts a string of little endian bits to a number
+    Converts a string of little endian bits to a number
     """
     bit_list = little_endian_string.split("-")
     if len(bit_list) > 1:
@@ -91,7 +102,10 @@ def le(little_endian_string):
         bits = "".join(bit_list)
         number = int(bits, 2)
         return number
-    bit_list = list(little_endian_string[i-8:i] for i in range(8, len(little_endian_string) + 1, 8))
+    bit_list = list(
+        little_endian_string[i - 8 : i]
+        for i in range(8, len(little_endian_string) + 1, 8)
+    )
     bit_list = bit_list[::-1]
     bits = "".join(bit_list)
     number = int(bits, 2)
@@ -100,7 +114,7 @@ def le(little_endian_string):
 
 def binary(number, endianness="be", sep=8, size=0, fmt="b"):
     """
-        Converts a number to a string of bits.
+    Converts a number to a string of bits.
     """
 
     def get_max_bits(number):
@@ -108,14 +122,16 @@ def binary(number, endianness="be", sep=8, size=0, fmt="b"):
         min_bits_ceil = 8 if min_bits % 8 == 0 else (min_bits + 8) - (min_bits % 8)
         max_bits = min_bits_ceil if size == 0 else size
         max_bits = max_bits if max_bits >= min_bits else min_bits
-        max_bits_ceil = max_bits if max_bits % 8 == 0 else (max_bits + 8) - (max_bits % 8)
+        max_bits_ceil = (
+            max_bits if max_bits % 8 == 0 else (max_bits + 8) - (max_bits % 8)
+        )
         return (max_bits, max_bits_ceil)
 
     # create padded binary in big endian
     if number >= 0:
         max_bits, max_bits_ceil = get_max_bits(number)
         binaryString = bin(number)[2:]
-        paddedBinary = ("0"*max_bits_ceil)[len(binaryString):] + binaryString
+        paddedBinary = ("0" * max_bits_ceil)[len(binaryString) :] + binaryString
     else:
         max_bits, max_bits_ceil = get_max_bits((-number << 1) - 1)
         mask = 2**max_bits_ceil - 1
@@ -124,8 +140,10 @@ def binary(number, endianness="be", sep=8, size=0, fmt="b"):
         return paddedBinary
 
     # trim bits and arrange endianness
-    byteGroups = list((paddedBinary[i:i+8] for i in range(0, len(paddedBinary), 8)))
-    sig_bits = max_bits if len(byteGroups) <= 1 else max_bits % ((len(byteGroups) - 1) * 8)
+    byteGroups = list((paddedBinary[i : i + 8] for i in range(0, len(paddedBinary), 8)))
+    sig_bits = (
+        max_bits if len(byteGroups) <= 1 else max_bits % ((len(byteGroups) - 1) * 8)
+    )
     byteGroups[0] = byteGroups[0][-sig_bits:]
     byteGroups = byteGroups if endianness == "be" else byteGroups[::-1]
     trimmed_binary = "".join(byteGroups)
@@ -133,9 +151,17 @@ def binary(number, endianness="be", sep=8, size=0, fmt="b"):
         return trimmed_binary
 
     # create binary string with separator
-    iterator = enumerate(trimmed_binary[::-1]) if endianness == "be" else enumerate(trimmed_binary)
-    separated_binary = "".join(f"-{v}" if i != 0 and i % sep == 0 else v for i, v in iterator)
-    separated_binary = separated_binary[::-1] if endianness == "be" else separated_binary
+    iterator = (
+        enumerate(trimmed_binary[::-1])
+        if endianness == "be"
+        else enumerate(trimmed_binary)
+    )
+    separated_binary = "".join(
+        f"-{v}" if i != 0 and i % sep == 0 else v for i, v in iterator
+    )
+    separated_binary = (
+        separated_binary[::-1] if endianness == "be" else separated_binary
+    )
     if fmt == "b":
         return separated_binary
 
@@ -143,9 +169,11 @@ def binary(number, endianness="be", sep=8, size=0, fmt="b"):
     formatted_groups = list((int(n, 2) for n in separated_binary.split("-")))
     if fmt == "d":
         return formatted_groups
-    hex_length = (math.ceil((max_bits_ceil // 4) / len(formatted_groups)))
+    hex_length = math.ceil((max_bits_ceil // 4) / len(formatted_groups))
     hex_length_rounded = hex_length + (hex_length % 2)
-    formatted_groups = list((f"0x%0{hex_length_rounded}x" % n for n in formatted_groups))
+    formatted_groups = list(
+        (f"0x%0{hex_length_rounded}x" % n for n in formatted_groups)
+    )
     return formatted_groups
 
 
@@ -167,22 +195,23 @@ def bits(n):
 
 def binList(byteIterable, maxPadding=8):
     """
-        Converts a byte array to a string of bits
+    Converts a byte array to a string of bits
     """
     bits = list()
     for byte in byteIterable:
         binaryData = bin(byte)[2:]
-        paddedBinary = ("0"*maxPadding)[len(binaryData):] + binaryData
+        paddedBinary = ("0" * maxPadding)[len(binaryData) :] + binaryData
         bits.append(paddedBinary)
     print("-".join(bits))
 
 
 def fromBinList(binaryString, split=8):
     """
-        Converts a string of bits into an array of numbers
+    Converts a string of bits into an array of numbers
     """
-    bitGroups = list((binaryString[i:i+split]
-                      for i in range(0, len(binaryString), split)))
+    bitGroups = list(
+        (binaryString[i : i + split] for i in range(0, len(binaryString), split))
+    )
     numberGroups = (str(int(x, 2)) for x in bitGroups)
     print("-".join(bitGroups))
     print("-".join(numberGroups))
@@ -253,7 +282,11 @@ def timestamp():
     """
     utc_offset_sec = time.altzone if time.localtime().tm_isdst else time.timezone
     utc_offset = datetime.timedelta(seconds=-utc_offset_sec)
-    return datetime.datetime.now().replace(microsecond=0, tzinfo=datetime.timezone(offset=utc_offset)).isoformat()
+    return (
+        datetime.datetime.now()
+        .replace(microsecond=0, tzinfo=datetime.timezone(offset=utc_offset))
+        .isoformat()
+    )
 
 
 def utc(epoch_seconds: int = None, ms: int = None):
@@ -274,7 +307,9 @@ def seconds(time_str: str):
     split_time = time_str.split(":")
     if len(split_time) != 3:
         raise Exception("bad time input")
-    total_seconds = int(split_time[0]) * 60 * 60 + int(split_time[1]) * 60 + int(split_time[2])
+    total_seconds = (
+        int(split_time[0]) * 60 * 60 + int(split_time[1]) * 60 + int(split_time[2])
+    )
     return total_seconds
 
 
@@ -288,18 +323,20 @@ def clip(start, stop):
     return {"start": startSeconds, "stop": stopSeconds, "duration": durationSeconds}
 
 
-def fmt(num):
+def fmt(num: int):
     return format(num, "_")
 
 
 def hex_bytes(bytes_input, encoding="S", hex_display="\\x", delimiter=""):
     """
-      Convert bytes to a hex string\n
-      S = Single byte\n
-      l = 16 bit little endian\n
-      b = 16 bit big endian
+    Convert bytes to a hex string\n
+    S = Single byte\n
+    l = 16 bit little endian\n
+    b = 16 bit big endian
     """
-    display_bytes = [(f"0x%0{2}x" % i).replace("0x", hex_display) for i in bytes(bytes_input)]
+    display_bytes = [
+        (f"0x%0{2}x" % i).replace("0x", hex_display) for i in bytes(bytes_input)
+    ]
     if encoding == "l":
         display_bytes = [f"{i}{delimiter}{hex_display}00" for i in display_bytes]
     if encoding == "b":
@@ -316,15 +353,38 @@ def open_json(filepath: str):
 
 def get_screen_info(res_x, res_y, diag_inches):
     print("size:", diag_inches)
-    res_diag = (res_x**2 + res_y**2)**.5
+    res_diag = (res_x**2 + res_y**2) ** 0.5
     res = f"{res_x}x{res_y}"
     print("resolution:", f"{res_x}x{res_y}")
-    aspect_x, aspect_y = [[int(res_x/i), int(res_y/i)]
-                          for i in reversed(range(2, res_y)) if res_x % i == 0 and res_y % i == 0][0]
+    aspect_x, aspect_y = [
+        [int(res_x / i), int(res_y / i)]
+        for i in reversed(range(2, res_y))
+        if res_x % i == 0 and res_y % i == 0
+    ][0]
     aspect_ratio = f"{aspect_x}x{aspect_y}"
     print("aspect ratio:", f"{aspect_x}x{aspect_y}")
-    pixels = fmt(res_x*res_y)
-    print("pixels:", fmt(res_x*res_y))
-    ppi = math.ceil(res_diag/diag_inches)
-    print("ppi:", math.ceil(res_diag/diag_inches))
-    return {"size": diag_inches, "res": res, "aspect_ratio": aspect_ratio, "pixels": pixels, "ppi": ppi}
+    pixels = fmt(res_x * res_y)
+    print("pixels:", fmt(res_x * res_y))
+    ppi = math.ceil(res_diag / diag_inches)
+    print("ppi:", math.ceil(res_diag / diag_inches))
+    return {
+        "size": diag_inches,
+        "res": res,
+        "aspect_ratio": aspect_ratio,
+        "pixels": pixels,
+        "ppi": ppi,
+    }
+
+
+def toggle_hex():
+    global format_mode
+    formatter = get_ipython().display_formatter.formatters["text/plain"]  # type: ignore # noqa: F821
+    if format_mode == "hex":
+        format_mode = "decimal"
+        formatter.for_type(int, lambda n, p, cycle: p.text(f"{n:_}"))  # type: ignore
+    else:
+        format_mode = "hex"
+        formatter.for_type(int, lambda n, p, cycle: p.text(f"0x{n:02_X}"))  # type: ignore
+
+
+toggle_hex()
