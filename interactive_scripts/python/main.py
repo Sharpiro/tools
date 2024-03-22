@@ -1,5 +1,5 @@
+import sys
 import hashlib
-import inspect
 import binascii
 import math
 import secrets
@@ -7,7 +7,7 @@ import base64
 import os
 import datetime
 import time
-from typing import Literal
+from typing import Any, Literal
 import uuid
 import json
 
@@ -20,7 +20,7 @@ irreduciblePolynomial = 0x11B
 pwd = (lambda: os.getcwd())()
 
 
-def add_bin(x, y):
+def add_bin(x: int, y: int):
     carry = 0
     z = 0
     for i in range(9):
@@ -34,7 +34,7 @@ def add_bin(x, y):
     return z
 
 
-def double_and_add(n, x):
+def double_and_add(n: int, x: int):
     """
     Returns the result of n * x, computed using
     the double and add algorithm.
@@ -53,7 +53,7 @@ def double_and_add(n, x):
     return result
 
 
-def rs1024_polymod(values):
+def rs1024_polymod(values: list[int]):
     GEN = [
         0xE0E040,
         0x1C1C080,
@@ -75,24 +75,24 @@ def rs1024_polymod(values):
     return chk
 
 
-def rs1024_verify_checksum(cs, data):
+def rs1024_verify_checksum(cs: list[str], data: list[int]):
     return rs1024_polymod([ord(x) for x in cs] + data) == 1
 
 
-def rs1024_create_checksum(cs, data):
+def rs1024_create_checksum(cs: list[str], data: list[int]):
     values = [ord(x) for x in cs] + data
     polymod = rs1024_polymod(values + [0, 0, 0]) ^ 1
     return [(polymod >> 10 * (2 - i)) & 1023 for i in range(3)]
 
 
-def be(big_endian_string):
+def be(big_endian_string: str):
     """
     Converts a string of big endian bits to a number
     """
     return int(big_endian_string.replace("-", ""), 2)
 
 
-def le(little_endian_string):
+def le(little_endian_string: str):
     """
     Converts a string of little endian bits to a number
     """
@@ -112,12 +112,12 @@ def le(little_endian_string):
     return number
 
 
-def binary(number, endianness="be", sep=8, size=0, fmt="b"):
+def binary(number: int, endianness="be", sep=8, size=0, fmt="b"):
     """
     Converts a number to a string of bits.
     """
 
-    def get_max_bits(number):
+    def get_max_bits(number: int):
         min_bits = 0 if number == 0 else math.floor(math.log2(number)) + 1
         min_bits_ceil = 8 if min_bits % 8 == 0 else (min_bits + 8) - (min_bits % 8)
         max_bits = min_bits_ceil if size == 0 else size
@@ -165,7 +165,8 @@ def binary(number, endianness="be", sep=8, size=0, fmt="b"):
     if fmt == "b":
         return separated_binary
 
-    # display separated groups in a different format
+    # @todo: probably needs to move to its own function or be deleted
+    raise Exception("unimplemented")
     formatted_groups = list((int(n, 2) for n in separated_binary.split("-")))
     if fmt == "d":
         return formatted_groups
@@ -177,7 +178,22 @@ def binary(number, endianness="be", sep=8, size=0, fmt="b"):
     return formatted_groups
 
 
-def bits(n):
+def binexpr(num: int, expr_list: list[int]):
+    bin_str = binary(num, sep=0)
+    assert isinstance(bin_str, str)
+    parts: list[str] = []
+    for expr_index in expr_list:
+        if len(bin_str) == 0 or expr_index > len(bin_str):
+            raise Exception(f"reached end of binary string at '{expr_index}'")
+        part = bin_str[:expr_index]
+        parts.append(part)
+        bin_str = bin_str[expr_index:]
+
+    parts_joined = " ".join(parts)
+    return parts_joined
+
+
+def bits(n: int):
     """
     Returns an array of the binary digits of n, starting
     from the least significant bit.
@@ -185,7 +201,7 @@ def bits(n):
     bits(151) -> 1, 1, 1, 0, 1, 0, 0, 1 // 8 bits
     """
 
-    def get(n):
+    def get(n: int):
         while n < -1 or n > 0:
             yield n & 1
             n >>= 1
@@ -193,11 +209,11 @@ def bits(n):
     return list(get(n))
 
 
-def binList(byteIterable, maxPadding=8):
+def binlist(byteIterable: list[int], maxPadding=8):
     """
     Converts a byte array to a string of bits
     """
-    bits = list()
+    bits: list[str] = list()
     for byte in byteIterable:
         binaryData = bin(byte)[2:]
         paddedBinary = ("0" * maxPadding)[len(binaryData) :] + binaryData
@@ -205,7 +221,7 @@ def binList(byteIterable, maxPadding=8):
     print("-".join(bits))
 
 
-def fromBinList(binaryString, split=8):
+def fromBinList(binaryString: str, split=8):
     """
     Converts a string of bits into an array of numbers
     """
@@ -217,7 +233,7 @@ def fromBinList(binaryString, split=8):
     print("-".join(numberGroups))
 
 
-def gfMul(a, b):
+def gfMul(a: int, b: int):
     z = 0
     while a > 0:
         if a & 1 == 1:
@@ -227,10 +243,6 @@ def gfMul(a, b):
         if b & 0x100 != 0:
             b ^= irreduciblePolynomial
     return z
-
-
-def sha(data):
-    return sha256(data)
 
 
 def buffer(data="", encoding="hex"):
@@ -243,7 +255,7 @@ def buffer(data="", encoding="hex"):
     return bytearray()
 
 
-def sha256(data):
+def sha256(data: str):
     dataArray = bytearray.fromhex(data)
     hasher = hashlib.sha256()
     hasher.update(dataArray)
@@ -251,29 +263,25 @@ def sha256(data):
     return res
 
 
-def ripemd(data):
+def sha(data: str):
+    return sha256(data)
+
+
+def ripemd(data: str):
     dataArray = bytearray.fromhex(data)
     res = hashlib.new("ripemd", dataArray).hexdigest()
     return res
 
 
-def hash160(data):
+def hash160(data: str):
     dataArray = bytearray.fromhex(data)
     shaRes = hashlib.new("sha256", dataArray).digest()
     ripRes = hashlib.new("ripemd", shaRes).hexdigest()
     return ripRes
 
 
-def fast(start, end):
+def fast(start: int, end: int):
     return (end - start) % 24
-
-
-def sig(func):
-    return inspect.signature(func)
-
-
-def whatis(func):
-    return sig(func)
 
 
 def timestamp():
@@ -289,14 +297,14 @@ def timestamp():
     )
 
 
-def utc(epoch_seconds: int = None, ms: int = None):
+def utc(epoch_seconds: int | None = None, ms: int | None = None):
     if epoch_seconds is not None:
-        date = datetime.datetime.utcfromtimestamp(epoch_seconds)
+        date = datetime.datetime.fromtimestamp(epoch_seconds, datetime.UTC)
     else:
-        date = datetime.datetime.utcnow()
+        date = datetime.datetime.now(datetime.UTC)
     if ms is not None:
         date = date.replace(microsecond=ms)
-    return date.isoformat() + "Z"
+    return date.isoformat()[:-6] + "Z"
 
 
 def guid():
@@ -313,7 +321,7 @@ def seconds(time_str: str):
     return total_seconds
 
 
-def clip(start, stop):
+def clip(start: str, stop: str):
     startSeconds = seconds(start)
     stopSeconds = seconds(stop)
     durationSeconds = stopSeconds - startSeconds
@@ -327,7 +335,7 @@ def fmt(num: int):
     return format(num, "_")
 
 
-def hex_bytes(bytes_input, encoding="S", hex_display="\\x", delimiter=""):
+def hex_bytes(bytes_input: list[int], encoding="S", hex_display="\\x", delimiter=""):
     """
     Convert bytes to a hex string\n
     S = Single byte\n
@@ -351,7 +359,7 @@ def open_json(filepath: str):
     return jsonObj
 
 
-def get_screen_info(res_x, res_y, diag_inches):
+def get_screen_info(res_x: int, res_y: int, diag_inches: int):
     print("size:", diag_inches)
     res_diag = (res_x**2 + res_y**2) ** 0.5
     res = f"{res_x}x{res_y}"
@@ -387,4 +395,18 @@ def toggle_hex():
         formatter.for_type(int, lambda n, p, cycle: p.text(f"0x{n:02_X}"))  # type: ignore
 
 
-toggle_hex()
+if __name__ == "__main__":
+
+    def ipython_global_exception_handler(
+        shell: Any, etype: Any, evalue: Any, tb: Any, tb_offset: Any = None
+    ):
+        print(f"ERROR: {evalue}")
+
+    def python_global_exception_handler(exctype: Any, value: Any, traceback: Any):
+        print(f"ERROR: {value}")
+
+    sys.excepthook = python_global_exception_handler
+    if "get_ipython" in globals():
+        ip = get_ipython()  # type: ignore # noqa: F821
+        ip.set_custom_exc((Exception,), ipython_global_exception_handler)  # type: ignore
+        toggle_hex()
