@@ -112,7 +112,7 @@ def le(little_endian_string: str):
     return number
 
 
-def binary(number: int, endianness="be", sep=8, size=0, fmt="b"):
+def binary(number: int, endian="be", sep=8, size=0):
     """
     Converts a number to a string of bits.
     """
@@ -136,7 +136,7 @@ def binary(number: int, endianness="be", sep=8, size=0, fmt="b"):
         max_bits, max_bits_ceil = get_max_bits((-number << 1) - 1)
         mask = 2**max_bits_ceil - 1
         paddedBinary = bin(number & mask)[2:]
-    if endianness == "be" and max_bits_ceil == max_bits and sep <= 0:
+    if endian == "be" and max_bits_ceil == max_bits and sep <= 0:
         return paddedBinary
 
     # trim bits and arrange endianness
@@ -145,37 +145,21 @@ def binary(number: int, endianness="be", sep=8, size=0, fmt="b"):
         max_bits if len(byteGroups) <= 1 else max_bits % ((len(byteGroups) - 1) * 8)
     )
     byteGroups[0] = byteGroups[0][-sig_bits:]
-    byteGroups = byteGroups if endianness == "be" else byteGroups[::-1]
+    byteGroups = byteGroups if endian == "be" else byteGroups[::-1]
     trimmed_binary = "".join(byteGroups)
     if sep <= 0:
         return trimmed_binary
 
     # create binary string with separator
     iterator = (
-        enumerate(trimmed_binary[::-1])
-        if endianness == "be"
-        else enumerate(trimmed_binary)
+        enumerate(trimmed_binary[::-1]) if endian == "be" else enumerate(trimmed_binary)
     )
     separated_binary = "".join(
         f"-{v}" if i != 0 and i % sep == 0 else v for i, v in iterator
     )
-    separated_binary = (
-        separated_binary[::-1] if endianness == "be" else separated_binary
-    )
-    if fmt == "b":
-        return separated_binary
+    separated_binary = separated_binary[::-1] if endian == "be" else separated_binary
 
-    # @todo: probably needs to move to its own function or be deleted
-    raise Exception("unimplemented")
-    formatted_groups = list((int(n, 2) for n in separated_binary.split("-")))
-    if fmt == "d":
-        return formatted_groups
-    hex_length = math.ceil((max_bits_ceil // 4) / len(formatted_groups))
-    hex_length_rounded = hex_length + (hex_length % 2)
-    formatted_groups = list(
-        (f"0x%0{hex_length_rounded}x" % n for n in formatted_groups)
-    )
-    return formatted_groups
+    return separated_binary
 
 
 def binexpr(num: int, expr_list: list[int]):
@@ -191,6 +175,10 @@ def binexpr(num: int, expr_list: list[int]):
 
     parts_joined = " ".join(parts)
     return parts_joined
+
+
+def hexa():
+    pass
 
 
 def bits(n: int):
