@@ -1,2 +1,2 @@
 @echo off
-dotnet script %~dp0..\..\downloader\main.csx %*
+dotnet script %~dp0../../downloader/main.csx %*
