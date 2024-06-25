@@ -398,3 +398,13 @@ if __name__ == "__main__":
         ip = get_ipython()  # type: ignore # noqa: F821
         ip.set_custom_exc((Exception,), ipython_global_exception_handler)  # type: ignore
         toggle_hex()
+
+
+def xor_crypt(key: bytes, rand: bytes, data: bytes):
+    data: bytearray = bytearray(data)
+    for i in range(0, len(data)):
+        for k in key:
+            rand_b = rand[i % len(rand)] if len(rand) else 0
+            rk = (k + rand_b) % 0x100
+            data[i] = data[i] ^ rk
+    return bytes([len(rand)]) + rand + data
