@@ -243,16 +243,11 @@ def buffer(data="", encoding="hex"):
     return bytearray()
 
 
-def sha256(data: str):
-    dataArray = bytearray.fromhex(data)
+def sha256(buffer: bytes):
     hasher = hashlib.sha256()
-    hasher.update(dataArray)
-    res = hasher.hexdigest()
+    hasher.update(buffer)
+    res = hasher.digest()
     return res
-
-
-def sha(data: str):
-    return sha256(data)
 
 
 def ripemd(data: str):
@@ -385,12 +380,19 @@ def toggle_hex():
 
 def xor_crypt(key: bytes, data: bytes, rand: bytes | None = None):
     XOR_CRYPT_MAGIC = b"\x0cs@\x0c\x94em\x1f"
+    XOR_CRYPT_MAGIC_LEN = len(XOR_CRYPT_MAGIC)
+
     rand = rand if rand is not None else secrets.token_bytes(32)
-    decrypt = data[:8] == XOR_CRYPT_MAGIC
+    decrypt = data[:XOR_CRYPT_MAGIC_LEN] == XOR_CRYPT_MAGIC
+    sum_expected: bytes | None = None
     if decrypt:
-        rand_len = data[8]
-        rand = data[len(XOR_CRYPT_MAGIC) + 1 : len(XOR_CRYPT_MAGIC) + 1 + rand_len]
-        data = data[len(XOR_CRYPT_MAGIC) + 1 + rand_len :]
+        rand_len = data[XOR_CRYPT_MAGIC_LEN]
+        rand_start = XOR_CRYPT_MAGIC_LEN + 1
+        rand = data[rand_start : rand_start + rand_len]
+        sum_len = data[rand_start + rand_len]
+        sum_start = rand_start + rand_len + 1
+        sum_expected = data[sum_start : sum_start + sum_len]
+        data = data[sum_start + sum_len :]
     data_mut = bytearray(data)
     for i in range(0, len(data_mut)):
         for k in key:
@@ -398,10 +400,39 @@ def xor_crypt(key: bytes, data: bytes, rand: bytes | None = None):
             rk = (k + rand_b) % 0x100
             data_mut[i] = data_mut[i] ^ rk
 
+    sum_actual: bytes
     if decrypt:
+        sum_actual = sha256(bytes(data_mut))
+        if sum_actual != sum_expected:
+            sum_expected_hex = None if sum_expected is None else sum_expected.hex()
+            raise Exception(
+                f"invalid sum, expected '{sum_expected_hex}', actual '{sum_actual.hex()}'"
+            )
         return bytes(data_mut)
 
-    return XOR_CRYPT_MAGIC + bytes([len(rand)]) + rand + data_mut
+    sum_actual = sha256(data)
+    return (
+        XOR_CRYPT_MAGIC
+        + bytes([len(rand)])
+        + rand
+        + bytes([len(sum_actual)])
+        + sum_actual
+        + data_mut
+    )
+
+
+def read(name: bytes):
+    with open(name, "rb") as f:
+        return f.read()
+
+
+def write(name: str, data: bytes):
+    with open(name, "wb") as f:
+        return f.write(data)
+
+
+def args(*args: Any):
+    print(args)
 
 
 if __name__ == "__main__":

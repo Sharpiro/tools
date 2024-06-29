@@ -1,6 +1,5 @@
 {
   "typeCheckingMode": "strict",
-  "reportUnusedVariable": "warning",
   "reportMissingParameterType": "none",
   "reportDeprecated": "warning",
   "reportUnusedImport": "warning"
