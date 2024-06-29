@@ -383,6 +383,27 @@ def toggle_hex():
         formatter.for_type(int, lambda n, p, cycle: p.text(f"0x{n:02_X}"))  # type: ignore
 
 
+def xor_crypt(key: bytes, data: bytes, rand: bytes | None = None):
+    XOR_CRYPT_MAGIC = b"\x0cs@\x0c\x94em\x1f"
+    rand = rand if rand is not None else secrets.token_bytes(32)
+    decrypt = data[:8] == XOR_CRYPT_MAGIC
+    if decrypt:
+        rand_len = data[8]
+        rand = data[len(XOR_CRYPT_MAGIC) + 1 : len(XOR_CRYPT_MAGIC) + 1 + rand_len]
+        data = data[len(XOR_CRYPT_MAGIC) + 1 + rand_len :]
+    data_mut = bytearray(data)
+    for i in range(0, len(data_mut)):
+        for k in key:
+            rand_b = rand[i % len(rand)] if len(rand) else 0
+            rk = (k + rand_b) % 0x100
+            data_mut[i] = data_mut[i] ^ rk
+
+    if decrypt:
+        return bytes(data_mut)
+
+    return XOR_CRYPT_MAGIC + bytes([len(rand)]) + rand + data_mut
+
+
 if __name__ == "__main__":
 
     def ipython_global_exception_handler(
@@ -398,13 +419,3 @@ if __name__ == "__main__":
         ip = get_ipython()  # type: ignore # noqa: F821
         ip.set_custom_exc((Exception,), ipython_global_exception_handler)  # type: ignore
         toggle_hex()
-
-
-def xor_crypt(key: bytes, rand: bytes, data: bytes):
-    data: bytearray = bytearray(data)
-    for i in range(0, len(data)):
-        for k in key:
-            rand_b = rand[i % len(rand)] if len(rand) else 0
-            rk = (k + rand_b) % 0x100
-            data[i] = data[i] ^ rk
-    return bytes([len(rand)]) + rand + data
