@@ -243,6 +243,13 @@ def buffer(data="", encoding="hex"):
     return bytearray()
 
 
+def sha1(buffer: bytes):
+    hasher = hashlib.sha1()
+    hasher.update(buffer)
+    res = hasher.digest()
+    return res
+
+
 def sha256(buffer: bytes):
     hasher = hashlib.sha256()
     hasher.update(buffer)
@@ -375,7 +382,7 @@ def toggle_hex():
         formatter.for_type(int, lambda n, p, cycle: p.text(f"{n:_}"))  # type: ignore
     else:
         format_mode = "hex"
-        formatter.for_type(int, lambda n, p, cycle: p.text(f"0x{n:02_X}"))  # type: ignore
+        formatter.for_type(int, lambda n, p, cycle: p.text(f"0x{n:02_x}"))  # type: ignore
 
 
 def xor_crypt(key: bytes, data: bytes, rand: bytes | None = None):
