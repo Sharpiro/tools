@@ -173,7 +173,10 @@ def binexpr(num: int, expr_list: list[int]):
         parts.append(part)
         bin_str = bin_str[expr_index:]
 
-    parts_joined = " ".join(parts)
+    parts_joined = "-".join(parts)
+    if len(bin_str):
+        parts_joined += "-" + bin_str
+        pass
     return parts_joined
 
 

@@ -207,7 +207,7 @@ def test_large_le_big_size_big_sep():
 
 class TestBinExpr:
     def test_bin_expr(self):
-        expected = "1110 001 1000 0 1010 0011 1011 11001100"
+        expected = "1110-001-1000-0-1010-0011-1011-11001100"
         actual = binexpr(0xE30A3BCC, [4, 3, 4, 1, 4, 4, 4, 8])
         assert expected == actual
 
@@ -220,3 +220,8 @@ class TestBinExpr:
         with raises(Exception) as e:
             binexpr(0xE30A3BCC, [4, 3, 4, 1, 4, 4, 4, 9])
         assert "reached end of binary string at '9'" in str(e.value)
+
+    def test_bin_expr_rest(self):
+        expected = "1110-001-1000-010100011101111001100"
+        actual = binexpr(0xE30A3BCC, [4, 3, 4])
+        assert expected == actual
