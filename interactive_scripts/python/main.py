@@ -1,3 +1,4 @@
+import platform
 import sys
 import hashlib
 import binascii
@@ -7,7 +8,7 @@ import base64
 import os
 import datetime
 import time
-from typing import Any, Literal
+from typing import Any, Callable, Literal
 import uuid
 import json
 
@@ -292,9 +293,9 @@ def timestamp():
 
 def utc(epoch_seconds: int | None = None, ms: int | None = None):
     if epoch_seconds is not None:
-        date = datetime.datetime.fromtimestamp(epoch_seconds, datetime.UTC)
+        date = datetime.datetime.fromtimestamp(epoch_seconds, datetime.timezone.utc)
     else:
-        date = datetime.datetime.now(datetime.UTC)
+        date = datetime.datetime.now(datetime.timezone.utc)
     if ms is not None:
         date = date.replace(microsecond=ms)
     return date.isoformat()[:-6] + "Z"
@@ -443,6 +444,48 @@ def write(name: str, data: bytes):
 
 def args(*args: Any):
     print(args)
+
+
+def clear_screen():
+    if platform.system() == "Windows":
+        os.system("cls")
+    else:
+        os.system("clear")
+
+
+def repeat(
+    func: Callable[[], None | Any],
+    interval: int = 1,
+    rand: bool = False,
+    verbose: bool = False,
+    inline: bool = False,
+    clear: bool = True,
+):
+    if clear:
+        clear_screen()
+    if rand:
+        interval += 1
+    if verbose:
+        print("verbose: interval", interval)
+        print("verbose: rand", rand)
+    try:
+        while True:
+            result = func()
+            if result is not None:
+                if inline:
+                    print(f" {result}", end="\r")
+                else:
+                    print(result)
+            computed_interval = secrets.randbelow(interval + 1) if rand else interval
+            if verbose:
+                print(
+                    "verbose: interval", datetime.timedelta(seconds=computed_interval)
+                )
+            time.sleep(computed_interval)
+    except Exception:
+        pass
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == "__main__":
