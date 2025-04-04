@@ -11,6 +11,8 @@ import time
 from typing import Any, Callable, Literal
 import uuid
 import json
+from time import sleep
+import shutil
 
 base64 = base64
 secrets = secrets
@@ -482,6 +484,31 @@ def repeat(
                     "verbose: interval", datetime.timedelta(seconds=computed_interval)
                 )
             time.sleep(computed_interval)
+    except Exception:
+        pass
+    except KeyboardInterrupt:
+        pass
+
+
+def progress(sleep_ms: int = 1_000):
+    print("\033[?25l\033[2J\033[H", end="")  # hide cursor
+    width, _ = shutil.get_terminal_size()
+    total_ticks = width - 2
+    progress = 0
+    try:
+        while True:
+            print("\033[2J\033[H", end="")  # clear screen
+            print("[", end="", flush=True)
+            for i in range(0, total_ticks):
+                if i < progress:
+                    print(".", end="", flush=True)
+                else:
+                    print(" ", end="", flush=True)
+            print("]", end="", flush=True)
+            progress += 1
+            if progress == total_ticks:
+                progress = 0
+            sleep(sleep_ms / 1_000)
     except Exception:
         pass
     except KeyboardInterrupt:
