@@ -13,6 +13,7 @@ import uuid
 import json
 from time import sleep
 import shutil
+from ctypes import c_int32
 
 base64 = base64
 secrets = secrets
@@ -513,6 +514,10 @@ def progress(sleep_ms: int = 1_000):
         pass
     except KeyboardInterrupt:
         pass
+
+
+def i32(num: int):
+    return c_int32(num).value
 
 
 if __name__ == "__main__":
