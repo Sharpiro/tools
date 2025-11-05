@@ -13,7 +13,7 @@ import uuid
 import json
 from time import sleep
 import shutil
-from ctypes import c_int32
+from ctypes import *
 
 base64 = base64
 secrets = secrets
@@ -516,8 +516,16 @@ def progress(sleep_ms: int = 1_000):
         pass
 
 
+def i8(num: int):
+    return c_int8(num).value
+
+
 def i32(num: int):
     return c_int32(num).value
+
+
+def utf8(char: str) -> list[int]:
+    return list(char.encode())
 
 
 if __name__ == "__main__":
