@@ -14,6 +14,7 @@ import json
 from time import sleep
 import shutil
 from ctypes import *
+from pathlib import Path
 
 base64 = base64
 secrets = secrets
