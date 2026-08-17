@@ -543,4 +543,5 @@ if __name__ == "__main__":
     if "get_ipython" in globals():
         ip = get_ipython()  # type: ignore # noqa: F821
         ip.set_custom_exc((Exception,), ipython_global_exception_handler)  # type: ignore
-        toggle_hex()
+        # @note rm for default hex
+        # toggle_hex()
