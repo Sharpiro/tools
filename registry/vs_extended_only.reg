@@ -1,7 +1,0 @@
-; move visual studio to extended
-[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\background\shell\AnyCode]
-"Icon"="\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\Common7\\IDE\\devenv.exe\",0"
-"Extended"=""
-[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shell\AnyCode]
-"Icon"="\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\Common7\\IDE\\devenv.exe\",0"
-"Extended"=""
